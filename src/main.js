@@ -10,6 +10,14 @@ const sizes ={
   height: window.innerHeight
 }
 
+const yAxisVinyl = []
+
+const raycasterObjects = [];
+let currentIntersects = [];
+
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
+
 // Loaders
 const textureLoader = new THREE.TextureLoader();
 
@@ -116,9 +124,27 @@ const screenGlassMaterial = new THREE.MeshPhysicalMaterial({
   polygonOffsetUnits: -1,
 });
 
+window.addEventListener("mousemove", (e) => {
+  pointer.x = ( e.clientX / window.innerWidth) * 2 - 1;
+  pointer.y = -(e.clientY / window.innerHeight) * 2 + 1;
+});
+
 loader.load("/models/Room_Portfolio.glb", (glb) => {
   glb.scene.traverse((child) => {
     if (child.isMesh) {
+      const raycasterNameTags = [
+        "_Zeroth",
+        "_First",
+        "_Second",
+        "_Third",
+        "_Fourth",
+        "_Fifth",
+        "_Sixth",
+      ];
+      if (raycasterNameTags.some((tag) => child.name.includes(tag))) {
+        raycasterObjects.push(child);
+      }
+
       if (child.name.includes("Water")) {
           child.material = new THREE.MeshBasicMaterial({
             color: 0x558bc8,
@@ -146,6 +172,10 @@ loader.load("/models/Room_Portfolio.glb", (glb) => {
               });
 
             child.material = material;
+
+            if(child.name.includes("Vinyl")){
+              yAxisVinyl.push(child);
+            }
 
             if(child.material.map){
             child.material.map.minFilter = THREE.LinearFilter;
@@ -202,10 +232,34 @@ window.addEventListener("resize", ()=>{
 const render = () =>{
   controls.update();
 
-  console.log(camera.position);
-  console.log("0000000000");
-  console.log(controls.target);
+  // console.log(camera.position);
+  // console.log("0000000000");
+  // console.log(controls.target);
 
+  // animate vinyl
+  yAxisVinyl.forEach((fan) => {
+    fan.rotation.y += 0.03;
+  });
+
+  // Raycaster
+  raycaster.setFromCamera( pointer, camera);
+
+  currentIntersects = raycaster.intersectObjects(raycasterObjects);
+
+  for (let i = 0; i < currentIntersects.length; i++) {
+  }
+
+  if (currentIntersects.length > 0) {
+    const currentIntersectObject = currentIntersects[0].object
+
+    if (currentIntersectObject.name.includes("Pointer")) {
+      document.body.style.cursor = "pointer";
+    } else {
+      document.body.style.cursor = "default";
+    }
+  } else {
+    document.body.style.cursor = "default";
+  }
 
   renderer.render( scene, camera );
 
