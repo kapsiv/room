@@ -166,9 +166,9 @@ const camera = new THREE.PerspectiveCamera(
 );
 
 camera.position.set(
-  -38.44019158594338,
-  18.26488478861603,
-  -39.38105389743106
+  -41.66822005077931,
+  19.380888256626005,
+  -42.571184190344454
 );
 
 const renderer = new THREE.WebGLRenderer({canvas:canvas, antialias: true });
@@ -180,9 +180,9 @@ controls.enableDamping = true;
 controls.dampingFactor = 0.05;
 controls.update();
 controls.target.set(
-  -35.806181017068816,
-  17.341277234245965,
-  -36.63324214350354
+  0,
+  0,
+  0
 )
 
 // Event listeners
@@ -205,7 +205,6 @@ const render = () =>{
   console.log(camera.position);
   console.log("0000000000");
   console.log(controls.target);
-
 
   renderer.render( scene, camera );
 
