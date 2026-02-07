@@ -3,12 +3,47 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import gsap from "gsap"
 
 const canvas = document.querySelector("#experience-canvas")
 const sizes ={
   width: window.innerWidth,
   height: window.innerHeight
 }
+
+const modals = {
+  blu: document.querySelector(".modal.blu"),
+  reflectiv: document.querySelector(".modal.reflectiv"),
+  archive: document.querySelector(".modal.archive"),
+};
+
+document.querySelectorAll(".modal-exit-button").forEach(button=>{
+  button.addEventListener("click", (e) => {
+    const modal = e.target.closest(".modal");
+    hideModal(modal);
+  })
+})
+
+const showModal = (modal) => {
+  modal.style.display = "block";
+
+  gsap.set(modal, { opacity: 0});
+
+  gsap.to(modal, {
+    opacity: 1,
+    duration: 0.5,
+  });
+};
+
+const hideModal = (modal) => {
+  gsap.to(modal, {
+    opacity: 0,
+    duration: 0.5,
+    onComplete: () => {
+      modal.style.display = "none";
+    },
+  });
+};
 
 const yAxisVinyl = []
 
@@ -128,6 +163,38 @@ window.addEventListener("mousemove", (e) => {
   pointer.x = ( e.clientX / window.innerWidth) * 2 - 1;
   pointer.y = -(e.clientY / window.innerHeight) * 2 + 1;
 });
+
+window.addEventListener("touchstart", (e) => {
+  e.preventDefault()
+  pointer.x = ( e.touches[0].clientX / window.innerWidth) * 2 - 1;
+  pointer.y = -(e.touches[0].clientY / window.innerHeight) * 2 + 1;
+  },
+  { passive: false }
+);
+
+window.addEventListener("touchend", (e) => {
+  e.preventDefault()
+  handleRaycasterInteraction()
+  },
+  { passive: false }
+);
+
+function handleRaycasterInteraction(){
+  if (currentIntersects.length > 0) {
+    const object = currentIntersects[0].object;
+
+    if (object.name.includes("Blu")) {
+      showModal(modals.blu);
+    } else if (object.name.includes("Vinyl")) {
+      showModal(modals.reflectiv);
+    } else if (object.name.includes("Bin")) {
+      showModal(modals.archive);
+    }
+  }
+}
+
+window.addEventListener("click", handleRaycasterInteraction);
+
 
 loader.load("/models/Room_Portfolio.glb", (glb) => {
   glb.scene.traverse((child) => {
