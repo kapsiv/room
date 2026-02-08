@@ -78,6 +78,70 @@ const hideModal = (modal) => {
   });
 };
 
+const stringAudioByIndex = {
+  1: new Audio("/audio/guitar-string-1.mp3"),
+  2: new Audio("/audio/guitar-string-2.mp3"),
+  3: new Audio("/audio/guitar-string-3.mp3"),
+  4: new Audio("/audio/guitar-string-4.mp3"),
+};
+
+Object.values(stringAudioByIndex).forEach((a) => {
+  a.preload = "auto";
+});
+
+let audioUnlocked = false;
+
+function unlockAudio() {
+  if (audioUnlocked) return;
+
+  const first = stringAudioByIndex[1];
+  if (!first) return;
+
+  const prevVol = first.volume;
+  first.volume = 0;
+
+  first.play()
+    .then(() => {
+      first.pause();
+      first.currentTime = 0;
+      first.volume = prevVol;
+      audioUnlocked = true;
+      console.log("Audio working");
+    })
+    .catch((err) => {
+      console.warn("Audio unlock failed:", err);
+    });
+}
+
+canvas.addEventListener("pointerdown", unlockAudio, { once: true });
+
+function playStringSoundByIndex(i) {
+  if (!audioUnlocked) return;
+
+  const base = stringAudioByIndex[i];
+  if (!base) return;
+
+  const a = base.cloneNode(true);
+  a.currentTime = 0;
+  a.volume = 0.85;
+  a.play().catch((err) => {
+    console.warn("Audio play failed:", err);
+  });
+}
+
+function getGuitarStringIndex(object) {
+  let cur = object;
+  while (cur) {
+    const name = typeof cur.name === "string" ? cur.name : "";
+
+    const m = name.match(/Guitar\.?0*([1-4])_Fifth/i);
+    if (m) return Number(m[1]);
+
+    cur = cur.parent;
+  }
+  return null;
+}
+
 const yAxisVinyl = []
 
 const raycasterObjects = [];
@@ -86,6 +150,8 @@ let currentHoveredObject = null;
 
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
+
+const hoverGroups = new Map();
 
 // Loaders
 const textureLoader = new THREE.TextureLoader();
@@ -215,26 +281,51 @@ window.addEventListener("touchend", (e) => {
   { passive: false }
 );
 
-function handleRaycasterInteraction(){
-  if (currentIntersects.length > 0) {
-    const object = currentIntersects[0].object;
+function handleRaycasterInteraction() {
+  if (isModalOpen) return;
+  if (currentIntersects.length === 0) return;
 
-    if (object.name.includes("Blu")) {
-      showModal(modals.blu);
-    } else if (object.name.includes("Vinyl")) {
-      showModal(modals.reflectiv);
-    } else if (object.name.includes("Bin")) {
-      showModal(modals.archive);
-    }
+  const hitObject = currentIntersects[0].object;
+
+  const stringIndex = getGuitarStringIndex(hitObject);
+  if (stringIndex) {
+    playStringSoundByIndex(stringIndex);
+    return;
   }
+
+  if (hitObject.name.includes("Blu")) {
+    showModal(modals.blu);
+  } else if (hitObject.name.includes("Vinyl")) {
+    showModal(modals.reflectiv);
+  } else if (hitObject.name.includes("Bin")) {
+    showModal(modals.archive);
+  }
+}
+
+function getHoverRoot(obj) {
+  let cur = obj;
+  while (cur) {
+    if (cur.name === "Guitar_HoverGroup") return cur;
+    cur = cur.parent;
+  }
+  return obj;
 }
 
 window.addEventListener("click", handleRaycasterInteraction);
 
 
 loader.load("/models/Room_Portfolio_V3.glb", (glb) => {
+  let guitarMesh = null;
+  const guitarParts = [];
+
   glb.scene.traverse((child) => {
     if (child.isMesh) {
+      if (child.name === "Guitar_Fifth_Hover") guitarMesh = child;
+
+      if (child.name.includes("Guitar")) {
+        guitarParts.push(child)
+      }
+
       const raycasterNameTags = [
         "_Zeroth",
         "_First",
@@ -295,7 +386,29 @@ loader.load("/models/Room_Portfolio_V3.glb", (glb) => {
     }
   });
   scene.add(glb.scene);
+
+  if (guitarMesh && guitarParts.length) {
+    const guitarGroup = new THREE.Group();
+    guitarGroup.name = "Guitar_HoverGroup";
+
+    guitarGroup.position.copy(guitarMesh.position);
+    guitarGroup.quaternion.copy(guitarMesh.quaternion);
+    guitarGroup.scale.copy(guitarMesh.scale);
+
+    guitarMesh.parent.add(guitarGroup);
+
+    guitarParts.forEach((part) => {
+      part.updateMatrixWorld(true);
+      guitarGroup.attach(part);
+    });
+
+    guitarGroup.userData.initialScale = guitarGroup.scale.clone();
+
+    raycasterObjects.push(guitarGroup);
+  }
 });
+
+
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(
@@ -351,7 +464,7 @@ function playHoverAnimation (object, isHovering){
 
   const canRotate = object.name.includes("Otamatone");
   if (canRotate) {
-    gsap.killTweensOf (Object.rotation);
+    gsap.killTweensOf (object.rotation);
   }
 
   if (isHovering){
@@ -365,7 +478,7 @@ function playHoverAnimation (object, isHovering){
 
   if (canRotate) {
     gsap.to(object.rotation, {
-      x: object.userData.initialRotation.x + Math.PI / 8,
+      x: object.userData.initialRotation.x - Math.PI / 20,
       duration: 0.5,
       ease: "bounce.out(1.8)",
     });
@@ -406,33 +519,38 @@ const render = () =>{
   if (!isModalOpen){
     raycaster.setFromCamera( pointer, camera);
     
-    currentIntersects = raycaster.intersectObjects(raycasterObjects);
+    currentIntersects = raycaster.intersectObjects(raycasterObjects, true);
     
     for (let i = 0; i < currentIntersects.length; i++) {
     }
     
     if (currentIntersects.length > 0) {
-      const currentIntersectObject = currentIntersects[0].object
+      const hitObject = currentIntersects[0].object;
       
-      if (currentIntersectObject.name.includes("Hover")) {
-        if (currentIntersectObject !== currentHoveredObject) {
+      const hoverRoot = getHoverRoot(hitObject);
+
+      if (hoverRoot.name.includes("Hover")) {
+        if (hoverRoot !== currentHoveredObject) {
           
           if(currentHoveredObject){
             playHoverAnimation(currentHoveredObject, false);
           }
           
-          playHoverAnimation(currentIntersectObject, true);
-          currentHoveredObject = currentIntersectObject;
+          playHoverAnimation(hoverRoot, true);
+          currentHoveredObject = hoverRoot;
+        }
+      } else {
+        if (currentHoveredObject) {
+          playHoverAnimation(currentHoveredObject, false);
+          currentHoveredObject = null;
         }
       }
       
-      if (currentIntersectObject.name.includes("Pointer")) {
-        document.body.style.cursor = "pointer";
-      } else {
-        document.body.style.cursor = "default";
-      }
-    } else {
-      if(currentHoveredObject){
+
+    document.body.style.cursor = hitObject.name.includes("Pointer") ? "pointer" : "default";
+  } else {
+
+      if (currentHoveredObject) {
         playHoverAnimation(currentHoveredObject, false);
         currentHoveredObject = null;
       }
