@@ -142,6 +142,10 @@ function getGuitarStringIndex(object) {
   return null;
 }
 
+let chairTop;
+let marimo;
+let hourHand;
+let minuteHand;
 const yAxisVinyl = []
 
 const raycasterObjects = [];
@@ -293,7 +297,7 @@ function handleRaycasterInteraction() {
     return;
   }
 
-  if (hitObject.name.includes("Blu")) {
+  if (hitObject.name.includes("Blu_Body")) {
     showModal(modals.blu);
   } else if (hitObject.name.includes("Vinyl")) {
     showModal(modals.reflectiv);
@@ -320,6 +324,29 @@ loader.load("/models/Room_Portfolio_V3.glb", (glb) => {
 
   glb.scene.traverse((child) => {
     if (child.isMesh) {
+
+      if (child.name.includes("Clock_H_Second")) {
+        hourHand = child;
+        child.userData.initialRotation = new THREE.Euler().copy(child.rotation);
+      }
+
+      if (child.name.includes("Clock_M_Second")) {
+        minuteHand = child;
+        child.userData.initialRotation = new THREE.Euler().copy(child.rotation);
+      }
+
+      if(child.name.includes("Marimo_Sixth_Hover")) {
+        marimo = child;
+        child.userData.initialPosition = new THREE.Vector3().copy(
+          child.position
+        );
+      }
+
+      if(child.name.includes("Chair_Top")) {
+        chairTop = child;
+        child.userData.initialRotation = new THREE.Euler().copy(child.rotation);
+      }
+
       if (child.name === "Guitar_Fifth_Hover") guitarMesh = child;
 
       if (child.name.includes("Guitar")) {
@@ -349,7 +376,7 @@ loader.load("/models/Room_Portfolio_V3.glb", (glb) => {
           child.material = new THREE.MeshBasicMaterial({
             color: 0x558bc8,
             transparent: true,
-            opacity: 0.66,
+            opacity: 0.45,
             depthWrite: false,
           });
         } else if (child.name.includes("Glass")){
@@ -503,9 +530,25 @@ function playHoverAnimation (object, isHovering){
   }
 }
 
-const render = () =>{
-  controls.update();
+const updateClockHands = () => {
+  if (!hourHand || !minuteHand) return;
 
+  const now = new Date();
+  const hours = now.getHours() % 12;
+  const minutes = now.getMinutes();
+  const seconds = now.getSeconds();
+
+  const minuteAngle = (minutes + seconds / 60) * ((Math.PI * 2) / 60);
+
+  const hourAngle = (hours + minutes / 60) * ((Math.PI * 2) / 12);
+
+  minuteHand.rotation.x = -minuteAngle;
+  hourHand.rotation.x = -hourAngle;
+};
+
+const render = (timestamp) =>{
+  controls.update();
+  updateClockHands();
   // console.log(camera.position);
   // console.log("0000000000");
   // console.log(controls.target);
@@ -514,6 +557,28 @@ const render = () =>{
   yAxisVinyl.forEach((fan) => {
     fan.rotation.y += 0.03;
   });
+
+  // rotate chair
+  if (chairTop) {
+    const time = timestamp * 0.001;
+    const baseAmplitude = Math.PI / 8;
+
+    const rotationOffset =
+      baseAmplitude *
+      Math.sin(time * 0.5) *
+      (1 - Math.abs(Math.sin(time * 0.5)) * 0.3);
+
+    chairTop.rotation.y = chairTop.userData.initialRotation.y + rotationOffset;
+  }
+
+  // marimo bobbing
+  if (marimo) {
+    const time = timestamp * 0.0015;
+    const amplitude = 0.12;
+    const position =
+      amplitude * Math.sin(time) * (1 - Math.abs(Math.sin(time)) * 0.1);
+    marimo.position.y = marimo.userData.initialPosition.y + position;
+  }
 
   // Raycaster
   if (!isModalOpen){
