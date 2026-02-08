@@ -42,8 +42,20 @@ document.querySelectorAll(".modal-exit-button").forEach(button => {
   );
 });
 
+let isModalOpen = false;
+
 const showModal = (modal) => {
   modal.style.display = "block";
+  isModalOpen = true;
+  controls.enabled = false;
+
+  if (currentHoveredObject) {
+    playHoverAnimation(currentHoveredObject, false);
+    currentHoveredObject = null;
+  }
+
+  document.body.style.cursor = 'default';
+  currentIntersects = [];
 
   gsap.set(modal, { opacity: 0});
 
@@ -54,6 +66,9 @@ const showModal = (modal) => {
 };
 
 const hideModal = (modal) => {
+  isModalOpen = false;
+  controls.enabled = true;
+
   gsap.to(modal, {
     opacity: 0,
     duration: 0.5,
@@ -185,7 +200,8 @@ window.addEventListener("mousemove", (e) => {
 });
 
 window.addEventListener("touchstart", (e) => {
-  e.preventDefault()
+  if(isModalOpen) return;
+  e.preventDefault();
   pointer.x = ( e.touches[0].clientX / window.innerWidth) * 2 - 1;
   pointer.y = -(e.touches[0].clientY / window.innerHeight) * 2 + 1;
   },
@@ -193,8 +209,8 @@ window.addEventListener("touchstart", (e) => {
 );
 
 window.addEventListener("touchend", (e) => {
-  e.preventDefault()
-  handleRaycasterInteraction()
+  e.preventDefault();
+  handleRaycasterInteraction();
   },
   { passive: false }
 );
@@ -216,7 +232,7 @@ function handleRaycasterInteraction(){
 window.addEventListener("click", handleRaycasterInteraction);
 
 
-loader.load("/models/Room_Portfolio_V2.glb", (glb) => {
+loader.load("/models/Room_Portfolio_V3.glb", (glb) => {
   glb.scene.traverse((child) => {
     if (child.isMesh) {
       const raycasterNameTags = [
@@ -236,7 +252,6 @@ loader.load("/models/Room_Portfolio_V2.glb", (glb) => {
         child.userData.initialScale = new THREE.Vector3().copy(child.scale);
         child.userData.initialPosition = new THREE.Vector3().copy(child.position);
         child.userData.initialRotation = new THREE.Vector3().copy(child.rotation);
-        child.userData.isAnimatingn = false;
       }
 
       if (child.name.includes("Water")) {
@@ -300,8 +315,11 @@ renderer.setSize(sizes.width , sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
 const controls = new OrbitControls( camera, renderer.domElement );
+
+
 controls.enableDamping = true;
 controls.dampingFactor = 0.05;
+
 controls.update();
 controls.target.set(
   0,
@@ -324,9 +342,12 @@ window.addEventListener("resize", ()=>{
 })
 
 function playHoverAnimation (object, isHovering){
-  if (object.userData.isAnimating) return;
+  gsap.killTweensOf(object.scale);
 
-  object.userData.isAnimating = true;
+  const canRotate = object.name.includes("Otamatone");
+  if (canRotate) {
+    gsap.killTweensOf (Object.rotation);
+  }
 
   if (isHovering){
     gsap.to(object.scale, {
@@ -336,14 +357,15 @@ function playHoverAnimation (object, isHovering){
       duration: 0.5,
       ease: "bounce.out(1.8)",
     });
+
+  if (canRotate) {
     gsap.to(object.rotation, {
       x: object.userData.initialRotation.x + Math.PI / 8,
       duration: 0.5,
       ease: "bounce.out(1.8)",
-      onComplete: () => {
-        object.userData.isAnimating = false;
-      },
     });
+  }
+    
   } else {
     gsap.to(object.scale, {
       x: object.userData.initialScale.x,
@@ -352,14 +374,14 @@ function playHoverAnimation (object, isHovering){
       duration: 0.3,
       ease: "bounce.out(1.8)",
     });
-    gsap.to(object.rotation, {
-      x: object.userData.initialRotation.x + Math.PI / 8,
-      duration: 0.3,
-      ease: "bounce.out(1.8)",
-      onComplete: () => {
-        object.userData.isAnimating = false;
-      },
-    });
+
+    if (canRotate) {
+      gsap.to(object.rotation, {
+        x: object.userData.initialRotation.x,
+        duration: 0.3,
+        ease: "bounce.out(1.8)",
+      });
+    }
   }
 }
 
@@ -376,44 +398,46 @@ const render = () =>{
   });
 
   // Raycaster
-  raycaster.setFromCamera( pointer, camera);
-
-  currentIntersects = raycaster.intersectObjects(raycasterObjects);
-
-  for (let i = 0; i < currentIntersects.length; i++) {
-  }
-
-  if (currentIntersects.length > 0) {
-    const currentIntersectObject = currentIntersects[0].object
-
-    if (currentIntersectObject.name.includes("Hover")) {
-      if (currentIntersectObject !== currentHoveredObject) {
-        
-        if(currentHoveredObject){
-          playHoverAnimation(currentHoveredObject, false);
-        }
-
-        playHoverAnimation(currentIntersectObject, true);
-        currentHoveredObject = currentIntersectObject;
-      }
+  if (!isModalOpen){
+    raycaster.setFromCamera( pointer, camera);
+    
+    currentIntersects = raycaster.intersectObjects(raycasterObjects);
+    
+    for (let i = 0; i < currentIntersects.length; i++) {
     }
-
-    if (currentIntersectObject.name.includes("Pointer")) {
-      document.body.style.cursor = "pointer";
+    
+    if (currentIntersects.length > 0) {
+      const currentIntersectObject = currentIntersects[0].object
+      
+      if (currentIntersectObject.name.includes("Hover")) {
+        if (currentIntersectObject !== currentHoveredObject) {
+          
+          if(currentHoveredObject){
+            playHoverAnimation(currentHoveredObject, false);
+          }
+          
+          playHoverAnimation(currentIntersectObject, true);
+          currentHoveredObject = currentIntersectObject;
+        }
+      }
+      
+      if (currentIntersectObject.name.includes("Pointer")) {
+        document.body.style.cursor = "pointer";
+      } else {
+        document.body.style.cursor = "default";
+      }
     } else {
+      if(currentHoveredObject){
+        playHoverAnimation(currentHoveredObject, false);
+        currentHoveredObject = null;
+      }
       document.body.style.cursor = "default";
     }
-  } else {
-    if(currentHoveredObject){
-          playHoverAnimation(currentHoveredObject, false);
-          currentHoveredObject = null;
-        }
-    document.body.style.cursor = "default";
   }
-
-  renderer.render( scene, camera );
-
-  window.requestAnimationFrame(render);
+    
+    renderer.render( scene, camera );
+    
+    window.requestAnimationFrame(render);
 }
-
+  
 render();
