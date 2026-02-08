@@ -148,6 +148,36 @@ let hourHand;
 let minuteHand;
 const yAxisVinyl = []
 
+let bookBlue,
+  bookGreen,
+  bookYellow,
+  bookOrange,
+  bookPurple,
+  bookBrown,
+  bookRed,
+  logo1,
+  logo2,
+  logo3,
+  logo4,
+  logo5,
+  logo6,
+  slipper1,
+  slipper2,
+  light1,
+  light2,
+  light3,
+  light4,
+  light5,
+  light6,
+  light7,
+  light8,
+  light9,
+  light10,
+  lilypad1,
+  lilypad2,
+  lilypad3,
+  lilypad4;
+
 const raycasterObjects = [];
 let currentIntersects = [];
 let currentHoveredObject = null;
@@ -325,14 +355,18 @@ loader.load("/models/Room_Portfolio_V3.glb", (glb) => {
   glb.scene.traverse((child) => {
     if (child.isMesh) {
 
+
+
       if (child.name.includes("Clock_H_Second")) {
         hourHand = child;
         child.userData.initialRotation = new THREE.Euler().copy(child.rotation);
+        child.raycast = () => {};
       }
 
       if (child.name.includes("Clock_M_Second")) {
         minuteHand = child;
         child.userData.initialRotation = new THREE.Euler().copy(child.rotation);
+        child.raycast = () => {};
       }
 
       if(child.name.includes("Marimo_Sixth_Hover")) {
@@ -370,6 +404,95 @@ loader.load("/models/Room_Portfolio_V3.glb", (glb) => {
         child.userData.initialScale = new THREE.Vector3().copy(child.scale);
         child.userData.initialPosition = new THREE.Vector3().copy(child.position);
         child.userData.initialRotation = new THREE.Vector3().copy(child.rotation);
+      }
+
+      if (child.name.includes("Book_Blue")) {
+        bookBlue = child;
+        child.scale.set(0, 0, 0);
+      } else if (child.name.includes("Book_Green")) {
+        bookGreen = child;
+        child.scale.set(0, 0, 0);
+      } else if (child.name.includes("Book_Yellow")) {
+        bookYellow = child;
+        child.scale.set(0, 0, 0);
+      } else if (child.name.includes("Book_Orange")) {
+        bookOrange = child;
+        child.scale.set(0, 0, 0);
+      } else if (child.name.includes("Book_Purple")) {
+        bookPurple = child;
+        child.scale.set(0, 0, 0);
+      } else if (child.name.includes("Book_Brown")) {
+        bookBrown = child;
+        child.scale.set(0, 0, 0);
+      } else if (child.name.includes("Book_Red")) {
+        bookRed = child;
+        child.scale.set(0, 0, 0);
+      } else if (child.name.includes("Kapsiv_Logo001")) {
+        logo1 = child;
+        child.scale.set(0, 0, 0);
+      } else if (child.name.includes("Kapsiv_Logo002")) {
+        logo2 = child;
+        child.scale.set(0, 0, 0);
+      } else if (child.name.includes("Kapsiv_Logo003")) {
+        logo3 = child;
+        child.scale.set(0, 0, 0);
+      } else if (child.name.includes("Kapsiv_Logo004")) {
+        logo4 = child;
+        child.scale.set(0, 0, 0);
+      } else if (child.name.includes("Kapsiv_Logo005")) {
+        logo5 = child;
+        child.scale.set(0, 0, 0);
+      } else if (child.name.includes("Kapsiv_Logo006")) {
+        logo6 = child;
+        child.scale.set(0, 0, 0);
+      } else if (child.name.includes("Slipper_Left")) {
+        slipper1 = child;
+        child.scale.set(0, 0, 0);
+      } else if (child.name.includes("Slipper_Right")) {
+        slipper2 = child;
+        child.scale.set(0, 0, 0);
+      } else if (child.name.includes("Lights_1001")) {
+        light1 = child;
+        child.scale.set(0, 0, 0);
+      } else if (child.name.includes("Lights_1002")) {
+        light2 = child;
+        child.scale.set(0, 0, 0);
+      } else if (child.name.includes("Lights_1003")) {
+        light3 = child;
+        child.scale.set(0, 0, 0);
+      } else if (child.name.includes("Lights_1004")) {
+        light4 = child;
+        child.scale.set(0, 0, 0);
+      } else if (child.name.includes("Lights_1005")) {
+        light5 = child;
+        child.scale.set(0, 0, 0);
+      } else if (child.name.includes("Lights_1006")) {
+        light6 = child;
+        child.scale.set(0, 0, 0);
+      } else if (child.name.includes("Lights_2001")) {
+        light7 = child;
+        child.scale.set(0, 0, 0);
+      } else if (child.name.includes("Lights_2002")) {
+        light8 = child;
+        child.scale.set(0, 0, 0);
+      } else if (child.name.includes("Lights_2003")) {
+        light9 = child;
+        child.scale.set(0, 0, 0);
+      } else if (child.name.includes("Lights_2004")) {
+        light10 = child;
+        child.scale.set(0, 0, 0);
+      } else if (child.name.includes("Lilypad_1")) {
+        lilypad1 = child;
+        child.scale.set(0, 0, 0);
+      } else if (child.name.includes("Lilypad_2")) {
+        lilypad2 = child;
+        child.scale.set(0, 0, 0);
+      } else if (child.name.includes("Lilypad_3")) {
+        lilypad3 = child;
+        child.scale.set(0, 0, 0);
+      } else if (child.name.includes("Lilypad_4")) {
+        lilypad4 = child;
+        child.scale.set(0, 0, 0);
       }
 
       if (child.name.includes("Water")) {
@@ -414,6 +537,8 @@ loader.load("/models/Room_Portfolio_V3.glb", (glb) => {
   });
   scene.add(glb.scene);
 
+  playIntroAnimation();
+
   if (guitarMesh && guitarParts.length) {
     const guitarGroup = new THREE.Group();
     guitarGroup.name = "Guitar_HoverGroup";
@@ -435,7 +560,60 @@ loader.load("/models/Room_Portfolio_V3.glb", (glb) => {
   }
 });
 
+function playIntroAnimation() {
+  const t1 = gsap.timeline({
+    defaults: {
+      duration: 0.8,
+      ease: "back.out(1.8)",
+    },
+  });
 
+  const items = [
+    bookBlue,
+    bookGreen,
+    bookYellow,
+    bookOrange,
+    bookPurple,
+    bookBrown,
+    bookRed,
+    logo1,
+    logo2,
+    logo3,
+    logo4,
+    logo5,
+    logo6,
+    slipper1,
+    slipper2,
+    light1,
+    light2,
+    light3,
+    light4,
+    light5,
+    light6,
+    light7,
+    light8,
+    light9,
+    light10,
+    lilypad1,
+    lilypad2,
+    lilypad3,
+    lilypad4,
+  ];
+
+  let started = false;
+
+  items.forEach((obj) => {
+    if (!obj || !obj.scale) return;
+
+    if (!started) {
+      t1.to(obj.scale, { x: 1, y: 1, z: 1 });
+      started = true;
+      return;
+    }
+
+    t1.to(obj.scale, { x: 1, y: 1, z: 1 }, "-=0.6");
+  });
+}
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(
@@ -486,7 +664,7 @@ window.addEventListener("resize", ()=>{
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 })
 
-function playHoverAnimation (object, isHovering){
+function playHoverAnimation (object, isHovering) {
   gsap.killTweensOf(object.scale);
 
   const canRotate = object.name.includes("Otamatone");
@@ -542,8 +720,10 @@ const updateClockHands = () => {
 
   const hourAngle = (hours + minutes / 60) * ((Math.PI * 2) / 12);
 
-  minuteHand.rotation.x = -minuteAngle;
-  hourHand.rotation.x = -hourAngle;
+  const CLOCK_ROTATION_OFFSET = -Math.PI / 2;
+
+  minuteHand.rotation.x = -minuteAngle - CLOCK_ROTATION_OFFSET;
+  hourHand.rotation.x = -hourAngle - CLOCK_ROTATION_OFFSET;
 };
 
 const render = (timestamp) =>{
