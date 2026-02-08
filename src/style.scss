@@ -1,11 +1,16 @@
+@use "./styles/fonts.scss";
+@use "./styles/reset.scss";
+@use "./styles/variables.scss" as vars;
+
 * {
   margin: 0;;
   padding: 0;
   box-sizing: border-box;
+  font-family: 'Ubuntu Mono';
 }
 
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Ubuntu Mono', system-ui, Avenir, Helvetica, Arial, sans-serif;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -34,9 +39,11 @@
   position: absolute;
   top: 50%;
   left: 50%;
+  max-width: 700px;
+  width: 100%;
   transform: translate(-50%,-50%);
   font-size: 32px;
   z-index: 9999;
   display: none;
-  background-color: black;
+  background-color: vars.$base-beige;
 }
