@@ -67,6 +67,7 @@ const yAxisVinyl = []
 
 const raycasterObjects = [];
 let currentIntersects = [];
+let currentHoveredObject = null;
 
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
@@ -215,7 +216,7 @@ function handleRaycasterInteraction(){
 window.addEventListener("click", handleRaycasterInteraction);
 
 
-loader.load("/models/Room_Portfolio.glb", (glb) => {
+loader.load("/models/Room_Portfolio_V2.glb", (glb) => {
   glb.scene.traverse((child) => {
     if (child.isMesh) {
       const raycasterNameTags = [
@@ -229,6 +230,13 @@ loader.load("/models/Room_Portfolio.glb", (glb) => {
       ];
       if (raycasterNameTags.some((tag) => child.name.includes(tag))) {
         raycasterObjects.push(child);
+      }
+
+      if (child.name.includes("Hover")) {
+        child.userData.initialScale = new THREE.Vector3().copy(child.scale);
+        child.userData.initialPosition = new THREE.Vector3().copy(child.position);
+        child.userData.initialRotation = new THREE.Vector3().copy(child.rotation);
+        child.userData.isAnimatingn = false;
       }
 
       if (child.name.includes("Water")) {
@@ -315,6 +323,46 @@ window.addEventListener("resize", ()=>{
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 })
 
+function playHoverAnimation (object, isHovering){
+  if (object.userData.isAnimating) return;
+
+  object.userData.isAnimating = true;
+
+  if (isHovering){
+    gsap.to(object.scale, {
+      x: object.userData.initialScale.x * 1.2,
+      y: object.userData.initialScale.y * 1.2,
+      z: object.userData.initialScale.z * 1.2,
+      duration: 0.5,
+      ease: "bounce.out(1.8)",
+    });
+    gsap.to(object.rotation, {
+      x: object.userData.initialRotation.x + Math.PI / 8,
+      duration: 0.5,
+      ease: "bounce.out(1.8)",
+      onComplete: () => {
+        object.userData.isAnimating = false;
+      },
+    });
+  } else {
+    gsap.to(object.scale, {
+      x: object.userData.initialScale.x,
+      y: object.userData.initialScale.y,
+      z: object.userData.initialScale.z,
+      duration: 0.3,
+      ease: "bounce.out(1.8)",
+    });
+    gsap.to(object.rotation, {
+      x: object.userData.initialRotation.x + Math.PI / 8,
+      duration: 0.3,
+      ease: "bounce.out(1.8)",
+      onComplete: () => {
+        object.userData.isAnimating = false;
+      },
+    });
+  }
+}
+
 const render = () =>{
   controls.update();
 
@@ -338,12 +386,28 @@ const render = () =>{
   if (currentIntersects.length > 0) {
     const currentIntersectObject = currentIntersects[0].object
 
+    if (currentIntersectObject.name.includes("Hover")) {
+      if (currentIntersectObject !== currentHoveredObject) {
+        
+        if(currentHoveredObject){
+          playHoverAnimation(currentHoveredObject, false);
+        }
+
+        playHoverAnimation(currentIntersectObject, true);
+        currentHoveredObject = currentIntersectObject;
+      }
+    }
+
     if (currentIntersectObject.name.includes("Pointer")) {
       document.body.style.cursor = "pointer";
     } else {
       document.body.style.cursor = "default";
     }
   } else {
+    if(currentHoveredObject){
+          playHoverAnimation(currentHoveredObject, false);
+          currentHoveredObject = null;
+        }
     document.body.style.cursor = "default";
   }
 
