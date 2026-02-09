@@ -146,6 +146,7 @@ let chairTop;
 let marimo;
 let hourHand;
 let minuteHand;
+const monsteras = [];
 const yAxisVinyl = []
 
 let bookBlue,
@@ -346,7 +347,7 @@ function getHoverRoot(obj) {
 window.addEventListener("click", handleRaycasterInteraction);
 
 
-loader.load("/models/Room_Portfolio_V3.glb", (glb) => {
+loader.load("/models/Room_Portfolio_V4.glb", (glb) => {
   let guitarMesh = null;
   const guitarParts = [];
 
@@ -379,6 +380,14 @@ loader.load("/models/Room_Portfolio_V3.glb", (glb) => {
         child.userData.initialRotation = new THREE.Euler().copy(child.rotation);
       }
 
+      if (child.name.includes("Monstera")) {
+        monsteras.push(child);
+        child.userData.initialRotation = new THREE.Euler().copy(child.rotation);
+        child.userData.swayPhase = Math.random() * Math.PI * 2;
+        child.userData.swaySpeed = 0.45 + Math.random() * 0.25;
+        child.userData.swayAmp = 0.03 + Math.random() * 0.02;
+      }
+
       if (child.name === "Guitar_Fifth_Hover") guitarMesh = child;
 
       if (child.name.includes("Guitar")) {
@@ -395,7 +404,11 @@ loader.load("/models/Room_Portfolio_V3.glb", (glb) => {
         "_Sixth",
       ];
       if (raycasterNameTags.some((tag) => child.name.includes(tag))) {
-        raycasterObjects.push(child);
+        if (child.name.includes("Hover")) {
+          raycasterObjects.push(child);
+        } else {
+          raycasterObjects.push(child);
+        }
       }
 
       if (child.name.includes("Hover")) {
@@ -553,6 +566,10 @@ loader.load("/models/Room_Portfolio_V3.glb", (glb) => {
     });
 
     guitarGroup.userData.initialScale = guitarGroup.scale.clone();
+    guitarGroup.userData.initialRotation = new THREE.Euler().copy(guitarGroup.rotation);
+    guitarGroup.userData.hoverTiltX = Math.PI / 24;
+    guitarGroup.userData.hoverTiltY = Math.PI / 24;
+    guitarGroup.userData.initialQuaternion = guitarGroup.quaternion.clone();
 
     raycasterObjects.push(guitarGroup);
   }
@@ -706,46 +723,157 @@ window.addEventListener("resize", ()=>{
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 })
 
-function playHoverAnimation (object, isHovering) {
-  gsap.killTweensOf(object.scale);
+function getHoverScaleMultiplier(name) {
+  if (typeof name !== "string") return 1;
+  if (name === "Guitar_HoverGroup") return 0.92;
 
-  const canRotate = object.name.includes("Otamatone");
+  if (name.includes("Pea_Plant00")) return 1.55;
+  if (name.includes("Pick")) return 1.7;
+  if (name.includes("Leaf")) return 1.12;
+  if (name.includes("Lilypad")) return 1.12;
+  if (name.includes("Box")) return 1.1;
+  if (name.includes("Otamatone")) return 1.15;
+  if (name.includes("Amp")) return 0.9;
+
+  return 1;
+}
+
+function playHoverAnimation (object, isHovering) {
+  const target = object;
+  const hoverEase = "back.out(1.35)";
+  const returnEase = "power2.out";
+
+  if (!target.userData.initialScale) {
+    target.userData.initialScale = new THREE.Vector3().copy(target.scale);
+  }
+  if (!target.userData.initialPosition) {
+    target.userData.initialPosition = new THREE.Vector3().copy(target.position);
+  }
+  if (!target.userData.initialRotation) {
+    target.userData.initialRotation = new THREE.Euler().copy(target.rotation);
+  }
+
+  gsap.killTweensOf(target.scale);
+  gsap.killTweensOf(target.position);
+
+  const isButton = typeof target.name === "string" && target.name.includes("Button");
+  const isLogo = typeof target.name === "string" && target.name.includes("Logo");
+
+  const isGuitar = target.name === "Guitar_HoverGroup";
+  const canRotate = target.name.includes("Otamatone") || isGuitar;
+
   if (canRotate) {
-    gsap.killTweensOf (object.rotation);
+    if (isGuitar) {
+      gsap.killTweensOf(target.quaternion);
+    } else {
+      gsap.killTweensOf(target.rotation);
+    }
   }
 
   if (isHovering){
-    gsap.to(object.scale, {
-      x: object.userData.initialScale.x * 1.2,
-      y: object.userData.initialScale.y * 1.2,
-      z: object.userData.initialScale.z * 1.2,
-      duration: 0.5,
-      ease: "bounce.out(1.8)",
-    });
+    if (isButton) {
+      gsap.to(target.scale, {
+        x: target.userData.initialScale.x,
+        y: target.userData.initialScale.y,
+        z: target.userData.initialScale.z,
+        duration: 0.15,
+        ease: "power2.out",
+      });
 
-  if (canRotate) {
-    gsap.to(object.rotation, {
-      x: object.userData.initialRotation.x - Math.PI / 20,
-      duration: 0.5,
-      ease: "bounce.out(1.8)",
-    });
-  }
-    
+      gsap.to(target.position, {
+        y: target.userData.initialPosition.y - 0.08,
+        duration: 0.18,
+        ease: "power2.out",
+      });
+    } else {
+      const baseHoverScale = 1.2;
+      const mult = getHoverScaleMultiplier(target.name);
+      const hoverTarget = baseHoverScale * mult;
+
+      gsap.to(target.scale, {
+        x: target.userData.initialScale.x * hoverTarget,
+        y: target.userData.initialScale.y * hoverTarget,
+        z: target.userData.initialScale.z * hoverTarget,
+        duration: 0.5,
+        ease: hoverEase,
+      });
+
+      if (isLogo) {
+        gsap.to(target.position, {
+          y: target.userData.initialPosition.y + 0.32,
+          duration: 0.35,
+          ease: "power2.out",
+        });
+      }
+    }
+
+    if (canRotate) {
+      if (isGuitar) {
+        const tiltX = target.userData.hoverTiltX ?? Math.PI / 18;
+        const tiltY = target.userData.hoverTiltY ?? Math.PI / 18;
+
+        const deltaEuler = new THREE.Euler(-tiltX, tiltY, 0, "YXZ");
+        const deltaQ = new THREE.Quaternion().setFromEuler(deltaEuler);
+
+        const initialQ = target.userData.initialQuaternion
+          ? target.userData.initialQuaternion.clone()
+          : target.quaternion.clone();
+        const targetQ = initialQ.clone().multiply(deltaQ);
+
+        gsap.to(target.quaternion, {
+          x: targetQ.x,
+          y: targetQ.y,
+          z: targetQ.z,
+          w: targetQ.w,
+          duration: 0.5,
+          ease: hoverEase,
+          onUpdate: () => target.quaternion.normalize(),
+        });
+      } else {
+        gsap.to(target.rotation, {
+          x: target.userData.initialRotation.x - Math.PI / 20,
+          duration: 0.5,
+          ease: hoverEase,
+        });
+      }
+    }
+
   } else {
-    gsap.to(object.scale, {
-      x: object.userData.initialScale.x,
-      y: object.userData.initialScale.y,
-      z: object.userData.initialScale.z,
+    gsap.to(target.scale, {
+      x: target.userData.initialScale.x,
+      y: target.userData.initialScale.y,
+      z: target.userData.initialScale.z,
       duration: 0.3,
-      ease: "bounce.out(1.8)",
+      ease: returnEase,
+    });
+    gsap.to(target.position, {
+      y: target.userData.initialPosition.y,
+      duration: 0.22,
+      ease: "power2.out",
     });
 
     if (canRotate) {
-      gsap.to(object.rotation, {
-        x: object.userData.initialRotation.x,
-        duration: 0.3,
-        ease: "bounce.out(1.8)",
-      });
+      if (isGuitar) {
+        const initialQ = target.userData.initialQuaternion
+          ? target.userData.initialQuaternion
+          : target.quaternion.clone();
+
+        gsap.to(target.quaternion, {
+          x: initialQ.x,
+          y: initialQ.y,
+          z: initialQ.z,
+          w: initialQ.w,
+          duration: 0.3,
+          ease: returnEase,
+          onUpdate: () => target.quaternion.normalize(),
+        });
+      } else {
+        gsap.to(target.rotation, {
+          x: target.userData.initialRotation.x,
+          duration: 0.3,
+          ease: returnEase,
+        });
+      }
     }
   }
 }
@@ -768,12 +896,9 @@ const updateClockHands = () => {
   hourHand.rotation.x = -hourAngle - CLOCK_ROTATION_OFFSET;
 };
 
-const render = (timestamp) =>{
+const render = (timestamp = 0) => {
   controls.update();
   updateClockHands();
-  // console.log(camera.position);
-  // console.log("0000000000");
-  // console.log(controls.target);
 
   // animate vinyl
   yAxisVinyl.forEach((fan) => {
@@ -802,27 +927,43 @@ const render = (timestamp) =>{
     marimo.position.y = marimo.userData.initialPosition.y + position;
   }
 
+  // monstera sway
+  if (monsteras.length) {
+    const t = timestamp * 0.001;
+    monsteras.forEach((plant) => {
+      const base = plant.userData.initialRotation;
+      const phase = plant.userData.swayPhase || 0;
+      const speed = plant.userData.swaySpeed || 0.45;
+      const amp = plant.userData.swayAmp || 0.04;
+
+      const swayA = Math.sin(t * speed + phase) * amp;
+      const swayB =
+        Math.sin(t * (speed * 0.8) + phase * 1.7) * (amp * 0.6);
+
+      plant.rotation.y = base.y + swayA;
+      plant.rotation.z = base.z + swayB;
+    });
+  }
+
   // Raycaster
-  if (!isModalOpen){
-    raycaster.setFromCamera( pointer, camera);
-    
+  if (!isModalOpen) {
+    raycaster.setFromCamera(pointer, camera);
+
     currentIntersects = raycaster.intersectObjects(raycasterObjects, true);
-    
-    for (let i = 0; i < currentIntersects.length; i++) {
-    }
-    
+
     if (currentIntersects.length > 0) {
       const hitObject = currentIntersects[0].object;
-      
       const hoverRoot = getHoverRoot(hitObject);
+
+      document.body.style.cursor = hitObject.name.includes("Pointer")
+        ? "pointer"
+        : "default";
 
       if (hoverRoot.name.includes("Hover")) {
         if (hoverRoot !== currentHoveredObject) {
-          
-          if(currentHoveredObject){
+          if (currentHoveredObject) {
             playHoverAnimation(currentHoveredObject, false);
           }
-          
           playHoverAnimation(hoverRoot, true);
           currentHoveredObject = hoverRoot;
         }
@@ -832,11 +973,7 @@ const render = (timestamp) =>{
           currentHoveredObject = null;
         }
       }
-      
-
-    document.body.style.cursor = hitObject.name.includes("Pointer") ? "pointer" : "default";
-  } else {
-
+    } else {
       if (currentHoveredObject) {
         playHoverAnimation(currentHoveredObject, false);
         currentHoveredObject = null;
@@ -844,10 +981,9 @@ const render = (timestamp) =>{
       document.body.style.cursor = "default";
     }
   }
-    
-    renderer.render( scene, camera );
-    
-    window.requestAnimationFrame(render);
-}
-  
-render();
+
+  renderer.render(scene, camera);
+  window.requestAnimationFrame(render);
+};
+
+window.requestAnimationFrame(render);
