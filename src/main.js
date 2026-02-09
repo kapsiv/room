@@ -185,8 +185,6 @@ let currentHoveredObject = null;
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
 
-const hoverGroups = new Map();
-
 // Loaders
 const textureLoader = new THREE.TextureLoader();
 
@@ -561,58 +559,100 @@ loader.load("/models/Room_Portfolio_V3.glb", (glb) => {
 });
 
 function playIntroAnimation() {
-  const t1 = gsap.timeline({
-    defaults: {
-      duration: 0.8,
-      ease: "back.out(1.8)",
-    },
-  });
+  const basePopDuration = 0.6;
+  const settleDuration = 0.15;
+  const overlap = "-=0.45";
+  const overshoot = 1.15;
 
-  const items = [
-    bookBlue,
-    bookGreen,
-    bookYellow,
-    bookOrange,
-    bookPurple,
-    bookBrown,
-    bookRed,
-    logo1,
-    logo2,
-    logo3,
-    logo4,
-    logo5,
-    logo6,
-    slipper1,
-    slipper2,
-    light1,
-    light2,
-    light3,
-    light4,
-    light5,
-    light6,
-    light7,
-    light8,
-    light9,
-    light10,
-    lilypad1,
-    lilypad2,
-    lilypad3,
-    lilypad4,
-  ];
+  const master = gsap.timeline();
 
-  let started = false;
+  function addSequence(items, opts = {}) {
+    const {
+      startOffset = 0,
+      speedMultiplier = 1,
+      jitter = 0.08,
+    } = opts;
 
-  items.forEach((obj) => {
-    if (!obj || !obj.scale) return;
+    const tl = gsap.timeline({ delay: startOffset });
 
-    if (!started) {
-      t1.to(obj.scale, { x: 1, y: 1, z: 1 });
-      started = true;
-      return;
-    }
+    let first = true;
 
-    t1.to(obj.scale, { x: 1, y: 1, z: 1 }, "-=0.6");
-  });
+    items.forEach((obj) => {
+      if (!obj || !obj.scale) return;
+
+      const popDuration =
+        basePopDuration * speedMultiplier * (1 + (Math.random() - 0.5) * jitter);
+
+      const tweenVars = {
+        keyframes: [
+          {
+            x: overshoot,
+            y: overshoot,
+            z: overshoot,
+            duration: popDuration,
+            ease: "back.out(2.6)",
+          },
+          {
+            x: 1,
+            y: 1,
+            z: 1,
+            duration: settleDuration,
+            ease: "power2.out",
+          },
+        ],
+      };
+
+      if (first) {
+        tl.to(obj.scale, tweenVars);
+        first = false;
+      } else {
+        tl.to(obj.scale, tweenVars, overlap);
+      }
+    });
+
+    return tl;
+  }
+
+  // intro sequences
+  master.add(
+    addSequence(
+      [bookBlue, bookGreen, bookYellow, bookOrange, bookPurple, bookBrown, bookRed],
+      { startOffset: 0.0, speedMultiplier: 1.0 }
+    ),
+    0
+  );
+
+  master.add(
+    addSequence([logo1, logo2, logo3, logo4, logo5, logo6], {
+      startOffset: 0.1,
+      speedMultiplier: 0.95,
+    }),
+    0
+  );
+
+  master.add(
+    addSequence([slipper1, slipper2], {
+      startOffset: 0.18,
+      speedMultiplier: 1.05,
+    }),
+    0
+  );
+
+  master.add(
+    addSequence(
+      [light1, light2, light3, light4, light5, light6, light7, light8, light9, light10],
+      { startOffset: 0.05, speedMultiplier: 0.9 }
+    ),
+    0
+  );
+
+  master.add(
+    addSequence([lilypad1, lilypad2, lilypad3, lilypad4], {
+      startOffset: 0.22,
+      speedMultiplier: 1.1,
+    }),
+    0
+  );
 }
 
 const scene = new THREE.Scene();
@@ -627,6 +667,8 @@ camera.position.set(
   18.26488478861603,
   -39.38105389743106
 );
+
+scene.background = new THREE.Color("#b8aaa5");
 
 const renderer = new THREE.WebGLRenderer({canvas:canvas, antialias: true });
 renderer.setSize(sizes.width , sizes.height);
