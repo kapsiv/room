@@ -1,9 +1,11 @@
 import './style.scss'
+
+import gsap from "gsap";
 import * as THREE from 'three';
-import { OrbitControls } from './utils/OrbitControls.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import gsap from "gsap";
+
+import { OrbitControls } from './utils/OrbitControls.js';
 
 let isModalOpen = false;
 
@@ -72,9 +74,7 @@ function playLoadingReveal() {
     );
 }
 
-manager.onLoad = function () {
-  playLoadingReveal();
-};
+manager.onLoad = () => playLoadingReveal();
 
 const canvas = document.querySelector("#experience-canvas")
 const sizes ={
