@@ -19,7 +19,6 @@
 }
 
 // Experience
-
 #experience {
   position: fixed;
   height: 100%;
@@ -46,4 +45,28 @@
   z-index: 9999;
   display: none;
   background-color: vars.$base-beige;
+}
+
+// Loading screen
+.loading-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  z-index: 9999;
+  background: #d9d2c5;
+  width: 140vw;
+  height: 140vh;
+  transform: translate(-50%, -50%) scale(1);
+  border-radius: 28px;
+  border: 10px solid #4e4738;
+  box-sizing: border-box;
+  pointer-events: auto;
+}
+
+.loading-logo {
+  width: 300px;
+  height: auto;
 }

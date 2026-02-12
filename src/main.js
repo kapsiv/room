@@ -8,71 +8,56 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from './utils/OrbitControls.js';
 
 let isModalOpen = false;
-
-
 let isLoading = true;
 let loadingRevealStarted = false;
-
 const manager = new THREE.LoadingManager();
 
-let loadingScreen = document.querySelector(".loading-screen");
+const loadingScreen = document.querySelector(".loading-screen");
 
-if (!loadingScreen) {
-  loadingScreen = document.createElement("div");
-  loadingScreen.className = "loading-screen";
-  document.body.appendChild(loadingScreen);
+if (loadingScreen) {
+  isModalOpen = true;
+
+  const logoPath = document.querySelector("#logo");
+  if (logoPath) {
+    const pathLength = logoPath.getTotalLength();
+
+    logoPath.style.strokeDasharray = pathLength;
+    logoPath.style.strokeDashoffset = pathLength;
+
+    gsap.to(logoPath, {
+      strokeDashoffset: 0,
+      duration: 2,
+      ease: "power2.inOut",
+    });
+  }
 }
-
-loadingScreen.style.display = "block";
-loadingScreen.style.position = "fixed";
-loadingScreen.style.left = "50%";
-loadingScreen.style.top = "50%";
-loadingScreen.style.zIndex = "9999";
-loadingScreen.style.background = "#d9d2c5";
-
-loadingScreen.style.width = "140vw";
-loadingScreen.style.height = "140vh";
-loadingScreen.style.transform = "translate(-50%, -50%) scale(1)";
-
-loadingScreen.style.borderRadius = "28px";
-loadingScreen.style.border = "10px solid #4e4738";
-loadingScreen.style.boxSizing = "border-box";
-loadingScreen.style.pointerEvents = "auto";
-
-isModalOpen = true;
 
 function playLoadingReveal() {
   if (loadingRevealStarted) return;
   loadingRevealStarted = true;
-
   const tl = gsap.timeline();
-
   tl.to(loadingScreen, {
-    scale: 0.62,
-    duration: 1.05,
+    scale: 0.54,
+    duration: 2,
     ease: "power4.inOut",
-  })
-    .to(
-      loadingScreen,
-      {
-        y: "220vh",
-        rotateX: 20,
-        rotateY: -2,
-        rotateZ: 60,
-        opacity: 0,
-        transformPerspective: 1400,
-        duration: 1.2,
-        ease: "power4.inOut",
-        onComplete: () => {
-          isLoading = false;
-          isModalOpen = false;
-          playIntroAnimation();
-          loadingScreen.remove();
-        },
+  }).to(
+    loadingScreen,
+    {
+      y: "220vh",
+      opacity: 0,
+      duration: 1.2,
+      ease: "power4.inOut",
+      onComplete: () => {
+        isLoading = false;
+        isModalOpen = false;
+        playIntroAnimation();
+        loadingScreen.remove();
       },
-      "-=0.1"
-    );
+    },
+    "-=0.1"
+  );
 }
+
 
 manager.onLoad = () => playLoadingReveal();
 
