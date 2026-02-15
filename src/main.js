@@ -424,8 +424,293 @@ const screenVideoMaterial = new THREE.MeshBasicMaterial({
   map: videoTexture,
 });
 
+// screen 1 texture
+
+const terminalCanvas = document.createElement("canvas");
+terminalCanvas.width = 1024;
+terminalCanvas.height = 1024;
+const terminalCtx = terminalCanvas.getContext("2d");
+const terminalLines = [];
+const terminalQueue = [];
+const terminalMaxLines = 20;
+let lastTerminalHoverKey = "";
+let typingLine = "";
+let typingCharIndex = 0;
+let terminalLastTypeAt = 0;
+let terminalLastCursorToggleAt = 0;
+let terminalCursorVisible = true;
+
+const terminalTypeIntervalMs = 26;
+const terminalCursorBlinkMs = 460;
+const terminalMaxQueuedLines = 60;
+
+const screenTerminalTexture = new THREE.CanvasTexture(terminalCanvas);
+screenTerminalTexture.colorSpace = THREE.SRGBColorSpace;
+screenTerminalTexture.flipY = true;
+screenTerminalTexture.repeat.x = -1;
+screenTerminalTexture.offset.x = 1;
+
+function wrapTerminalLine(text, maxWidth) {
+  if (!terminalCtx) return [text];
+
+  const words = text.split(" ");
+  const wrapped = [];
+  let current = "";
+
+  words.forEach((word) => {
+    const candidate = current ? `${current} ${word}` : word;
+    if (terminalCtx.measureText(candidate).width <= maxWidth) {
+      current = candidate;
+      return;
+    }
+
+    if (current) {
+      wrapped.push(current);
+      current = "";
+    }
+
+    if (terminalCtx.measureText(word).width <= maxWidth) {
+      current = word;
+      return;
+    }
+
+    let chunk = "";
+    for (const ch of word) {
+      const next = chunk + ch;
+      if (terminalCtx.measureText(next).width > maxWidth) {
+        if (chunk) wrapped.push(chunk);
+        chunk = ch;
+      } else {
+        chunk = next;
+      }
+    }
+    current = chunk;
+  });
+
+  if (current) {
+    wrapped.push(current);
+  }
+
+  return wrapped.length ? wrapped : [text];
+}
+
+function drawTerminal() {
+  if (!terminalCtx) return;
+
+  const width = terminalCanvas.width;
+  const height = terminalCanvas.height;
+  const rightEdge = Math.floor(width * 0.72);
+  const textColumnWidth = Math.floor(width * 0.27);
+  const padX = rightEdge - textColumnWidth;
+  const leftInset = 100;
+  const textStartX = padX + leftInset;
+  const padY = 280;
+  const lineHeight = 20;
+  const maxTextWidth = textColumnWidth - leftInset;
+
+  terminalCtx.fillStyle = "#d9d2c5";
+  terminalCtx.fillRect(0, 0, width, height);
+
+  terminalCtx.fillStyle = "#4e4738";
+  terminalCtx.font = "700 16px 'Ubuntu Mono', monospace";
+  terminalCtx.textBaseline = "top";
+
+  const wrappedLog = [];
+  terminalLines.forEach((line) => {
+    wrappedLog.push(...wrapTerminalLine(line, maxTextWidth));
+  });
+
+  const inProgressLine = typingLine ? typingLine.slice(0, typingCharIndex) : "";
+  const wrappedTypingLine = inProgressLine ? wrapTerminalLine(inProgressLine, maxTextWidth) : [];
+  const renderLines = [...wrappedLog, ...wrappedTypingLine];
+
+  const visibleLines = renderLines.slice(-terminalMaxLines);
+  const startY = height - padY - visibleLines.length * lineHeight;
+
+  visibleLines.forEach((line, i) => {
+    const y = startY + i * lineHeight;
+    terminalCtx.fillText(line, textStartX, y);
+  });
+
+  if (terminalCursorVisible) {
+    const visibleStartIndex = Math.max(0, renderLines.length - terminalMaxLines);
+    let cursorLineGlobalIndex = 0;
+    let cursorLineText = "";
+
+    if (typingLine) {
+      if (wrappedTypingLine.length > 0) {
+        cursorLineGlobalIndex = wrappedLog.length + wrappedTypingLine.length - 1;
+        cursorLineText = wrappedTypingLine[wrappedTypingLine.length - 1];
+      } else {
+        cursorLineGlobalIndex = wrappedLog.length;
+        cursorLineText = "";
+      }
+    } else if (renderLines.length > 0) {
+      cursorLineGlobalIndex = renderLines.length - 1;
+      cursorLineText = renderLines[renderLines.length - 1];
+    }
+
+    const cursorLineVisibleIndex = cursorLineGlobalIndex - visibleStartIndex;
+    const cursorY = startY + cursorLineVisibleIndex * lineHeight;
+    const cursorX = textStartX + terminalCtx.measureText(cursorLineText).width + 2;
+
+    terminalCtx.fillRect(cursorX, cursorY + 2, 2, lineHeight - 4);
+  }
+
+  screenTerminalTexture.needsUpdate = true;
+}
+
+function appendTerminalLine(text) {
+  terminalQueue.push(text);
+
+  if (terminalQueue.length > terminalMaxQueuedLines) {
+    terminalQueue.splice(0, terminalQueue.length - terminalMaxQueuedLines);
+  }
+}
+
+function updateTerminalTyping(timestampMs) {
+  if (!terminalCtx) return;
+
+  if (!typingLine && terminalQueue.length > 0) {
+    typingLine = terminalQueue.shift() || "";
+    typingCharIndex = 0;
+    terminalLastTypeAt = timestampMs;
+  }
+
+  if (typingLine && timestampMs - terminalLastTypeAt >= terminalTypeIntervalMs) {
+    typingCharIndex += 1;
+    terminalLastTypeAt = timestampMs;
+
+    if (typingCharIndex >= typingLine.length) {
+      terminalLines.push(typingLine);
+      if (terminalLines.length > terminalMaxLines * 2) {
+        terminalLines.splice(0, terminalLines.length - terminalMaxLines * 2);
+      }
+      typingLine = "";
+      typingCharIndex = 0;
+    }
+  }
+
+  if (timestampMs - terminalLastCursorToggleAt >= terminalCursorBlinkMs) {
+    terminalCursorVisible = !terminalCursorVisible;
+    terminalLastCursorToggleAt = timestampMs;
+  }
+
+  drawTerminal();
+}
+
+function toTerminalLabel(rawName) {
+  return rawName
+    .replace(/_Hover$/i, "")
+    .replace(/\d+/g, "")
+    .replace(/_+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/\b(First|Second|Third|Fourth|Fifth|Sixth)\b/gi, "")
+    .toLowerCase();
+}
+
+const hoverMessages = {
+  guitar: [
+    "click the strings to play",
+    "yamaha c40",
+  ],
+  vinyl: [
+    "analogue music",
+    "vinyl spinning at 33.3",
+    "reflectiv",
+  ],
+  blu: [
+    "meow meow",
+    "meow meow meow",
+    "meow x3",
+  ],
+  bin: [
+    "old stuff",
+  ],
+  marimo: [
+    "bob the marimo",
+    "marimo stil alive",
+  ],
+  otamatone: [
+    "the coltrane of otamatone",
+    "kilometers davis",
+    "otamatonious monk",
+  ],
+  amp: [
+    "vox av15",
+    "treble at 0",
+    "slight reverb",
+  ],
+  mug: [
+    "tea, milk no sugar",
+    "caution, contents hot",
+    "wide-bottom mug",
+  ],
+  plant: [
+    "plont",
+    "do monsteras grow in water",
+    "peas in a pod",
+    "bology",
+  ],
+  default: [
+    "%label% detected",
+    "hovering on %label%",
+    "%label% written",
+    "%label% loaded",
+  ],
+};
+
+function pickRandom(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function getTodayGmtDateLabel() {
+  return new Intl.DateTimeFormat("en-GB", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(new Date()).toLowerCase();
+}
+
+function buildHoverTerminalLine(rawName) {
+  const name = rawName || "UNKNOWN_NODE";
+  if (name.includes("Keyboard") || name.includes("Chair_Top")) return null;
+  if (name.includes("Calendar")) return `the date is ${getTodayGmtDateLabel()}`;
+  const label = toTerminalLabel(name);
+
+  let pool = hoverMessages.default;
+  if (name.includes("Guitar")) pool = hoverMessages.guitar;
+  else if (name.includes("Vinyl")) pool = hoverMessages.vinyl;
+  else if (name.includes("Blu")) pool = hoverMessages.blu;
+  else if (name.includes("Bin")) pool = hoverMessages.bin;
+  else if (name.includes("Marimo")) pool = hoverMessages.marimo;
+  else if (name.includes("Otamatone")) pool = hoverMessages.otamatone;
+  else if (name.includes("Amp")) pool = hoverMessages.amp;
+  else if (name.includes("Mug")) pool = hoverMessages.mug;
+  else if (name.includes("Plant") || name.includes("Leaf") || name.includes("Monstera")) {
+    pool = hoverMessages.plant;
+  }
+
+  return pickRandom(pool).replace("%label%", label);
+}
+
+appendTerminalLine(":: booting kapsiv");
+appendTerminalLine(":: click objects !");
+appendTerminalLine("‎");
+appendTerminalLine("‎       ████");
+appendTerminalLine("‎          ██");
+appendTerminalLine("‎    █████████████");
+appendTerminalLine("‎  ███     ███  ███");
+appendTerminalLine("‎  ██      ███   ███");
+appendTerminalLine("‎  ███     ██    ███");
+appendTerminalLine("‎   ████████ ██████");
+appendTerminalLine("‎      ███ █████");
+appendTerminalLine("‎ ");
+
 const screenStaticMaterial = new THREE.MeshBasicMaterial({
-  color: "#d9d2c5",
+  map: screenTerminalTexture,
 });
 
 const screenGlassMaterial = new THREE.MeshPhysicalMaterial({
@@ -1058,6 +1343,7 @@ const updateClockHands = () => {
 };
 
 const render = (timestamp = 0) => {
+  updateTerminalTyping(timestamp);
   controls.update();
   updateClockHands();
 
@@ -1115,6 +1401,15 @@ const render = (timestamp = 0) => {
     if (currentIntersects.length > 0) {
       const hitObject = currentIntersects[0].object;
       const hoverRoot = getHoverRoot(hitObject);
+      const hoverLogKey = hoverRoot.name.includes("Hover") ? hoverRoot.name : hitObject.name;
+
+      if (hoverLogKey && hoverLogKey !== lastTerminalHoverKey) {
+        const line = buildHoverTerminalLine(hoverLogKey);
+        if (line) {
+          appendTerminalLine(line);
+        }
+        lastTerminalHoverKey = hoverLogKey;
+      }
 
       document.body.style.cursor = hitObject.name.includes("Pointer")
         ? "pointer"
