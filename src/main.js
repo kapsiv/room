@@ -1324,20 +1324,48 @@ function playHoverAnimation (object, isHovering) {
   }
 }
 
+const DEBUG_FAST_CLOCK = false;
+
 const updateClockHands = () => {
   if (!hourHand || !minuteHand) return;
 
-  const now = new Date();
-  const hours = now.getHours() % 12;
-  const minutes = now.getMinutes();
-  const seconds = now.getSeconds();
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Europe/London",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  }).formatToParts(new Date());
 
-  const minuteAngle = (minutes + seconds / 60) * ((Math.PI * 2) / 60);
+  const getPart = (type) => Number(parts.find((p) => p.type === type)?.value || 0);
 
-  const hourAngle = (hours + minutes / 60) * ((Math.PI * 2) / 12);
+  const hours = getPart("hour") % 12;
+  const minutes = getPart("minute");
+  const seconds = getPart("second");
+
+  let minuteAngle = 0;
+  let hourAngle = 0;
+
+  if (DEBUG_FAST_CLOCK) {
+    const elapsedSeconds = performance.now() * 0.001;
+    const fastMinuteCyclesPerSecond = 0.5;
+    const minuteTurns = elapsedSeconds * fastMinuteCyclesPerSecond;
+    const fullTurn = Math.PI * 2;
+
+    minuteAngle = -((minuteTurns % 1) * fullTurn);
+    hourAngle = -(((minuteTurns / 12) % 1) * fullTurn);
+  } else {
+    const minuteOffset = 17;
+    const hourOffset = 7.2;
+
+    const calibratedMinute = ((minutes + seconds / 60 - minuteOffset) % 60 + 60) % 60;
+    const calibratedHour = ((hours + minutes / 60 + seconds / 3600 - hourOffset) % 12 + 12) % 12;
+
+    minuteAngle = -(calibratedMinute * ((Math.PI * 2) / 60));
+    hourAngle = -(calibratedHour * ((Math.PI * 2) / 12));
+  }
 
   const CLOCK_ROTATION_OFFSET = -Math.PI / 2;
-
   minuteHand.rotation.x = -minuteAngle - CLOCK_ROTATION_OFFSET;
   hourHand.rotation.x = -hourAngle - CLOCK_ROTATION_OFFSET;
 };
