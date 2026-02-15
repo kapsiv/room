@@ -58,9 +58,31 @@
     </div>
 
     <div id="app"></div>
-    <div class="blu modal"><div class="modal-title">bluuu</div> <button class="modal-exit-button">CLOSE</button></div>
-    <div class="reflectiv modal"><div class="modal-title">music innit </div><button class="modal-exit-button">CLOSE</button></div>
-    <div class="archive modal"><div class="modal-title">old stuff</div><button class="modal-exit-button">CLOSE</button></div>
+
+    <div class="blu modal" role="dialog" aria-modal="true" aria-labelledby="window-title-blu">
+      <div class="modal-window-bar">
+        <div id="window-title-blu" class="modal-window-title">bluuu</div>
+        <button class="modal-exit-button" type="button" aria-label="Close window">X</button>
+      </div>
+      <div class="modal-window-content">placeholder content...</div>
+    </div>
+
+    <div class="reflectiv modal" role="dialog" aria-modal="true" aria-labelledby="window-title-reflectiv">
+      <div class="modal-window-bar">
+        <div id="window-title-reflectiv" class="modal-window-title">music innit</div>
+        <button class="modal-exit-button" type="button" aria-label="Close window">X</button>
+      </div>
+      <div class="modal-window-content">placeholder content...</div>
+    </div>
+
+    <div class="archive modal" role="dialog" aria-modal="true" aria-labelledby="window-title-archive">
+      <div class="modal-window-bar">
+        <div id="window-title-archive" class="modal-window-title">old stuff</div>
+        <button class="modal-exit-button" type="button" aria-label="Close window">X</button>
+      </div>
+      <div class="modal-window-content">placeholder content...</div>
+    </div>
+
     <div id="experience">
       <canvas id="experience-canvas" class="experience-canvas"></canvas>
     </div>

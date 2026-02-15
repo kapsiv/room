@@ -7,7 +7,6 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 import { OrbitControls } from './utils/OrbitControls.js';
 
-let isModalOpen = false;
 let isLoading = true;
 let loadingRevealStarted = false;
 const manager = new THREE.LoadingManager();
@@ -15,8 +14,6 @@ const manager = new THREE.LoadingManager();
 const loadingScreen = document.querySelector(".loading-screen");
 
 if (loadingScreen) {
-  isModalOpen = true;
-
   const logoPath = document.querySelector("#logo");
   if (logoPath) {
     const pathLength = logoPath.getTotalLength();
@@ -49,7 +46,6 @@ function playLoadingReveal() {
       ease: "power4.inOut",
       onComplete: () => {
         isLoading = false;
-        isModalOpen = false;
         playIntroAnimation();
         loadingScreen.remove();
       },
@@ -72,6 +68,95 @@ const modals = {
   reflectiv: document.querySelector(".modal.reflectiv"),
   archive: document.querySelector(".modal.archive"),
 };
+const modalMargin = 16;
+let modalZIndex = 10000;
+
+function clampModalPosition(modal, left, top) {
+  const rect = modal.getBoundingClientRect();
+  const maxLeft = Math.max(modalMargin, window.innerWidth - rect.width - modalMargin);
+  const maxTop = Math.max(modalMargin, window.innerHeight - rect.height - modalMargin);
+
+  return {
+    left: Math.min(Math.max(modalMargin, left), maxLeft),
+    top: Math.min(Math.max(modalMargin, top), maxTop),
+  };
+}
+
+function bringModalToFront(modal) {
+  modalZIndex += 1;
+  modal.style.zIndex = String(modalZIndex);
+}
+
+function placeModalAt(modal, left, top) {
+  const clamped = clampModalPosition(modal, left, top);
+  modal.style.left = `${clamped.left}px`;
+  modal.style.top = `${clamped.top}px`;
+}
+
+function centerModal(modal) {
+  const rect = modal.getBoundingClientRect();
+  const left = (window.innerWidth - rect.width) / 2;
+  const top = (window.innerHeight - rect.height) / 2;
+  placeModalAt(modal, left, top);
+}
+
+function setupDraggableModal(modal) {
+  const handle = modal.querySelector(".modal-window-bar");
+  if (!handle) return;
+
+  let activePointerId = null;
+  let startX = 0;
+  let startY = 0;
+  let startLeft = 0;
+  let startTop = 0;
+
+  const endDrag = () => {
+    activePointerId = null;
+    modal.classList.remove("dragging");
+  };
+
+  handle.addEventListener("pointerdown", (e) => {
+    const isMouse = e.pointerType === "mouse";
+    if (isMouse && e.button !== 0) return;
+    if (e.target.closest(".modal-exit-button")) return;
+
+    e.preventDefault();
+    activePointerId = e.pointerId;
+
+    const rect = modal.getBoundingClientRect();
+    startX = e.clientX;
+    startY = e.clientY;
+    startLeft = rect.left;
+    startTop = rect.top;
+
+    bringModalToFront(modal);
+    modal.classList.add("dragging");
+    handle.setPointerCapture(e.pointerId);
+  });
+
+  handle.addEventListener("pointermove", (e) => {
+    if (activePointerId !== e.pointerId) return;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    placeModalAt(modal, startLeft + dx, startTop + dy);
+  });
+
+  handle.addEventListener("pointerup", (e) => {
+    if (activePointerId !== e.pointerId) return;
+    handle.releasePointerCapture(e.pointerId);
+    endDrag();
+  });
+
+  handle.addEventListener("pointercancel", endDrag);
+
+  modal.addEventListener("click", (e) => e.stopPropagation());
+  modal.addEventListener("touchstart", (e) => e.stopPropagation(), { passive: true });
+  modal.addEventListener("touchend", (e) => e.stopPropagation(), { passive: true });
+}
+
+Object.values(modals).forEach((modal) => {
+  if (modal) setupDraggableModal(modal);
+});
 
 let touchHappened = false;
 document.querySelectorAll(".modal-exit-button").forEach(button => {
@@ -100,9 +185,18 @@ document.querySelectorAll(".modal-exit-button").forEach(button => {
 
 
 const showModal = (modal) => {
+  if (!modal) return;
+
   modal.style.display = "block";
-  isModalOpen = true;
-  controls.enabled = false;
+  bringModalToFront(modal);
+
+  if (!modal.dataset.positioned) {
+    centerModal(modal);
+    modal.dataset.positioned = "true";
+  } else {
+    const rect = modal.getBoundingClientRect();
+    placeModalAt(modal, rect.left, rect.top);
+  }
 
   if (currentHoveredObject) {
     playHoverAnimation(currentHoveredObject, false);
@@ -121,8 +215,7 @@ const showModal = (modal) => {
 };
 
 const hideModal = (modal) => {
-  isModalOpen = false;
-  controls.enabled = true;
+  if (!modal) return;
 
   gsap.to(modal, {
     opacity: 0,
@@ -354,7 +447,6 @@ window.addEventListener("mousemove", (e) => {
 });
 
 window.addEventListener("touchstart", (e) => {
-  if(isModalOpen) return;
   e.preventDefault();
   pointer.x = ( e.touches[0].clientX / window.innerWidth) * 2 - 1;
   pointer.y = -(e.touches[0].clientY / window.innerHeight) * 2 + 1;
@@ -369,8 +461,8 @@ window.addEventListener("touchend", (e) => {
   { passive: false }
 );
 
-function handleRaycasterInteraction() {
-  if (isModalOpen) return;
+function handleRaycasterInteraction(e) {
+  if (e?.target?.closest?.(".modal")) return;
   if (currentIntersects.length === 0) return;
 
   const hitObject = currentIntersects[0].object;
@@ -774,6 +866,12 @@ window.addEventListener("resize", ()=>{
   // Update renderer
   renderer.setSize(sizes.width, sizes.height);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  Object.values(modals).forEach((modal) => {
+    if (!modal || modal.style.display !== "block") return;
+    const rect = modal.getBoundingClientRect();
+    placeModalAt(modal, rect.left, rect.top);
+  });
 })
 
 function getHoverScaleMultiplier(name) {
@@ -999,7 +1097,7 @@ const render = (timestamp = 0) => {
   }
 
   // Raycaster
-  if (!isModalOpen && !isLoading) {
+  if (!isLoading) {
     raycaster.setFromCamera(pointer, camera);
 
     currentIntersects = raycaster.intersectObjects(raycasterObjects, true);

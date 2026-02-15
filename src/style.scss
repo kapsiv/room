@@ -34,17 +34,74 @@
 }
 
 // Modals
-.modal{
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  max-width: 700px;
-  width: 100%;
-  transform: translate(-50%,-50%);
-  font-size: 32px;
+.modal {
+  position: fixed;
+  width: min(700px, calc(100vw - 32px));
+  min-width: min(320px, calc(100vw - 32px));
+  font-size: 18px;
   z-index: 9999;
   display: none;
+  opacity: 0;
+  overflow: hidden;
+  border-radius: 12px;
+  border: 3px solid vars.$base-brown;
   background-color: vars.$base-beige;
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.28);
+}
+
+.modal-window-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  padding: 8px 12px;
+  background-color: vars.$base-brown;
+  color: vars.$base-white;
+  cursor: grab;
+  touch-action: none;
+}
+
+.modal.dragging .modal-window-bar {
+  cursor: grabbing;
+}
+
+.modal-window-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: vars.$base-white;
+  letter-spacing: 0.02em;
+}
+
+.modal-exit-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  background: transparent;
+  color: vars.$base-white;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background-color 0.15s ease;
+}
+
+.modal-exit-button:hover,
+.modal-exit-button:focus-visible {
+  background-color: rgba(249, 249, 249, 0.2);
+  outline: none;
+}
+
+.modal-window-content {
+  padding: 18px 20px 20px;
+  color: vars.$base-black;
+  font-size: 16px;
+  line-height: 1.4;
+  user-select: text;
 }
 
 // Loading screen
