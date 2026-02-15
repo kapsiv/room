@@ -61,18 +61,178 @@
 
     <div class="blu modal" role="dialog" aria-modal="true" aria-labelledby="window-title-blu">
       <div class="modal-window-bar">
-        <div id="window-title-blu" class="modal-window-title">blu</div>
+        <div id="window-title-blu" class="modal-window-title">about</div>
         <button class="modal-exit-button" type="button" aria-label="Close window">X</button>
       </div>
-      <div class="modal-window-content">placeholder content...</div>
+      <div class="modal-window-content">
+        <div class="about-banner">
+          <img
+            src="https://wordpress-1498213-5726420.cloudwaysapps.com/wp-content/uploads/2025/10/kapsiv-profile.png"
+            alt="Kapilan's profile"
+            class="about-photo"
+          >
+          <div class="about-info">
+            <h2>kapilan sivanesan</h2>
+            <p>aspiring designer and developer</p>
+            <p>based in london</p>
+            <p class="now-playing-pill">
+              currently listening to:
+              <span class="now-playing-wrap">
+                <span class="now-playing-inner">
+                  <span class="now-playing-text"> loading...</span>
+                  <span class="now-playing-text now-playing-duplicate" aria-hidden="true"> loading...</span>
+                </span>
+              </span>
+            </p>
+          </div>
+        </div>
+
+        <div class="about-body">
+          <p>hello i'm kaps! i am learning to design things and program. i'm especially interested in:</p>
+          <ul>
+            <li>graphic design</li>
+            <li>web dev</li>
+            <li>game dev</li>
+            <li>3d modelling</li>
+            <li>guitar</li>
+            <li>typography</li>
+          </ul><br>
+
+          <p>any questions? send a message to <a href="me@kapsiv.com">me@kapsiv.com</a> :D</p><br>
+
+          <h3>education</h3>
+          <p>master's in biology, university of oxford<br><small>2021-2025</small></p>
+
+          <h3>work</h3>
+          <p>tech consulting (data and ai)<br><small>2025-present</small></p>
+
+          <h3>other interests</h3>
+          <ul>
+            <li>biology</li>
+            <li>music production</li>
+          </ul>
+        </div>
+      </div>
     </div>
 
-    <div class="reflectiv modal" role="dialog" aria-modal="true" aria-labelledby="window-title-reflectiv">
+    <div class="reflectiv modal modal--wide" role="dialog" aria-modal="true" aria-labelledby="window-title-reflectiv">
       <div class="modal-window-bar">
-        <div id="window-title-reflectiv" class="modal-window-title">listening...</div>
+        <div id="window-title-reflectiv" class="modal-window-title">reflectiv</div>
         <button class="modal-exit-button" type="button" aria-label="Close window">X</button>
       </div>
-      <div class="modal-window-content">placeholder content...</div>
+      <div class="modal-window-content">
+        <div id="reflectiv-root" class="reflectiv-body">
+          <div id="reflectiv-loading-overlay" class="reflectiv-loading-overlay visible">
+            <div class="reflectiv-loading-box">
+              <div class="loading-spinner"></div>
+              <p id="reflectiv-loading-main" class="loading-main">loading last.fm data...</p>
+              <p class="loading-sub">(this might take a while)</p>
+            </div>
+          </div>
+
+          <div class="reflectiv-nowplaying-widget">
+            <div class="rnw-slider-track">
+              <div class="rnw-slider-thumb">
+                <div class="rnw-meta">
+                  <div class="rnw-label">currently listening to</div>
+                  <div class="rnw-title">loading...</div>
+                  <div class="rnw-artist"></div>
+                  <div class="rnw-album"></div>
+                </div>
+                <div class="rnw-slider-hint">
+                  <span class="rnw-slider-text">slide to expand</span>
+                  <span class="rnw-slider-arrow">-></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="reflectiv-filters">
+            <button class="reflectiv-filter active" data-range="all">ALL</button>
+            <button class="reflectiv-filter" data-range="year">YEAR</button>
+            <button class="reflectiv-filter" data-range="month">MONTH</button>
+            <button class="reflectiv-filter" data-range="week">WEEK</button>
+            <button type="button" class="reflectiv-filter reflectiv-musiclib-button">see my music library</button>
+          </div>
+
+          <div class="reflectiv-facts">
+            <div class="fact-card">
+              <span class="fact-label">total scrobbles</span>
+              <span class="fact-value" id="fact-total-scrobbles">-</span>
+            </div>
+            <div class="fact-card">
+              <span class="fact-label">most active day</span>
+              <span class="fact-value" id="fact-busiest-day">-</span>
+            </div>
+            <div class="fact-card">
+              <span class="fact-label">first scrobble</span>
+              <span class="fact-value" id="fact-last-updated">-</span>
+            </div>
+            <div class="fact-card">
+              <span class="fact-label">last scrobble</span>
+              <span class="fact-value" id="fact-first-scrobble">-</span>
+            </div>
+          </div>
+
+          <section class="chart-section">
+            <h3 class="chart-title">scrobbles over time</h3>
+            <canvas id="scrobblesOverTime"></canvas>
+          </section>
+
+          <section class="chart-row">
+            <div class="chart-section half">
+              <h3 class="chart-title">top artists</h3>
+              <div class="top-artists-scroll">
+                <ul id="topArtistsList" class="top-artists-list">
+                  <li><span class="artist-name">loading...</span></li>
+                </ul>
+              </div>
+            </div>
+            <div class="chart-section half">
+              <h3 class="chart-title">top tags</h3>
+              <canvas id="tagPie"></canvas>
+            </div>
+          </section>
+
+          <section class="chart-section">
+            <h3 class="chart-title">tags over time</h3>
+            <canvas id="tagStream"></canvas>
+            <p class="chart-note">working on this</p>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <div class="nowplaying modal modal--nowplaying" role="dialog" aria-modal="true" aria-labelledby="window-title-nowplaying">
+      <div class="modal-window-bar">
+        <div id="window-title-nowplaying" class="modal-window-title">now playing</div>
+        <button class="modal-exit-button" type="button" aria-label="Close window">X</button>
+      </div>
+      <div class="modal-window-content">
+        <div class="nowplaying-body">
+          <div class="nowplaying-current">
+            <div class="nowplaying-art-wrapper">
+              <img class="nowplaying-art" src="" alt="Album art">
+              <div class="nowplaying-art-placeholder">no artwork</div>
+            </div>
+            <div class="nowplaying-meta">
+              <h3 class="nowplaying-title">loading...</h3>
+              <p class="nowplaying-artist"></p>
+            </div>
+          </div>
+
+          <div class="nowplaying-recent">
+            <h4>recent tracks</h4>
+            <ol class="nowplaying-recent-list">
+              <li>loading your recent listens...</li>
+            </ol>
+          </div>
+
+          <div class="nowplaying-actions">
+            <button type="button" class="reflectiv-filter nowplaying-see-scrobbles">see all scrobbles</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="archive modal" role="dialog" aria-modal="true" aria-labelledby="window-title-archive">

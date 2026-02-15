@@ -66,8 +66,519 @@ const sizes ={
 const modals = {
   blu: document.querySelector(".modal.blu"),
   reflectiv: document.querySelector(".modal.reflectiv"),
+  nowplaying: document.querySelector(".modal.nowplaying"),
   archive: document.querySelector(".modal.archive"),
 };
+
+const LASTFM_USER = "kapsiv";
+const LASTFM_API_KEY = "683650a829cee53959e8d505e8841726";
+const LASTFM_ENDPOINT = "https://ws.audioscrobbler.com/2.0/";
+
+const reflectivState = {
+  range: "all",
+  scrobbles: [],
+  daily: [],
+  topArtists: [],
+  topTags: [],
+};
+
+const cacheState = {
+  nowPlaying: null,
+  scrobbles: null,
+  collection: null,
+};
+
+function parseCsv(text) {
+  const rows = [];
+  let row = [];
+  let cell = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < text.length; i += 1) {
+    const char = text[i];
+    const next = text[i + 1];
+
+    if (char === '"') {
+      if (inQuotes && next === '"') {
+        cell += '"';
+        i += 1;
+      } else {
+        inQuotes = !inQuotes;
+      }
+      continue;
+    }
+
+    if (!inQuotes && char === ",") {
+      row.push(cell);
+      cell = "";
+      continue;
+    }
+
+    if (!inQuotes && (char === "\n" || char === "\r")) {
+      if (char === "\r" && next === "\n") i += 1;
+      row.push(cell);
+      if (row.some((c) => c !== "")) rows.push(row);
+      row = [];
+      cell = "";
+      continue;
+    }
+
+    cell += char;
+  }
+
+  if (cell.length || row.length) {
+    row.push(cell);
+    if (row.some((c) => c !== "")) rows.push(row);
+  }
+
+  if (!rows.length) return [];
+
+  const headers = rows[0].map((h) => h.trim());
+  return rows.slice(1).map((r) => {
+    const out = {};
+    headers.forEach((h, idx) => {
+      out[h] = (r[idx] || "").trim();
+    });
+    return out;
+  });
+}
+
+async function fetchNowPlayingTrack() {
+  const url = `${LASTFM_ENDPOINT}?method=user.getrecenttracks&user=${encodeURIComponent(LASTFM_USER)}&api_key=${LASTFM_API_KEY}&format=json&limit=1`;
+  const res = await fetch(url);
+  if (!res.ok) return null;
+  const data = await res.json();
+  const trackData = data?.recenttracks?.track;
+  if (!trackData) return null;
+  const track = Array.isArray(trackData) ? trackData[0] : trackData;
+
+  const title = track?.name || "";
+  const artist = track?.artist?.["#text"] || "";
+  const album = track?.album?.["#text"] || "";
+  const images = track?.image || [];
+  const imageUrl = images.length ? images[images.length - 1]?.["#text"] || "" : "";
+
+  if (!title || !artist) return null;
+  return { title, artist, album, imageUrl };
+}
+
+async function fetchRecentTracks(limit = 11) {
+  const url = `${LASTFM_ENDPOINT}?method=user.getrecenttracks&user=${encodeURIComponent(LASTFM_USER)}&api_key=${LASTFM_API_KEY}&format=json&limit=${limit}`;
+  const res = await fetch(url);
+  if (!res.ok) return [];
+  const data = await res.json();
+  const tracksData = data?.recenttracks?.track;
+  if (!tracksData) return [];
+  const arr = Array.isArray(tracksData) ? tracksData : [tracksData];
+  return arr
+    .map((track) => {
+      const images = track?.image || [];
+      return {
+        title: track?.name || "",
+        artist: track?.artist?.["#text"] || "",
+        album: track?.album?.["#text"] || "",
+        imageUrl: images.length ? images[images.length - 1]?.["#text"] || "" : "",
+      };
+    })
+    .filter((t) => t.title && t.artist);
+}
+
+async function getNowPlayingTrack() {
+  try {
+    cacheState.nowPlaying = await fetchNowPlayingTrack();
+  } catch (err) {
+    console.warn("Now playing fetch failed:", err);
+  }
+  return cacheState.nowPlaying;
+}
+
+function formatDate(uts) {
+  const d = new Date(Number(uts) * 1000);
+  return d.toLocaleDateString("en-GB", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+
+function countBy(items, keyFn) {
+  const map = new Map();
+  items.forEach((item) => {
+    const key = keyFn(item);
+    if (!key) return;
+    map.set(key, (map.get(key) || 0) + 1);
+  });
+  return map;
+}
+
+function aggregateDaily(scrobbles) {
+  const byDay = countBy(scrobbles, (s) => {
+    const d = new Date(Number(s.uts) * 1000);
+    return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`;
+  });
+  return [...byDay.entries()]
+    .map(([day, count]) => ({ day, count, date: new Date(`${day}T00:00:00Z`) }))
+    .sort((a, b) => a.date - b.date);
+}
+
+function lastNDays(daily, n) {
+  if (!daily.length) return [];
+  const last = daily[daily.length - 1].date.getTime();
+  const cutoff = last - (n - 1) * 24 * 60 * 60 * 1000;
+  return daily.filter((d) => d.date.getTime() >= cutoff);
+}
+
+function aggregateMonthly(daily) {
+  const monthly = new Map();
+  daily.forEach((d) => {
+    const key = d.day.slice(0, 7);
+    monthly.set(key, (monthly.get(key) || 0) + d.count);
+  });
+  return [...monthly.entries()].map(([month, count]) => ({ label: month, count }));
+}
+
+function getSeriesForRange(range) {
+  const daily = reflectivState.daily;
+  if (!daily.length) return [];
+  if (range === "week") return lastNDays(daily, 7).map((d) => ({ label: d.day.slice(5), count: d.count }));
+  if (range === "month") return lastNDays(daily, 31).map((d) => ({ label: d.day.slice(5), count: d.count }));
+  if (range === "year") return lastNDays(daily, 365).map((d) => ({ label: d.day.slice(2), count: d.count }));
+  return aggregateMonthly(daily);
+}
+
+function drawLineOnCanvas(canvas, series) {
+  const ctx = canvas?.getContext?.("2d");
+  if (!ctx) return;
+  const width = canvas.clientWidth || 720;
+  const height = canvas.clientHeight || 220;
+  canvas.width = width;
+  canvas.height = height;
+  ctx.clearRect(0, 0, width, height);
+
+  if (!series.length) {
+    ctx.fillStyle = "#4e4738";
+    ctx.font = "14px 'Ubuntu Mono', monospace";
+    ctx.fillText("No data available", 12, 20);
+    return;
+  }
+
+  const pad = { l: 28, r: 12, t: 10, b: 24 };
+  const max = Math.max(...series.map((s) => s.count), 1);
+  const usableW = width - pad.l - pad.r;
+  const usableH = height - pad.t - pad.b;
+
+  ctx.strokeStyle = "rgba(78,71,56,0.2)";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(pad.l, pad.t + usableH);
+  ctx.lineTo(width - pad.r, pad.t + usableH);
+  ctx.stroke();
+
+  ctx.strokeStyle = "#4e4738";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  series.forEach((p, i) => {
+    const x = pad.l + (i / Math.max(series.length - 1, 1)) * usableW;
+    const y = pad.t + usableH - (p.count / max) * usableH;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+}
+
+function drawBarsOnCanvas(canvas, items, labelKey, valueKey) {
+  const ctx = canvas?.getContext?.("2d");
+  if (!ctx) return;
+  const width = canvas.clientWidth || 720;
+  const height = canvas.clientHeight || 220;
+  canvas.width = width;
+  canvas.height = height;
+  ctx.clearRect(0, 0, width, height);
+
+  const topItems = items.slice(0, 8);
+  if (!topItems.length) {
+    ctx.fillStyle = "#4e4738";
+    ctx.font = "14px 'Ubuntu Mono', monospace";
+    ctx.fillText("No data available", 12, 20);
+    return;
+  }
+
+  const max = Math.max(...topItems.map((i) => i[valueKey]), 1);
+  const rowH = Math.floor((height - 16) / topItems.length);
+
+  topItems.forEach((item, i) => {
+    const y = 8 + i * rowH;
+    const w = Math.floor(((item[valueKey] || 0) / max) * (width - 220));
+
+    ctx.fillStyle = "rgba(78,71,56,0.18)";
+    ctx.fillRect(190, y + 4, w, rowH - 8);
+
+    ctx.fillStyle = "#4e4738";
+    ctx.font = "12px 'Ubuntu Mono', monospace";
+    ctx.fillText(String(item[labelKey]).slice(0, 24), 8, y + rowH / 2 + 4);
+    ctx.fillText(String(item[valueKey]), 194 + w, y + rowH / 2 + 4);
+  });
+}
+
+async function loadScrobblesCsv() {
+  if (cacheState.scrobbles) return cacheState.scrobbles;
+  const res = await fetch("/data/scrobbles.csv");
+  if (!res.ok) throw new Error(`scrobbles.csv fetch failed: ${res.status}`);
+  const text = await res.text();
+  cacheState.scrobbles = parseCsv(text).filter((r) => r.uts && r.artist && r.track);
+  return cacheState.scrobbles;
+}
+
+async function loadCollectionCsv() {
+  if (cacheState.collection) return cacheState.collection;
+  const res = await fetch("/data/collection.csv");
+  if (!res.ok) throw new Error(`collection.csv fetch failed: ${res.status}`);
+  const text = await res.text();
+  cacheState.collection = parseCsv(text);
+  return cacheState.collection;
+}
+
+function setNowPlayingPill(modal, track) {
+  const textEls = modal.querySelectorAll(".now-playing-text");
+  const innerEl = modal.querySelector(".now-playing-inner");
+  if (!textEls.length || !innerEl) return;
+  const value = track
+    ? ` ${String(track.title).toLowerCase()} - ${String(track.artist).toLowerCase()}`
+    : " not sure right now";
+  textEls.forEach((el) => { el.textContent = value; });
+  innerEl.classList.remove("is-animating");
+  void innerEl.offsetWidth;
+  innerEl.classList.add("is-animating");
+}
+
+async function initAboutModal(modal) {
+  const track = await getNowPlayingTrack();
+  setNowPlayingPill(modal, track);
+}
+
+async function initNowPlayingModal(modal) {
+  const art = modal.querySelector(".nowplaying-art");
+  const artPlaceholder = modal.querySelector(".nowplaying-art-placeholder");
+  const titleEl = modal.querySelector(".nowplaying-title");
+  const artistEl = modal.querySelector(".nowplaying-artist");
+  const listEl = modal.querySelector(".nowplaying-recent-list");
+
+  if (titleEl) titleEl.textContent = "loading...";
+  if (artistEl) artistEl.textContent = "";
+  if (listEl) listEl.innerHTML = "<li>loading your recent listens...</li>";
+
+  try {
+    const tracks = await fetchRecentTracks(11);
+    const current = tracks[0];
+    const previous = tracks.slice(1, 11);
+
+    if (titleEl) titleEl.textContent = current?.title ? String(current.title).toLowerCase() : "not sure right now";
+    if (artistEl) {
+      artistEl.textContent = current?.artist
+        ? `${String(current.artist).toLowerCase()}${current.album ? ` - ${String(current.album).toLowerCase()}` : ""}`
+        : "";
+    }
+
+    if (art && artPlaceholder) {
+      if (current?.imageUrl) {
+        art.src = current.imageUrl;
+        art.style.display = "block";
+        artPlaceholder.style.display = "none";
+      } else {
+        art.removeAttribute("src");
+        art.style.display = "none";
+        artPlaceholder.style.display = "grid";
+      }
+    }
+
+    if (listEl) {
+      if (!previous.length) {
+        listEl.innerHTML = "<li>no earlier tracks found.</li>";
+      } else {
+        listEl.innerHTML = previous
+          .map((t) => `<li>${String(t.title).toLowerCase()} - ${String(t.artist).toLowerCase()}</li>`)
+          .join("");
+      }
+    }
+  } catch (err) {
+    console.warn("Recent tracks fetch failed:", err);
+    if (titleEl) titleEl.textContent = "couldn't load recent tracks";
+  }
+
+  const seeAllBtn = modal.querySelector(".nowplaying-see-scrobbles");
+  if (seeAllBtn && modal.dataset.nowPlayingBound !== "true") {
+    modal.dataset.nowPlayingBound = "true";
+    seeAllBtn.addEventListener("click", () => {
+      showModal(modals.reflectiv);
+    });
+  }
+}
+
+function updateReflectivNowPlaying(modal, track) {
+  const titleEl = modal.querySelector(".rnw-title");
+  const artistEl = modal.querySelector(".rnw-artist");
+  const albumEl = modal.querySelector(".rnw-album");
+  if (titleEl) titleEl.textContent = track?.title || "not sure right now";
+  if (artistEl) artistEl.textContent = track?.artist || "";
+  if (albumEl) albumEl.textContent = track?.album ? `from ${track.album}` : "";
+}
+
+function updateReflectivFacts(modal) {
+  const scrobbles = reflectivState.scrobbles;
+  const totalEl = modal.querySelector("#fact-total-scrobbles");
+  const busyEl = modal.querySelector("#fact-busiest-day");
+  const firstEl = modal.querySelector("#fact-first-scrobble");
+  const lastEl = modal.querySelector("#fact-last-updated");
+  if (!scrobbles.length) return;
+
+  const first = scrobbles[scrobbles.length - 1];
+  const last = scrobbles[0];
+  const busiest = reflectivState.daily.reduce((max, d) => (d.count > max.count ? d : max), reflectivState.daily[0]);
+
+  if (totalEl) totalEl.textContent = scrobbles.length.toLocaleString();
+  if (busyEl) busyEl.textContent = `${busiest.count} on ${busiest.day}`;
+  if (firstEl) firstEl.textContent = formatDate(first.uts);
+  if (lastEl) lastEl.textContent = formatDate(last.uts);
+}
+
+function renderReflectivTopArtists(modal) {
+  const list = modal.querySelector("#topArtistsList");
+  if (!list) return;
+  const top = reflectivState.topArtists.slice(0, 30);
+  list.innerHTML = "";
+  top.forEach((a, idx) => {
+    const li = document.createElement("li");
+    li.innerHTML = `<span class="artist-name">${idx + 1}. ${a.name}</span><span class="artist-count">${a.count.toLocaleString()}</span>`;
+    list.appendChild(li);
+  });
+}
+
+function renderReflectivCharts(modal) {
+  const series = getSeriesForRange(reflectivState.range);
+  drawLineOnCanvas(modal.querySelector("#scrobblesOverTime"), series);
+  drawBarsOnCanvas(modal.querySelector("#tagPie"), reflectivState.topTags, "name", "count");
+
+  const tagStream = modal.querySelector("#tagStream");
+  const ctx = tagStream?.getContext?.("2d");
+  if (ctx && tagStream) {
+    tagStream.width = tagStream.clientWidth || 720;
+    tagStream.height = tagStream.clientHeight || 220;
+    ctx.clearRect(0, 0, tagStream.width, tagStream.height);
+    ctx.fillStyle = "#4e4738";
+    ctx.font = "13px 'Ubuntu Mono', monospace";
+    ctx.fillText("coming soon - streamgraph in progress", 10, 20);
+  }
+}
+
+function bindReflectivControls(modal) {
+  if (modal.dataset.reflectivBound === "true") return;
+  modal.dataset.reflectivBound = "true";
+
+  const buttons = modal.querySelectorAll(".reflectiv-filter[data-range]");
+  buttons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const next = btn.dataset.range || "all";
+      reflectivState.range = next;
+      buttons.forEach((b) => b.classList.toggle("active", b === btn));
+      renderReflectivCharts(modal);
+    });
+  });
+
+  const libraryBtn = modal.querySelector(".reflectiv-musiclib-button");
+  if (libraryBtn) {
+    libraryBtn.addEventListener("click", async () => {
+      const modalArchive = modals.archive;
+      const title = modalArchive?.querySelector(".modal-window-title");
+      const content = modalArchive?.querySelector(".modal-window-content");
+      if (!modalArchive || !title || !content) return;
+
+      title.textContent = "music library";
+      const rows = await loadCollectionCsv();
+      const albums = new Set();
+      const artists = new Set();
+      const genres = new Set();
+      const artistCounts = new Map();
+
+      rows.forEach((r) => {
+        const artist = (r.Artist || "").trim();
+        const album = (r.Album || "").trim();
+        if (artist) artists.add(artist);
+        if (artist && album) albums.add(`${artist.toLowerCase()}::${album.toLowerCase()}`);
+        (r.Genres || "").split(";").map((g) => g.trim().toLowerCase()).filter(Boolean).forEach((g) => genres.add(g));
+        if (artist) artistCounts.set(artist, (artistCounts.get(artist) || 0) + 1);
+      });
+
+      const topArtists = [...artistCounts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 12);
+      content.innerHTML = `
+        <div class="reflectiv-facts">
+          <div class="fact-card"><span class="fact-label">number of albums</span><span class="fact-value">${albums.size.toLocaleString()}</span></div>
+          <div class="fact-card"><span class="fact-label">number of songs</span><span class="fact-value">${rows.length.toLocaleString()}</span></div>
+          <div class="fact-card"><span class="fact-label">number of artists</span><span class="fact-value">${artists.size.toLocaleString()}</span></div>
+          <div class="fact-card"><span class="fact-label">number of genres</span><span class="fact-value">${genres.size.toLocaleString()}</span></div>
+        </div>
+        <section class="chart-section">
+          <h3 class="chart-title">top artists</h3>
+          <div class="top-artists-scroll">
+            <ul class="top-artists-list">
+              ${topArtists.map(([name, count], i) => `<li><span class="artist-name">${i + 1}. ${name}</span><span class="artist-count">${count}</span></li>`).join("")}
+            </ul>
+          </div>
+        </section>
+      `;
+      showModal(modalArchive);
+    });
+  }
+}
+
+async function initReflectivModal(modal) {
+  const overlay = modal.querySelector("#reflectiv-loading-overlay");
+  const loadingText = modal.querySelector("#reflectiv-loading-main");
+  if (overlay) overlay.classList.add("visible");
+  if (loadingText) loadingText.textContent = "loading last.fm data...";
+
+  bindReflectivControls(modal);
+
+  try {
+    const [track, scrobbles, collection] = await Promise.all([
+      getNowPlayingTrack(),
+      loadScrobblesCsv(),
+      loadCollectionCsv(),
+    ]);
+
+    updateReflectivNowPlaying(modal, track);
+
+    reflectivState.scrobbles = [...scrobbles].sort((a, b) => Number(b.uts) - Number(a.uts));
+    reflectivState.daily = aggregateDaily(reflectivState.scrobbles);
+    reflectivState.topArtists = [...countBy(reflectivState.scrobbles, (s) => s.artist).entries()]
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count);
+
+    const tagCounts = new Map();
+    collection.forEach((row) => {
+      const tags = (row.Genres || "")
+        .split(";")
+        .map((g) => g.trim().toLowerCase())
+        .filter(Boolean);
+      tags.forEach((tag) => {
+        tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1);
+      });
+    });
+
+    reflectivState.topTags = [...tagCounts.entries()]
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 20);
+
+    updateReflectivFacts(modal);
+    renderReflectivTopArtists(modal);
+    renderReflectivCharts(modal);
+  } catch (err) {
+    console.error("Reflectiv init failed:", err);
+    if (loadingText) loadingText.textContent = "couldn't load reflectiv data";
+  } finally {
+    if (overlay) overlay.classList.remove("visible");
+  }
+}
 const modalMargin = 16;
 let modalZIndex = 10000;
 
@@ -212,6 +723,26 @@ const showModal = (modal) => {
     opacity: 1,
     duration: 0.5,
   });
+
+  if (modal === modals.blu) {
+    initAboutModal(modal);
+    const pill = modal.querySelector(".now-playing-pill");
+    if (pill && modal.dataset.aboutBound !== "true") {
+      modal.dataset.aboutBound = "true";
+      pill.style.cursor = "pointer";
+      pill.addEventListener("click", () => {
+        showModal(modals.nowplaying);
+      });
+    }
+  }
+
+  if (modal === modals.nowplaying) {
+    initNowPlayingModal(modal);
+  }
+
+  if (modal === modals.reflectiv) {
+    initReflectivModal(modal);
+  }
 };
 
 const hideModal = (modal) => {
@@ -772,7 +1303,7 @@ function handleRaycasterInteraction(e) {
     return;
   }
 
-  if (hitObject.name.includes("Blu_Body")) {
+  if (hitObject.name.includes("Blu_Body") || hitObject.name.includes("Rug")) {
     showModal(modals.blu);
   } else if (hitObject.name.includes("Vinyl")) {
     showModal(modals.reflectiv);
