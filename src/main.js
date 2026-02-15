@@ -424,6 +424,10 @@ const screenVideoMaterial = new THREE.MeshBasicMaterial({
   map: videoTexture,
 });
 
+const screenStaticMaterial = new THREE.MeshBasicMaterial({
+  color: "#d9d2c5",
+});
+
 const screenGlassMaterial = new THREE.MeshPhysicalMaterial({
   transparent: true,
   opacity: 0.32,
@@ -439,6 +443,16 @@ const screenGlassMaterial = new THREE.MeshPhysicalMaterial({
   polygonOffsetFactor: -1,
   polygonOffsetUnits: -1,
 });
+
+function applyScreenGlassOverlay(screenMesh) {
+  screenMesh.renderOrder = 1;
+
+  const glassOverlay = screenMesh.clone();
+  glassOverlay.material = screenGlassMaterial;
+  glassOverlay.renderOrder = 2;
+
+  screenMesh.parent.add(glassOverlay);
+}
 
 window.addEventListener("mousemove", (e) => {
   touchHappened = false;
@@ -660,18 +674,14 @@ loader.load("/models/Room_Portfolio_V4.glb", (glb) => {
             opacity: 0.45,
             depthWrite: false,
           });
+        } else if (child.name.includes("Screen_2")){
+          child.material = screenVideoMaterial;
+          applyScreenGlassOverlay(child);
+        } else if (child.name.includes("Screen_1")) {
+          child.material = screenStaticMaterial;
+          applyScreenGlassOverlay(child);
         } else if (child.name.includes("Glass")){
           child.material = glassMaterial;
-        }
-          else if (child.name.includes("Screen_2")){
-          child.material = screenVideoMaterial;
-          child.renderOrder = 1;
-
-          const glassOverlay = child.clone();
-          glassOverlay.material = screenGlassMaterial;
-          glassOverlay.renderOrder = 2;
-          
-          child.parent.add(glassOverlay);
         } else {
           Object.keys(textureMap).forEach((key) => {
             if (child.name.includes(key)) {
