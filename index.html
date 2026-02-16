@@ -64,7 +64,7 @@
         <div id="window-title-blu" class="modal-window-title">about</div>
         <button class="modal-exit-button" type="button" aria-label="Close window">X</button>
       </div>
-      <div class="modal-window-content">
+      <div class="modal-window-header">
         <div class="about-banner">
           <img
             src="https://wordpress-1498213-5726420.cloudwaysapps.com/wp-content/uploads/2025/10/kapsiv-profile.png"
@@ -73,8 +73,8 @@
           >
           <div class="about-info">
             <h2>kapilan sivanesan</h2>
-            <p>aspiring designer and developer</p>
-            <p>based in london</p>
+            <p>> aspiring designer and developer</p>
+            <p>> based in london</p>
             <p class="now-playing-pill">
               currently listening to:
               <span class="now-playing-wrap">
@@ -86,7 +86,8 @@
             </p>
           </div>
         </div>
-
+      </div>
+      <div class="modal-window-content modal-window-content--offwhite">
         <div class="about-body">
           <p>hello i'm kaps! i am learning to design things and program. i'm especially interested in:</p>
           <ul>
@@ -104,7 +105,7 @@
           <p>master's in biology, university of oxford<br><small>2021-2025</small></p>
 
           <h3>work</h3>
-          <p>tech consulting (data and ai)<br><small>2025-present</small></p>
+          <p>data engineering, city of london<br><small>2025-present</small></p>
 
           <h3>other interests</h3>
           <ul>
@@ -117,10 +118,41 @@
 
     <div class="reflectiv modal modal--wide" role="dialog" aria-modal="true" aria-labelledby="window-title-reflectiv">
       <div class="modal-window-bar">
-        <div id="window-title-reflectiv" class="modal-window-title">reflectiv</div>
+        <div id="window-title-reflectiv" class="modal-window-title">kaps' music data</div>
         <button class="modal-exit-button" type="button" aria-label="Close window">X</button>
       </div>
+      <div class="modal-tab-strip" role="tablist" aria-label="reflectiv tabs">
+        <button
+          type="button"
+          class="modal-tab is-active"
+          data-reflectiv-tab="reflectiv"
+          role="tab"
+          aria-selected="true"
+          aria-controls="reflectiv-tab-panel"
+          id="reflectiv-tab-button"
+        >
+          reflectIV
+        </button>
+        <button
+          type="button"
+          class="modal-tab"
+          data-reflectiv-tab="library"
+          role="tab"
+          aria-selected="false"
+          aria-controls="library-tab-panel"
+          id="library-tab-button"
+        >
+          music library
+        </button>
+      </div>
       <div class="modal-window-content">
+        <section
+          id="reflectiv-tab-panel"
+          class="reflectiv-panel is-active"
+          data-reflectiv-panel="reflectiv"
+          role="tabpanel"
+          aria-labelledby="reflectiv-tab-button"
+        >
         <div id="reflectiv-root" class="reflectiv-body">
           <div id="reflectiv-loading-overlay" class="reflectiv-loading-overlay visible">
             <div class="reflectiv-loading-box">
@@ -132,16 +164,22 @@
 
           <div class="reflectiv-nowplaying-widget">
             <div class="rnw-slider-track">
+              <div class="rnw-slider-hint">
+                <span class="rnw-slider-text">slide to expand</span>
+                <span class="rnw-slider-arrow" aria-hidden="true">>></span>
+              </div>
               <div class="rnw-slider-thumb">
-                <div class="rnw-meta">
-                  <div class="rnw-label">currently listening to</div>
-                  <div class="rnw-title">loading...</div>
-                  <div class="rnw-artist"></div>
-                  <div class="rnw-album"></div>
-                </div>
-                <div class="rnw-slider-hint">
-                  <span class="rnw-slider-text">slide to expand</span>
-                  <span class="rnw-slider-arrow">-></span>
+                <div class="rnw-pill-content">
+                  <div class="rnw-art-wrapper">
+                    <img class="rnw-art" src="" alt="Current album art">
+                    <div class="rnw-art-placeholder">♪</div>
+                  </div>
+                  <div class="rnw-meta">
+                    <div class="rnw-label">currently listening to</div>
+                    <div class="rnw-title">loading...</div>
+                    <div class="rnw-artist"></div>
+                    <div class="rnw-album"></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -152,7 +190,6 @@
             <button class="reflectiv-filter" data-range="year">YEAR</button>
             <button class="reflectiv-filter" data-range="month">MONTH</button>
             <button class="reflectiv-filter" data-range="week">WEEK</button>
-            <button type="button" class="reflectiv-filter reflectiv-musiclib-button">see my music library</button>
           </div>
 
           <div class="reflectiv-facts">
@@ -182,9 +219,16 @@
           <section class="chart-row">
             <div class="chart-section half">
               <h3 class="chart-title">top artists</h3>
+              <div class="top-artists-columns">
+                <span>artist</span>
+                <span>scrobbles</span>
+              </div>
               <div class="top-artists-scroll">
                 <ul id="topArtistsList" class="top-artists-list">
-                  <li><span class="artist-name">loading...</span></li>
+                  <li>
+                    <span class="artist-name">loading...</span>
+                    <span class="artist-count">-</span>
+                  </li>
                 </ul>
               </div>
             </div>
@@ -200,6 +244,78 @@
             <p class="chart-note">working on this</p>
           </section>
         </div>
+        </section>
+        <section
+          id="library-tab-panel"
+          class="reflectiv-panel"
+          data-reflectiv-panel="library"
+          role="tabpanel"
+          aria-labelledby="library-tab-button"
+        >
+          <div id="musiclib-root" class="musiclib-body">
+            <div class="reflectiv-facts">
+              <div class="fact-card">
+                <span class="fact-label">number of albums</span>
+                <span class="fact-value" id="musiclib-total-albums">-</span>
+              </div>
+              <div class="fact-card">
+                <span class="fact-label">number of songs</span>
+                <span class="fact-value" id="musiclib-total-songs">-</span>
+              </div>
+              <div class="fact-card">
+                <span class="fact-label">number of artists</span>
+                <span class="fact-value" id="musiclib-total-artists">-</span>
+              </div>
+              <div class="fact-card">
+                <span class="fact-label">number of genres</span>
+                <span class="fact-value" id="musiclib-total-genres">-</span>
+              </div>
+            </div>
+
+            <section class="chart-section">
+              <h3 class="chart-title">albums by year</h3>
+              <canvas id="libraryAlbumsByYear"></canvas>
+            </section>
+
+            <section class="chart-section">
+              <h3 class="chart-title">albums by country</h3>
+              <canvas id="libraryWorldMap"></canvas>
+              <p id="libraryWorldMapNote" class="chart-note">loading map...</p>
+            </section>
+
+            <section class="chart-section">
+              <h3 class="chart-title">top artists</h3>
+              <div class="top-artists-columns">
+                <span>artist</span>
+                <span>songs</span>
+              </div>
+              <div class="top-artists-scroll top-artists-scroll--tall">
+                <ul id="libraryTopArtistsList" class="top-artists-list">
+                  <li>
+                    <span class="artist-name">loading...</span>
+                    <span class="artist-count">-</span>
+                  </li>
+                </ul>
+              </div>
+            </section>
+
+            <section class="chart-section">
+              <h3 class="chart-title">top genres</h3>
+              <div class="top-artists-columns">
+                <span>genre</span>
+                <span>songs</span>
+              </div>
+              <div class="top-artists-scroll">
+                <ul id="libraryTopGenresList" class="top-artists-list">
+                  <li>
+                    <span class="artist-name">loading...</span>
+                    <span class="artist-count">-</span>
+                  </li>
+                </ul>
+              </div>
+            </section>
+          </div>
+        </section>
       </div>
     </div>
 
@@ -221,21 +337,21 @@
             </div>
           </div>
 
+          <div class="nowplaying-actions">
+            <button type="button" class="reflectiv-filter nowplaying-see-scrobbles">see all scrobbles</button>
+          </div>
+
           <div class="nowplaying-recent">
             <h4>recent tracks</h4>
             <ol class="nowplaying-recent-list">
               <li>loading your recent listens...</li>
             </ol>
           </div>
-
-          <div class="nowplaying-actions">
-            <button type="button" class="reflectiv-filter nowplaying-see-scrobbles">see all scrobbles</button>
-          </div>
         </div>
       </div>
     </div>
 
-    <div class="archive modal" role="dialog" aria-modal="true" aria-labelledby="window-title-archive">
+    <div class="archive modal modal--wide" role="dialog" aria-modal="true" aria-labelledby="window-title-archive">
       <div class="modal-window-bar">
         <div id="window-title-archive" class="modal-window-title">archive</div>
         <button class="modal-exit-button" type="button" aria-label="Close window">X</button>
