@@ -224,11 +224,48 @@ let bookBlue,
   lilypad4;
 
 const raycasterObjects = [];
+const raycastHitToVisualObject = new Map();
 let currentIntersects = [];
 let currentHoveredObject = null;
 
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
+
+function createDetachedHitboxForTarget(target) {
+  if (!target?.isMesh || !target.geometry) return null;
+
+  target.updateWorldMatrix(true, false);
+  const worldPosition = new THREE.Vector3();
+  const worldQuaternion = new THREE.Quaternion();
+  const worldScale = new THREE.Vector3();
+  target.matrixWorld.decompose(worldPosition, worldQuaternion, worldScale);
+
+  const hitbox = new THREE.Mesh(
+    target.geometry.clone(),
+    new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+    }),
+  );
+
+  hitbox.name = target.name;
+  hitbox.position.copy(worldPosition);
+  hitbox.quaternion.copy(worldQuaternion);
+  hitbox.scale.copy(worldScale);
+  hitbox.userData.isRaycastHitbox = true;
+
+  scene.add(hitbox);
+  raycastHitToVisualObject.set(hitbox, target);
+  raycasterObjects.push(hitbox);
+  return hitbox;
+}
+
+function resolveRaycastVisualObject(hitObject) {
+  return raycastHitToVisualObject.get(hitObject) || hitObject;
+}
 
 // Loaders
 const textureLoader = new THREE.TextureLoader(manager);
@@ -660,18 +697,19 @@ function handleRaycasterInteraction(e) {
   if (currentIntersects.length === 0) return;
 
   const hitObject = currentIntersects[0].object;
+  const visualObject = resolveRaycastVisualObject(hitObject);
 
-  const stringIndex = getGuitarStringIndex(hitObject);
+  const stringIndex = getGuitarStringIndex(visualObject);
   if (stringIndex) {
     playStringSoundByIndex(stringIndex);
     return;
   }
 
-  if (hitObject.name.includes("Blu_Body") || hitObject.name.includes("Rug")) {
+  if (visualObject.name.includes("Blu_Body") || visualObject.name.includes("Rug")) {
     showModal(modals.blu);
-  } else if (hitObject.name.includes("Vinyl")) {
+  } else if (visualObject.name.includes("Vinyl")) {
     showModal(modals.reflectiv);
-  } else if (hitObject.name.includes("Bin")) {
+  } else if (visualObject.name.includes("Bin")) {
     showModal(modals.reflectiv);
     setReflectivTab(modals.reflectiv, "library");
   }
@@ -746,11 +784,7 @@ loader.load("/models/Room_Portfolio_V4.glb", (glb) => {
         "_Sixth",
       ];
       if (raycasterNameTags.some((tag) => child.name.includes(tag))) {
-        if (child.name.includes("Hover")) {
-          raycasterObjects.push(child);
-        } else {
-          raycasterObjects.push(child);
-        }
+        createDetachedHitboxForTarget(child);
       }
 
       if (child.name.includes("Hover")) {
@@ -907,7 +941,7 @@ loader.load("/models/Room_Portfolio_V4.glb", (glb) => {
     guitarGroup.userData.hoverTiltY = Math.PI / 24;
     guitarGroup.userData.initialQuaternion = guitarGroup.quaternion.clone();
 
-    raycasterObjects.push(guitarGroup);
+    createDetachedHitboxForTarget(guitarGroup);
   }
 });
 
@@ -1324,8 +1358,9 @@ const render = (timestamp = 0) => {
 
     if (currentIntersects.length > 0) {
       const hitObject = currentIntersects[0].object;
-      const hoverRoot = getHoverRoot(hitObject);
-      const hoverLogKey = hoverRoot.name.includes("Hover") ? hoverRoot.name : hitObject.name;
+      const visualObject = resolveRaycastVisualObject(hitObject);
+      const hoverRoot = getHoverRoot(visualObject);
+      const hoverLogKey = hoverRoot.name.includes("Hover") ? hoverRoot.name : visualObject.name;
 
       if (hoverLogKey && hoverLogKey !== lastTerminalHoverKey) {
         const line = buildHoverTerminalLine(hoverLogKey);
@@ -1335,7 +1370,7 @@ const render = (timestamp = 0) => {
         lastTerminalHoverKey = hoverLogKey;
       }
 
-      document.body.style.cursor = hitObject.name.includes("Pointer")
+      document.body.style.cursor = visualObject.name.includes("Pointer")
         ? "pointer"
         : "default";
 
