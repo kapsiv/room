@@ -132,6 +132,10 @@
           id="reflectiv-tab-button"
         >
           reflectIV
+          <span class="ui-tooltip">
+            <span class="ui-tooltip-trigger" aria-label="reflectIV description" tabindex="0">i</span>
+            <span class="ui-tooltip-content" role="tooltip">like my own kind of spotify wrapped! statistics and visualisations of my music listening habits</span>
+          </span>
         </button>
         <button
           type="button"
@@ -238,11 +242,6 @@
             </div>
           </section>
 
-          <section class="chart-section">
-            <h3 class="chart-title">tags over time</h3>
-            <canvas id="tagStream"></canvas>
-            <p class="chart-note">working on this</p>
-          </section>
         </div>
         </section>
         <section
@@ -273,12 +272,34 @@
             </div>
 
             <section class="chart-section">
-              <h3 class="chart-title">albums by year</h3>
+              <div class="chart-title-row chart-title-row--split">
+                <h3 class="chart-title">albums by year</h3>
+                <div class="musiclib-year-filter">
+                  <span class="musiclib-year-filter-label" tabindex="0">filter by genre</span>
+                  <div class="musiclib-year-filter-popover">
+                    <label class="musiclib-year-filter-field" for="libraryYearGenreFilter">genre group</label>
+                    <select id="libraryYearGenreFilter" class="musiclib-year-filter-select">
+                      <option value="all">all genres</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
               <canvas id="libraryAlbumsByYear"></canvas>
             </section>
 
             <section class="chart-section">
-              <h3 class="chart-title">albums by country</h3>
+              <div class="chart-title-row chart-title-row--split">
+                <h3 class="chart-title">albums by country</h3>
+                <div class="musiclib-year-filter">
+                  <span class="musiclib-year-filter-label" tabindex="0">filter by genre</span>
+                  <div class="musiclib-year-filter-popover">
+                    <label class="musiclib-year-filter-field" for="libraryCountryGenreFilter">genre group</label>
+                    <select id="libraryCountryGenreFilter" class="musiclib-year-filter-select">
+                      <option value="all">all genres</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
               <canvas id="libraryWorldMap"></canvas>
               <p id="libraryWorldMapNote" class="chart-note">loading map...</p>
             </section>
@@ -334,15 +355,26 @@
               </div>
             </section>
 
-            <section class="chart-section">
-              <div class="chart-title-row">
-                <h3 class="chart-title">genre distribution</h3>
-                <span class="ui-tooltip">
-                  <button type="button" class="ui-tooltip-trigger" aria-label="Genre distribution notes">i</button>
-                  <span class="ui-tooltip-content" role="tooltip">subgenres have been grouped under genre groups</span>
-                </span>
+            <section class="chart-row">
+              <div class="chart-section half">
+                <div class="chart-title-row">
+                  <h3 class="chart-title">genre distribution</h3>
+                  <span class="ui-tooltip">
+                    <button type="button" class="ui-tooltip-trigger" aria-label="Genre distribution notes">i</button>
+                    <span class="ui-tooltip-content" role="tooltip">subgenres have been grouped under genre groups</span>
+                  </span>
+                </div>
+                <canvas id="libraryGenreUmbrellaPie"></canvas>
               </div>
-              <canvas id="libraryGenreUmbrellaPie"></canvas>
+              <div class="chart-section half">
+                <h3 class="chart-title">filetype distribution</h3>
+                <canvas id="libraryFileTypePie"></canvas>
+              </div>
+            </section>
+
+            <section class="chart-section">
+              <h3 class="chart-title">song length distribution</h3>
+              <canvas id="libraryDurationScatter"></canvas>
             </section>
           </div>
         </section>

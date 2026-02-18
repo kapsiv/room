@@ -668,6 +668,10 @@ a:focus-visible {
   margin-bottom: 8px;
 }
 
+.chart-title-row--split {
+  justify-content: space-between;
+}
+
 .chart-title-row .chart-title {
   margin-bottom: 0;
 }
@@ -676,6 +680,7 @@ a:focus-visible {
   position: relative;
   display: inline-flex;
   align-items: center;
+  z-index: 50;
 }
 
 .ui-tooltip-trigger {
@@ -700,8 +705,8 @@ a:focus-visible {
   left: calc(100% + 8px);
   top: 50%;
   transform: translateY(-50%);
-  min-width: 220px;
-  max-width: 280px;
+  min-width: 280px;
+  max-width: 360px;
   padding: 6px 8px;
   border-radius: 6px;
   border: 1px solid rgba(78, 71, 56, 0.35);
@@ -709,18 +714,80 @@ a:focus-visible {
   color: vars.$base-brown;
   font-size: 12px;
   line-height: 1.3;
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: break-word;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.14);
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
   transition: opacity 0.14s ease, visibility 0.14s ease;
-  z-index: 5;
+  z-index: 2000;
 }
 
 .ui-tooltip:hover .ui-tooltip-content,
 .ui-tooltip:focus-within .ui-tooltip-content {
   opacity: 1;
   visibility: visible;
+}
+
+.musiclib-year-filter {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.musiclib-year-filter-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: lowercase;
+  color: rgba(78, 71, 56, 0.88);
+  border: 1px solid rgba(78, 71, 56, 0.35);
+  border-radius: 999px;
+  padding: 2px 9px;
+  background: #f5f0e8;
+  cursor: default;
+}
+
+.musiclib-year-filter-popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 190px;
+  padding: 8px;
+  border: 1px solid rgba(78, 71, 56, 0.35);
+  border-radius: 8px;
+  background: #f5f0e8;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.14);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  z-index: 6;
+}
+
+.musiclib-year-filter:hover .musiclib-year-filter-popover,
+.musiclib-year-filter:focus-within .musiclib-year-filter-popover {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.musiclib-year-filter-field {
+  display: block;
+  font-size: 11px;
+  margin-bottom: 4px;
+  opacity: 0.85;
+  text-transform: lowercase;
+}
+
+.musiclib-year-filter-select {
+  width: 100%;
+  border: 1px solid rgba(78, 71, 56, 0.35);
+  border-radius: 6px;
+  padding: 4px 6px;
+  background: #ece5da;
+  color: #4e4738;
+  font-size: 12px;
 }
 
 .chart-row {
@@ -887,7 +954,9 @@ a:focus-visible {
 #tagStream,
 #libraryAlbumsByYear,
 #libraryWorldMap,
-#libraryGenreUmbrellaPie {
+#libraryGenreUmbrellaPie,
+#libraryFileTypePie,
+#libraryDurationScatter {
   width: 100%;
   height: 220px;
 }
