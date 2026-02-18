@@ -219,26 +219,30 @@ a:focus-visible {
 }
 
 .modal-window-content::-webkit-scrollbar,
-.top-artists-scroll::-webkit-scrollbar {
+.top-artists-scroll::-webkit-scrollbar,
+.library-lookup-scroll::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
 
 .modal-window-content::-webkit-scrollbar-track,
-.top-artists-scroll::-webkit-scrollbar-track {
+.top-artists-scroll::-webkit-scrollbar-track,
+.library-lookup-scroll::-webkit-scrollbar-track {
   background: #ece5da;
   border-radius: 10px;
 }
 
 .modal-window-content::-webkit-scrollbar-thumb,
-.top-artists-scroll::-webkit-scrollbar-thumb {
+.top-artists-scroll::-webkit-scrollbar-thumb,
+.library-lookup-scroll::-webkit-scrollbar-thumb {
   background: vars.$base-brown;
   border-radius: 10px;
   border: 2px solid #ece5da;
 }
 
 .modal-window-content::-webkit-scrollbar-thumb:hover,
-.top-artists-scroll::-webkit-scrollbar-thumb:hover {
+.top-artists-scroll::-webkit-scrollbar-thumb:hover,
+.library-lookup-scroll::-webkit-scrollbar-thumb:hover {
   background: #3f392d;
 }
 
@@ -251,6 +255,11 @@ a:focus-visible {
   width: min(420px, calc(100vw - 32px));
   min-width: min(320px, calc(100vw - 32px));
   background: #f5f0e8;
+}
+
+.modal--lookup {
+  width: min(420px, calc(100vw - 32px));
+  min-width: min(320px, calc(100vw - 32px));
 }
 
 .modal--nowplaying .modal-window-content {
@@ -618,6 +627,18 @@ a:focus-visible {
   background: #ece5da;
 }
 
+.fact-card--clickable {
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.fact-card--clickable:hover,
+.fact-card--clickable:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(78, 71, 56, 0.16);
+  outline: none;
+}
+
 .fact-label {
   font-size: 12px;
   opacity: 0.8;
@@ -638,6 +659,68 @@ a:focus-visible {
 
 .chart-title {
   margin-bottom: 8px;
+}
+
+.chart-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.chart-title-row .chart-title {
+  margin-bottom: 0;
+}
+
+.ui-tooltip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.ui-tooltip-trigger {
+  width: 18px;
+  height: 18px;
+  border: 1px solid rgba(78, 71, 56, 0.7);
+  border-radius: 50%;
+  background: #f5f0e8;
+  color: vars.$base-brown;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: help;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.ui-tooltip-content {
+  position: absolute;
+  left: calc(100% + 8px);
+  top: 50%;
+  transform: translateY(-50%);
+  min-width: 220px;
+  max-width: 280px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(78, 71, 56, 0.35);
+  background: #f5f0e8;
+  color: vars.$base-brown;
+  font-size: 12px;
+  line-height: 1.3;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.14);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.14s ease, visibility 0.14s ease;
+  z-index: 5;
+}
+
+.ui-tooltip:hover .ui-tooltip-content,
+.ui-tooltip:focus-within .ui-tooltip-content {
+  opacity: 1;
+  visibility: visible;
 }
 
 .chart-row {
@@ -671,6 +754,16 @@ a:focus-visible {
   text-align: right;
 }
 
+.library-ranking-columns {
+  grid-template-columns: minmax(0, 1fr) 90px 64px;
+  column-gap: 14px;
+}
+
+.library-ranking-columns span:nth-child(2),
+.library-ranking-columns span:nth-child(3) {
+  text-align: left;
+}
+
 .modal-window-content .top-artists-list {
   list-style: none;
   padding-left: 0;
@@ -685,6 +778,11 @@ a:focus-visible {
   padding: 6px 0;
 }
 
+.modal-window-content .top-artists-list--three-cols li {
+  grid-template-columns: minmax(0, 1fr) 90px 64px;
+  column-gap: 14px;
+}
+
 .artist-name {
   min-width: 0;
   overflow: hidden;
@@ -697,17 +795,99 @@ a:focus-visible {
   white-space: nowrap;
 }
 
+.artist-share {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.top-artists-list--three-cols .artist-count,
+.top-artists-list--three-cols .artist-share {
+  text-align: left;
+}
+
+.musiclib-controls {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
+.musiclib-metric-filters {
+  margin-bottom: 0;
+}
+
 .chart-note {
   margin-top: 6px;
   font-size: 13px;
   opacity: 0.8;
 }
 
+.library-lookup-controls {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+
+.library-lookup-toggle {
+  padding: 4px 10px;
+  font-size: 12px;
+}
+
+.library-lookup-scroll {
+  max-height: min(62vh, 520px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: vars.$base-brown #ece5da;
+}
+
+.library-lookup-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.library-lookup-list li {
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(78, 71, 56, 0.2);
+}
+
+.library-lookup-group-row {
+  padding: 7px 9px;
+  font-weight: 700;
+  color: #3f392d;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  font-size: 12px;
+  border: 1px solid rgba(78, 71, 56, 0.26);
+  border-radius: 6px;
+  background: #e8dfd1;
+}
+
+.library-lookup-group-block {
+  padding: 6px 0 8px;
+  border-bottom: 1px solid rgba(78, 71, 56, 0.2);
+}
+
+.library-lookup-sublist {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+}
+
+.library-lookup-child-row {
+  padding: 5px 0 5px 12px;
+  border-bottom: 1px solid rgba(78, 71, 56, 0.13);
+}
+
+.library-lookup-sublist .library-lookup-child-row:last-child {
+  border-bottom: 0;
+}
+
 #scrobblesOverTime,
 #tagPie,
 #tagStream,
 #libraryAlbumsByYear,
-#libraryWorldMap {
+#libraryWorldMap,
+#libraryGenreUmbrellaPie {
   width: 100%;
   height: 220px;
 }

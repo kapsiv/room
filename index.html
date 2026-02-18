@@ -262,11 +262,11 @@
                 <span class="fact-label">number of songs</span>
                 <span class="fact-value" id="musiclib-total-songs">-</span>
               </div>
-              <div class="fact-card">
+              <div class="fact-card fact-card--clickable" id="musiclib-artists-card" role="button" tabindex="0" aria-label="Open artists list">
                 <span class="fact-label">number of artists</span>
                 <span class="fact-value" id="musiclib-total-artists">-</span>
               </div>
-              <div class="fact-card">
+              <div class="fact-card fact-card--clickable" id="musiclib-genres-card" role="button" tabindex="0" aria-label="Open genres list">
                 <span class="fact-label">number of genres</span>
                 <span class="fact-value" id="musiclib-total-genres">-</span>
               </div>
@@ -283,39 +283,86 @@
               <p id="libraryWorldMapNote" class="chart-note">loading map...</p>
             </section>
 
-            <section class="chart-section">
-              <h3 class="chart-title">top artists</h3>
-              <div class="top-artists-columns">
-                <span>artist</span>
-                <span>songs</span>
+            <div class="musiclib-controls">
+              <div class="reflectiv-filters musiclib-metric-filters">
+                <button class="reflectiv-filter musiclib-metric-filter active" data-metric="songs">songs</button>
+                <button class="reflectiv-filter musiclib-metric-filter" data-metric="albums">albums</button>
               </div>
-              <div class="top-artists-scroll top-artists-scroll--tall">
-                <ul id="libraryTopArtistsList" class="top-artists-list">
-                  <li>
-                    <span class="artist-name">loading...</span>
-                    <span class="artist-count">-</span>
-                  </li>
-                </ul>
+            </div>
+
+            <section class="chart-row musiclib-rankings-row">
+              <div class="chart-section">
+                <h3 class="chart-title">top artists</h3>
+                <div class="top-artists-columns library-ranking-columns">
+                  <span>artist</span>
+                  <span id="libraryTopArtistsCountLabel">songs</span>
+                  <span>%</span>
+                </div>
+                <div class="top-artists-scroll top-artists-scroll--tall">
+                  <ul id="libraryTopArtistsList" class="top-artists-list top-artists-list--three-cols">
+                    <li>
+                      <span class="artist-name">loading...</span>
+                      <span class="artist-count">-</span>
+                      <span class="artist-share">-</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="chart-section">
+                <div class="chart-title-row">
+                  <h3 class="chart-title">top genres</h3>
+                  <span class="ui-tooltip">
+                    <button type="button" class="ui-tooltip-trigger" aria-label="Genre notes">i</button>
+                    <span class="ui-tooltip-content" role="tooltip">note: releases can be tagged with multiple genres</span>
+                  </span>
+                </div>
+                <div class="top-artists-columns library-ranking-columns">
+                  <span>genre</span>
+                  <span id="libraryTopGenresCountLabel">songs</span>
+                  <span>%</span>
+                </div>
+                <div class="top-artists-scroll top-artists-scroll--tall">
+                  <ul id="libraryTopGenresList" class="top-artists-list top-artists-list--three-cols">
+                    <li>
+                      <span class="artist-name">loading...</span>
+                      <span class="artist-count">-</span>
+                      <span class="artist-share">-</span>
+                    </li>
+                  </ul>
+                </div>
               </div>
             </section>
 
             <section class="chart-section">
-              <h3 class="chart-title">top genres</h3>
-              <div class="top-artists-columns">
-                <span>genre</span>
-                <span>songs</span>
+              <div class="chart-title-row">
+                <h3 class="chart-title">genre distribution</h3>
+                <span class="ui-tooltip">
+                  <button type="button" class="ui-tooltip-trigger" aria-label="Genre distribution notes">i</button>
+                  <span class="ui-tooltip-content" role="tooltip">subgenres have been grouped under genre groups</span>
+                </span>
               </div>
-              <div class="top-artists-scroll">
-                <ul id="libraryTopGenresList" class="top-artists-list">
-                  <li>
-                    <span class="artist-name">loading...</span>
-                    <span class="artist-count">-</span>
-                  </li>
-                </ul>
-              </div>
+              <canvas id="libraryGenreUmbrellaPie"></canvas>
             </section>
           </div>
         </section>
+      </div>
+    </div>
+
+    <div class="library-lookup modal modal--lookup" role="dialog" aria-modal="true" aria-labelledby="window-title-library-lookup">
+      <div class="modal-window-bar">
+        <div id="window-title-library-lookup" class="modal-window-title">artists</div>
+        <button class="modal-exit-button" type="button" aria-label="Close window">X</button>
+      </div>
+      <div class="modal-window-content">
+        <div class="library-lookup-controls">
+          <button id="libraryLookupGroupToggle" type="button" class="reflectiv-filter library-lookup-toggle" hidden>group genres: off</button>
+        </div>
+        <div class="library-lookup-scroll">
+          <ul id="libraryLookupList" class="library-lookup-list">
+            <li>loading...</li>
+          </ul>
+        </div>
       </div>
     </div>
 

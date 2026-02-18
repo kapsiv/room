@@ -14,9 +14,230 @@ const countryAliases = {
   "north korea": "korea democratic peoples republic of",
 };
 
+const genreUmbrellaMap = {
+  // rock
+  "acid rock": "rock",
+  "alternative rock": "rock",
+  "anatolian rock": "rock",
+  "art rock": "rock",
+  "avant-prog": "rock",
+  "brutal prog": "rock",
+  "canterbury scene": "rock",
+  "folk rock": "rock",
+  "folk-rock": "rock",
+  "garage rock": "rock",
+  "garage rock revival": "rock",
+  "gothic rock": "rock",
+  "grunge": "rock",
+  "hard rock": "rock",
+  "indie rock": "rock",
+  "industrial rock": "rock",
+  "javanese tribal rock": "rock",
+  "krautrock": "rock",
+  "math rock": "rock",
+  "neo-psychedelia": "rock",
+  "new wave": "rock",
+  "no wave": "rock",
+  "noise rock": "rock",
+  "pop rock": "rock",
+  "post-britpop": "rock",
+  "post-rock": "rock",
+  "progressive rock": "rock",
+  "proto-punk": "rock",
+  "psychedelic rock": "rock",
+  "raga rock": "rock",
+  "rock in opposition": "rock",
+  "rock opera": "rock",
+  "shoegaze": "rock",
+  "slacker rock": "rock",
+  "slowcore": "rock",
+  "space rock": "rock",
+  "space rock revival": "rock",
+  "symphonic prog": "rock",
+  "symphonic rock": "rock",
+  "yacht rock": "rock",
+
+  // punk
+  "art punk": "punk / hardcore",
+  "emo": "punk / hardcore",
+  "hardcore punk": "punk / hardcore",
+  "midwest emo": "punk / hardcore",
+  "post-hardcore": "punk / hardcore",
+  "post-punk": "punk / hardcore",
+  "post-punk revival": "punk / hardcore",
+  "punk blues": "punk / hardcore",
+  "stoner metal": "metal",
+
+  // jazz
+  "avant-garde jazz": "jazz",
+  "chamber jazz": "jazz",
+  "contemporary jazz": "jazz",
+  "cool jazz": "jazz",
+  "european free jazz": "jazz",
+  "experimental big band": "jazz",
+  "free improvisation": "jazz",
+  "free jazz": "jazz",
+  "hard bop": "jazz",
+  "indo jazz": "jazz",
+  "jazz funk": "jazz",
+  "jazz fusion": "jazz",
+  "jazz pop": "jazz",
+  "jazz rock": "jazz",
+  "modal jazz": "jazz",
+  "post-bop": "jazz",
+  "spiritual jazz": "jazz",
+  "third stream": "jazz",
+  "vocal jazz": "jazz",
+
+  // blues
+  "blues": "blues",
+  "blues rock": "blues",
+  "chicago blues": "blues",
+  "electric blues": "blues",
+
+  // electronic
+  "acid techno": "electronic",
+  "ambient techno": "electronic",
+  "downtempo": "electronic",
+  "drill and bass": "electronic",
+  "dubstep": "electronic",
+  "electronic": "electronic",
+  "electronic dance music": "electronic",
+  "electropop": "electronic",
+  "future garage": "electronic",
+  "glitch": "electronic",
+  "glitch pop": "electronic",
+  "house": "electronic",
+  "idm": "electronic",
+  "indietronica": "electronic",
+  "industrial": "electronic",
+  "microhouse": "electronic",
+  "microsound": "electronic",
+  "progressive electronic": "electronic",
+  "synthpop": "electronic",
+  "trip hop": "electronic",
+
+  // ambient
+  "ambient": "ambient",
+  "ambient pop": "ambient",
+  "dark ambient": "ambient",
+  "drone": "ambient",
+  "eai": "ambient",
+  "onkyo": "ambient",
+  "new age": "ambient",
+  "space ambient": "ambient",
+  "tribal ambient": "ambient",
+
+  // experimental
+  "avant-garde": "experimental / sound art",
+  "data sonification": "experimental / sound art",
+  "electroacoustic": "experimental / sound art",
+  "experimental": "experimental / sound art",
+  "field recordings": "experimental / sound art",
+  "musique concrete": "experimental / sound art",
+  "nature recordings": "experimental / sound art",
+  "noise": "experimental / sound art",
+  "sound collage": "experimental / sound art",
+  "plunderphonics": "experimental / sound art",
+  "tape music": "experimental / sound art",
+  "turntable music": "experimental / sound art",
+
+  // country
+  "alt-country": "country / americana",
+  "americana": "country / americana",
+  "contemporary country": "country / americana",
+  "progressive bluegrass": "country / americana",
+
+  // folk
+  "acoustic": "folk",
+  "avant-folk": "folk",
+  "chamber folk": "folk",
+  "contemporary folk": "folk",
+  "folk baroque": "folk",
+  "folktronica": "folk",
+  "freak folk": "folk",
+  "indie folk": "folk",
+  "neofolk": "folk",
+  "progressive folk": "folk",
+  "psychedelic folk": "folk",
+  "wyrd folk": "folk",
+
+  // classical
+  "ballet": "classical",
+  "carnatic classical music": "classical",
+  "chamber music": "classical",
+  "classical": "classical",
+  "hindustani classical music": "classical",
+  "microtonal classical": "classical",
+  "minimalism": "classical",
+  "modern classical": "classical",
+  "post-minimalism": "classical",
+  "totalism": "classical",
+
+  // pop
+  "a cappella": "pop",
+  "art pop": "pop",
+  "baroque pop": "pop",
+  "chamber pop": "pop",
+  "dark cabaret": "pop",
+  "dream pop": "pop",
+  "hypnagogic pop": "pop",
+  "indie": "rock",
+  "indie pop": "pop",
+  "jangle pop": "pop",
+  "math pop": "pop",
+  "noise pop": "pop",
+  "power pop": "pop",
+  "progressive pop": "pop",
+  "psychedelic pop": "pop",
+  "shibuya-kei": "pop",
+
+  // funk / reggae
+  "funk": "funk / soul",
+  "dub": "reggae",
+  "reggae fusion": "reggae",
+
+  // world
+  "afrobeat": "world / traditional",
+  "bossa nova": "world / traditional",
+  "burmese stereo": "world / traditional",
+  "gamelan": "world / traditional",
+  "ghazal": "world / traditional",
+  "griot music": "world / traditional",
+  "jaipongan": "world / traditional",
+  "klezmer": "world / traditional",
+  "mande music": "world / traditional",
+  "min yo": "world / traditional",
+  "molam sing": "world / traditional",
+  "qawwali": "world / traditional",
+  "southeast asian folk music": "world / traditional",
+
+  // other
+  "spoken word": "spoken / vocal",
+};
+
+function normalizeGenreKey(value) {
+  return String(value || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/&/g, " and ")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+const normalizedGenreUmbrellaMap = Object.fromEntries(
+  Object.entries(genreUmbrellaMap).map(([key, umbrella]) => [normalizeGenreKey(key), umbrella]),
+);
+
 export function createReflectivFeature({ gsap, modals, getShowModal }) {
   const reflectivState = {
     range: "all",
+    libraryMetric: "songs",
+    libraryArtists: [],
+    libraryGenres: [],
+    libraryLookupType: "artists",
+    libraryLookupGrouped: false,
     scrobbles: [],
     daily: [],
     topArtists: [],
@@ -158,6 +379,17 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
     });
   }
 
+  function formatDayKey(dayKey) {
+    const d = new Date(`${dayKey}T00:00:00Z`);
+    if (Number.isNaN(d.getTime())) return dayKey;
+    return d.toLocaleDateString("en-GB", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      timeZone: "UTC",
+    });
+  }
+
   function countBy(items, keyFn) {
     const map = new Map();
     items.forEach((item) => {
@@ -199,12 +431,43 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
   }
 
   function getSeriesForRange(range) {
-    const daily = reflectivState.daily;
-    if (!daily.length) return [];
-    if (range === "week") return lastNDays(daily, 7).map((d) => ({ label: d.day.slice(5), count: d.count, date: d.date }));
-    if (range === "month") return lastNDays(daily, 31).map((d) => ({ label: d.day.slice(5), count: d.count, date: d.date }));
-    if (range === "year") return lastNDays(daily, 365).map((d) => ({ label: d.day.slice(2), count: d.count, date: d.date }));
-    return aggregateMonthly(daily);
+    if (range === "all") {
+      const daily = reflectivState.daily;
+      if (!daily.length) return [];
+      return aggregateMonthly(daily);
+    }
+
+    const scrobbles = getScrobblesForRange(range);
+    if (!scrobbles.length) return [];
+    const daily = aggregateDaily(scrobbles);
+    if (range === "year") return daily.map((d) => ({ label: d.day.slice(2), count: d.count, date: d.date }));
+    return daily.map((d) => ({ label: d.day.slice(5), count: d.count, date: d.date }));
+  }
+
+  function getRangeCutoffTimestamp(range, latestUts) {
+    const latestDate = new Date(Number(latestUts) * 1000);
+    if (Number.isNaN(latestDate.getTime())) return null;
+
+    const cutoff = new Date(latestDate);
+    if (range === "year") cutoff.setUTCFullYear(cutoff.getUTCFullYear() - 1);
+    else if (range === "month") cutoff.setUTCMonth(cutoff.getUTCMonth() - 1);
+    else if (range === "week") cutoff.setUTCDate(cutoff.getUTCDate() - 7);
+    else return null;
+
+    return Math.floor(cutoff.getTime() / 1000);
+  }
+
+  function getScrobblesForRange(range) {
+    const scrobbles = reflectivState.scrobbles;
+    if (!scrobbles.length || range === "all") return scrobbles;
+
+    const latestUts = Number(scrobbles[0]?.uts);
+    if (!Number.isFinite(latestUts)) return scrobbles;
+
+    const cutoffUts = getRangeCutoffTimestamp(range, latestUts);
+    if (!Number.isFinite(cutoffUts)) return scrobbles;
+
+    return scrobbles.filter((s) => Number(s.uts) >= cutoffUts);
   }
 
   function drawLineOnCanvas(canvas, series, range = "all") {
@@ -387,6 +650,83 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
       ctx.font = "12px 'Ubuntu Mono', monospace";
       ctx.fillText(String(item[labelKey]).slice(0, 24), 8, y + rowH / 2 + 4);
       ctx.fillText(String(item[valueKey]), 194 + w, y + rowH / 2 + 4);
+    });
+  }
+
+  function drawGenreUmbrellaPie(canvas, countsMap) {
+    const ctx = canvas?.getContext?.("2d");
+    if (!ctx) return;
+    const width = canvas.clientWidth || 720;
+    const height = canvas.clientHeight || 260;
+    canvas.width = width;
+    canvas.height = height;
+    ctx.clearRect(0, 0, width, height);
+
+    const data = [...countsMap.entries()]
+      .map(([name, count]) => ({ name, count }))
+      .filter((d) => d.count > 0)
+      .sort((a, b) => b.count - a.count);
+
+    if (!data.length) {
+      ctx.fillStyle = "#4e4738";
+      ctx.font = "14px 'Ubuntu Mono', monospace";
+      ctx.fillText("No genre data available", 12, 20);
+      return;
+    }
+
+    const total = data.reduce((sum, d) => sum + d.count, 0);
+    const size = Math.min(width * 0.38, height - 20);
+    const radius = Math.max(42, size / 2);
+    const innerRadius = Math.round(radius * 0.58);
+    const cx = Math.max(radius + 14, Math.min(width * 0.24, width - radius - 14));
+    const cy = height / 2;
+
+    const palette = data.map((_, idx) => {
+      const hue = 34 + ((idx * 31) % 56);
+      const saturation = 20 + ((idx * 17) % 18);
+      const lightness = 28 + ((idx * 13) % 30);
+      return `hsl(${hue} ${saturation}% ${lightness}%)`;
+    });
+
+    let angle = -Math.PI / 2;
+    data.forEach((slice, idx) => {
+      const sweep = (slice.count / total) * Math.PI * 2;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.arc(cx, cy, radius, angle, angle + sweep);
+      ctx.closePath();
+      ctx.fillStyle = palette[idx % palette.length];
+      ctx.fill();
+      ctx.strokeStyle = "#ece5da";
+      ctx.lineWidth = 1.8;
+      ctx.stroke();
+      angle += sweep;
+    });
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, innerRadius, 0, Math.PI * 2);
+    ctx.fillStyle = "#ece5da";
+    ctx.fill();
+    ctx.strokeStyle = "rgba(78, 71, 56, 0.2)";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    const legendX = Math.max(cx + radius + 26, width * 0.46);
+    const legendY = 14;
+    const rowH = 16;
+    const maxRows = Math.max(1, Math.floor((height - 20) / rowH));
+    const shown = data.slice(0, maxRows);
+
+    ctx.font = "12px 'Ubuntu Mono', monospace";
+    ctx.textBaseline = "middle";
+    ctx.textAlign = "left";
+    shown.forEach((item, idx) => {
+      const y = legendY + idx * rowH;
+      const pct = `${((item.count / total) * 100).toFixed(1)}%`;
+      ctx.fillStyle = palette[idx % palette.length];
+      ctx.fillRect(legendX, y - 4, 8, 8);
+      ctx.fillStyle = "#4e4738";
+      ctx.fillText(`${item.name} (${pct})`, legendX + 12, y);
     });
   }
 
@@ -687,19 +1027,26 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
   }
 
   function updateReflectivFacts(modal) {
-    const scrobbles = reflectivState.scrobbles;
+    const scrobbles = getScrobblesForRange(reflectivState.range);
     const totalEl = modal.querySelector("#fact-total-scrobbles");
     const busyEl = modal.querySelector("#fact-busiest-day");
     const firstEl = modal.querySelector("#fact-last-updated");
     const lastEl = modal.querySelector("#fact-first-scrobble");
-    if (!scrobbles.length) return;
+    if (!scrobbles.length) {
+      if (totalEl) totalEl.textContent = "0";
+      if (busyEl) busyEl.textContent = "-";
+      if (firstEl) firstEl.textContent = "-";
+      if (lastEl) lastEl.textContent = "-";
+      return;
+    }
 
     const first = scrobbles[scrobbles.length - 1];
     const last = scrobbles[0];
-    const busiest = reflectivState.daily.reduce((max, d) => (d.count > max.count ? d : max), reflectivState.daily[0]);
+    const daily = aggregateDaily(scrobbles);
+    const busiest = daily.reduce((max, d) => (d.count > max.count ? d : max), daily[0]);
 
     if (totalEl) totalEl.textContent = scrobbles.length.toLocaleString();
-    if (busyEl) busyEl.textContent = `${busiest.count} on ${busiest.day}`;
+    if (busyEl) busyEl.textContent = `${busiest.count} on ${formatDayKey(busiest.day)}`;
     if (firstEl) firstEl.textContent = formatDate(first.uts);
     if (lastEl) lastEl.textContent = formatDate(last.uts);
   }
@@ -876,12 +1223,82 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
     }
   }
 
+  function sortAlpha(values) {
+    return [...values].sort((a, b) => String(a).localeCompare(String(b), "en-GB", { sensitivity: "base" }));
+  }
+
+  function updateLibraryLookupToggle(lookupModal) {
+    const toggle = lookupModal?.querySelector("#libraryLookupGroupToggle");
+    if (!toggle) return;
+    const isGenres = reflectivState.libraryLookupType === "genres";
+    toggle.hidden = !isGenres;
+    if (!isGenres) return;
+    toggle.classList.toggle("active", reflectivState.libraryLookupGrouped);
+    toggle.textContent = `group genres: ${reflectivState.libraryLookupGrouped ? "on" : "off"}`;
+  }
+
+  function renderLibraryLookupList(lookupModal) {
+    const listEl = lookupModal?.querySelector("#libraryLookupList");
+    if (!listEl) return;
+
+    const isGenres = reflectivState.libraryLookupType === "genres";
+    const items = isGenres ? reflectivState.libraryGenres : reflectivState.libraryArtists;
+    if (!items.length) {
+      listEl.innerHTML = "<li>no data found.</li>";
+      return;
+    }
+
+    if (!isGenres || !reflectivState.libraryLookupGrouped) {
+      listEl.innerHTML = items.map((item) => `<li>${item}</li>`).join("");
+      return;
+    }
+
+    const grouped = new Map();
+    items.forEach((genre) => {
+      const umbrella = normalizedGenreUmbrellaMap[normalizeGenreKey(genre)] || "other";
+      if (!grouped.has(umbrella)) grouped.set(umbrella, []);
+      grouped.get(umbrella).push(genre);
+    });
+
+    const groupNames = sortAlpha(grouped.keys());
+    listEl.innerHTML = groupNames
+      .map((group) => {
+        const rows = sortAlpha(grouped.get(group))
+          .map((genre) => `<li class="library-lookup-child-row">${genre}</li>`)
+          .join("");
+        return `<li class="library-lookup-group-block"><div class="library-lookup-group-row">${group}</div><ul class="library-lookup-sublist">${rows}</ul></li>`;
+      })
+      .join("");
+  }
+
+  function openLibraryLookupModal(type) {
+    const showModal = getShowModal?.();
+    const lookupModal = modals.libraryLookup;
+    if (!showModal || !lookupModal) return;
+
+    const titleEl = lookupModal.querySelector("#window-title-library-lookup");
+    if (!titleEl) return;
+
+    const isGenres = type === "genres";
+    const title = isGenres ? "genres" : "artists";
+    reflectivState.libraryLookupType = isGenres ? "genres" : "artists";
+    reflectivState.libraryLookupGrouped = false;
+    titleEl.textContent = title;
+    updateLibraryLookupToggle(lookupModal);
+    renderLibraryLookupList(lookupModal);
+
+    showModal(lookupModal);
+  }
+
   function renderMusicLibraryPanel(modal, rows) {
     const albums = new Set();
     const artists = new Set();
     const genres = new Set();
-    const artistCounts = new Map();
-    const genreCounts = new Map();
+    const artistSongCounts = new Map();
+    const genreSongCounts = new Map();
+    const umbrellaGenreCounts = new Map();
+    const artistAlbumSets = new Map();
+    const genreAlbumSets = new Map();
     const albumYearByKey = new Map();
     const albumCountriesByKey = new Map();
 
@@ -892,19 +1309,32 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
 
       if (artist) artists.add(artist);
       if (albumKey) albums.add(albumKey);
-      (r.Genres || "")
+      const rowGenres = [...new Set((r.Genres || "")
         .split(";")
         .map((g) => g.trim().toLowerCase())
-        .filter(Boolean)
-        .forEach((g) => {
-          genres.add(g);
-          genreCounts.set(g, (genreCounts.get(g) || 0) + 1);
-        });
-      if (artist) artistCounts.set(artist, (artistCounts.get(artist) || 0) + 1);
+        .filter(Boolean))];
+      rowGenres.forEach((g) => {
+        genres.add(g);
+        genreSongCounts.set(g, (genreSongCounts.get(g) || 0) + 1);
+        const umbrella = normalizedGenreUmbrellaMap[normalizeGenreKey(g)] || "other";
+        umbrellaGenreCounts.set(umbrella, (umbrellaGenreCounts.get(umbrella) || 0) + 1);
+      });
+      if (artist) artistSongCounts.set(artist, (artistSongCounts.get(artist) || 0) + 1);
 
       const year = Number.parseInt((r.Year || "").trim(), 10);
       if (albumKey && Number.isInteger(year) && year >= 1900 && year <= 2100 && !albumYearByKey.has(albumKey)) {
         albumYearByKey.set(albumKey, year);
+      }
+
+      if (albumKey) {
+        if (artist) {
+          if (!artistAlbumSets.has(artist)) artistAlbumSets.set(artist, new Set());
+          artistAlbumSets.get(artist).add(albumKey);
+        }
+        rowGenres.forEach((genre) => {
+          if (!genreAlbumSets.has(genre)) genreAlbumSets.set(genre, new Set());
+          genreAlbumSets.get(genre).add(albumKey);
+        });
       }
 
       if (albumKey) {
@@ -944,24 +1374,58 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
     setText("#musiclib-total-artists", artists.size.toLocaleString());
     setText("#musiclib-total-genres", genres.size.toLocaleString());
 
+    reflectivState.libraryArtists = sortAlpha(artists);
+    reflectivState.libraryGenres = sortAlpha(genres);
+
     const topArtistsList = modal.querySelector("#libraryTopArtistsList");
+    const topArtistsCountLabel = modal.querySelector("#libraryTopArtistsCountLabel");
+    const topGenresCountLabel = modal.querySelector("#libraryTopGenresCountLabel");
     if (topArtistsList) {
-      const topArtists = [...artistCounts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 50);
+      const metric = reflectivState.libraryMetric;
+      const topArtists = (metric === "albums"
+        ? [...artistAlbumSets.entries()].map(([name, albumSet]) => [name, albumSet.size])
+        : [...artistSongCounts.entries()])
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 100);
+      const totalForPercent = metric === "albums" ? albums.size : rows.length;
+      const percentFormatter = new Intl.NumberFormat("en-GB", { maximumFractionDigits: 1 });
+      if (topArtistsCountLabel) topArtistsCountLabel.textContent = metric;
       topArtistsList.innerHTML = topArtists
-        .map(([name, count], i) => `<li><span class="artist-name">${i + 1}. ${name}</span><span class="artist-count">${count.toLocaleString()}</span></li>`)
+        .map(([name, count], i) => {
+          const share = totalForPercent > 0 ? `${percentFormatter.format((count / totalForPercent) * 100)}%` : "0%";
+          return `<li><span class="artist-name">${i + 1}. ${name}</span><span class="artist-count">${count.toLocaleString()}</span><span class="artist-share">${share}</span></li>`;
+        })
         .join("");
     }
 
     const topGenresList = modal.querySelector("#libraryTopGenresList");
     if (topGenresList) {
-      const topGenres = [...genreCounts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 20);
+      const metric = reflectivState.libraryMetric;
+      const topGenres = (metric === "albums"
+        ? [...genreAlbumSets.entries()].map(([name, albumSet]) => [name, albumSet.size])
+        : [...genreSongCounts.entries()])
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 50);
+      const totalForPercent = metric === "albums" ? albums.size : rows.length;
+      const percentFormatter = new Intl.NumberFormat("en-GB", { maximumFractionDigits: 1 });
+      if (topGenresCountLabel) topGenresCountLabel.textContent = metric;
       topGenresList.innerHTML = topGenres
-        .map(([name, count], i) => `<li><span class="artist-name">${i + 1}. ${name}</span><span class="artist-count">${count.toLocaleString()}</span></li>`)
+        .map(([name, count], i) => {
+          const share = totalForPercent > 0 ? `${percentFormatter.format((count / totalForPercent) * 100)}%` : "0%";
+          return `<li><span class="artist-name">${i + 1}. ${name}</span><span class="artist-count">${count.toLocaleString()}</span><span class="artist-share">${share}</span></li>`;
+        })
         .join("");
     }
 
+    const metricButtons = modal.querySelectorAll(".musiclib-metric-filter[data-metric]");
+    metricButtons.forEach((button) => {
+      const metric = button.dataset.metric || "songs";
+      button.classList.toggle("active", metric === reflectivState.libraryMetric);
+    });
+
     drawAlbumsByYearCanvas(modal.querySelector("#libraryAlbumsByYear"), albumsByYear);
     renderMusicLibraryWorldMap(modal, countryAlbumCounts);
+    drawGenreUmbrellaPie(modal.querySelector("#libraryGenreUmbrellaPie"), umbrellaGenreCounts);
   }
 
   function bindReflectivControls(modal) {
@@ -982,6 +1446,7 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
         const next = btn.dataset.range || "all";
         reflectivState.range = next;
         buttons.forEach((b) => b.classList.toggle("active", b === btn));
+        updateReflectivFacts(modal);
         renderReflectivCharts(modal);
       });
     });
@@ -990,6 +1455,47 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
     if (libraryBtn) {
       libraryBtn.addEventListener("click", () => {
         setReflectivTab(modal, "library");
+      });
+    }
+
+    const metricButtons = modal.querySelectorAll(".musiclib-metric-filter[data-metric]");
+    metricButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        reflectivState.libraryMetric = button.dataset.metric || "songs";
+        metricButtons.forEach((b) => b.classList.toggle("active", b === button));
+        if (cacheState.collection?.length) {
+          renderMusicLibraryPanel(modal, cacheState.collection);
+        }
+      });
+    });
+
+    const bindLookupCard = (selector, type) => {
+      const card = modal.querySelector(selector);
+      if (!card) return;
+      const open = () => {
+        if (!cacheState.collection?.length) return;
+        openLibraryLookupModal(type);
+      };
+      card.addEventListener("click", open);
+      card.addEventListener("keydown", (e) => {
+        if (e.key !== "Enter" && e.key !== " ") return;
+        e.preventDefault();
+        open();
+      });
+    };
+
+    bindLookupCard("#musiclib-artists-card", "artists");
+    bindLookupCard("#musiclib-genres-card", "genres");
+
+    const lookupModal = modals.libraryLookup;
+    const lookupToggle = lookupModal?.querySelector("#libraryLookupGroupToggle");
+    if (lookupToggle && lookupModal.dataset.lookupBound !== "true") {
+      lookupModal.dataset.lookupBound = "true";
+      lookupToggle.addEventListener("click", () => {
+        if (reflectivState.libraryLookupType !== "genres") return;
+        reflectivState.libraryLookupGrouped = !reflectivState.libraryLookupGrouped;
+        updateLibraryLookupToggle(lookupModal);
+        renderLibraryLookupList(lookupModal);
       });
     }
   }

@@ -68,6 +68,7 @@ const sizes ={
 const modals = {
   blu: document.querySelector(".modal.blu"),
   reflectiv: document.querySelector(".modal.reflectiv"),
+  libraryLookup: document.querySelector(".modal.library-lookup"),
   nowplaying: document.querySelector(".modal.nowplaying"),
   archive: document.querySelector(".modal.archive"),
 };
