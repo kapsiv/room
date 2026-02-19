@@ -262,6 +262,166 @@ a:focus-visible {
   min-width: min(320px, calc(100vw - 32px));
 }
 
+.modal--book {
+  width: min(980px, calc(100vw - 32px));
+  min-width: min(360px, calc(100vw - 32px));
+}
+
+.modal-window-content--book {
+  padding: 12px;
+  background: #d7ccb9;
+}
+
+.book-shell {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  min-height: 340px;
+  border: 2px solid rgba(78, 71, 56, 0.4);
+  border-radius: 10px;
+  background: #d7ccb9;
+  overflow: hidden;
+  perspective: 1600px;
+}
+
+.book-cover {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border: 0;
+  border-right: 5px solid rgba(78, 71, 56, 0.45);
+  background:
+    linear-gradient(145deg, rgba(0, 33, 71, 0.96), rgba(0, 27, 58, 0.99)),
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.02) 0,
+      rgba(255, 255, 255, 0.02) 3px,
+      rgba(0, 0, 0, 0.03) 3px,
+      rgba(0, 0, 0, 0.03) 6px
+    );
+  color: #f3ebde;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  gap: 12px;
+  padding: 20px 24px 30px;
+  font-family: "Times New Roman", Times, serif;
+  cursor: pointer;
+  transform-origin: left center;
+  transform: rotateY(0deg);
+  transition: transform 0.58s ease;
+  backface-visibility: hidden;
+}
+
+.book-cover-title {
+  font-size: clamp(24px, 4.2vw, 44px);
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: 0;
+  margin-top: -26px;
+}
+
+.book-cover-title em {
+  font-style: italic;
+}
+
+.book-cover-logo {
+  width: clamp(88px, 11vw, 130px);
+  height: auto;
+  margin: 4px auto 0;
+  object-fit: contain;
+}
+
+.book-cover-subtitle {
+  font-size: clamp(17px, 2vw, 24px);
+  font-style: normal;
+  opacity: 0.95;
+  margin-top: 12px;
+}
+
+.book-cover-year {
+  font-size: clamp(14px, 1.35vw, 16px);
+  opacity: 0.85;
+  margin-top: 4px;
+}
+
+.book-spread {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: #cfc2ad;
+  opacity: 0;
+  transition: opacity 0.22s ease;
+}
+
+.book-page {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(78, 71, 56, 0.18);
+  background: #f4eee2;
+  display: grid;
+  place-items: center;
+}
+
+.book-page:first-child {
+  box-shadow: inset -10px 0 14px rgba(0, 0, 0, 0.11);
+}
+
+.book-page:last-child {
+  box-shadow: inset 10px 0 14px rgba(0, 0, 0, 0.11);
+}
+
+.book-page-canvas {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  cursor: pointer;
+}
+
+.book-shell.is-open .book-cover {
+  transform: rotateY(-145deg);
+}
+
+.book-shell.is-open .book-spread {
+  opacity: 1;
+}
+
+.book-controls {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.book-page-status {
+  min-width: 140px;
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(78, 71, 56, 0.9);
+}
+
+.modal--image {
+  width: auto;
+  min-width: 0;
+  max-width: calc(100vw - 32px);
+}
+
+.modal--image .modal-window-content {
+  padding: 0;
+  max-height: none;
+  overflow: hidden;
+}
+
+.calendar-image {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: calc(100vw - 64px);
+  max-height: calc(100vh - 124px);
+  object-fit: contain;
+}
+
 .modal--nowplaying .modal-window-content {
   max-height: min(64vh, 520px);
   padding: 14px;
@@ -951,6 +1111,7 @@ a:focus-visible {
 
 #scrobblesOverTime,
 #tagPie,
+#peakHours,
 #tagStream,
 #libraryAlbumsByYear,
 #libraryWorldMap,
@@ -1003,6 +1164,16 @@ a:focus-visible {
 
   .reflectiv-facts {
     grid-template-columns: 1fr;
+  }
+
+  .book-shell {
+    aspect-ratio: auto;
+    min-height: 360px;
+  }
+
+  .book-spread {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr;
   }
 }
 

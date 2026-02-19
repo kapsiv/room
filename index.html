@@ -242,6 +242,11 @@
             </div>
           </section>
 
+          <section class="chart-section">
+            <h3 class="chart-title">peak hours</h3>
+            <canvas id="peakHours"></canvas>
+          </section>
+
         </div>
         </section>
         <section
@@ -436,6 +441,46 @@
         <button class="modal-exit-button" type="button" aria-label="Close window">X</button>
       </div>
       <div class="modal-window-content">placeholder content...</div>
+    </div>
+
+    <div class="calendar modal modal--image" role="dialog" aria-modal="true" aria-labelledby="window-title-calendar">
+      <div class="modal-window-bar">
+        <div id="window-title-calendar" class="modal-window-title">calendar</div>
+        <button class="modal-exit-button" type="button" aria-label="Close window">X</button>
+      </div>
+      <div class="modal-window-content modal-window-content--image">
+        <img src="/images/2026-mood.jpg" alt="2026 mood calendar" class="calendar-image">
+      </div>
+    </div>
+
+    <div class="book modal modal--book" role="dialog" aria-modal="true" aria-labelledby="window-title-book">
+      <div class="modal-window-bar">
+        <div id="window-title-book" class="modal-window-title">dissertation</div>
+        <button class="modal-exit-button" type="button" aria-label="Close window">X</button>
+      </div>
+      <div class="modal-window-content modal-window-content--book">
+        <div class="book-shell" id="bookShell">
+          <button class="book-cover" id="bookCoverButton" type="button" aria-label="Open book">
+            <span class="book-cover-title">Structural and Functional Characterisation of nodD from <em>Rhizobium leguminosarum</em></span>
+            <img src="/images/oxford-logo.png" alt="University of Oxford logo" class="book-cover-logo">
+            <span class="book-cover-subtitle">Kapilan Sivanesan</span>
+            <span class="book-cover-year">MBiol 2025</span>
+          </button>
+          <div class="book-spread">
+            <div class="book-page">
+              <canvas id="bookPageLeft" class="book-page-canvas"></canvas>
+            </div>
+            <div class="book-page">
+              <canvas id="bookPageRight" class="book-page-canvas"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="book-controls">
+          <button type="button" class="reflectiv-filter" id="bookOpenButton">open</button>
+          <button type="button" class="reflectiv-filter" id="bookOpenPdfTab">open pdf</button>
+          <span id="bookPageStatus" class="book-page-status">pages 1-2</span>
+        </div>
+      </div>
     </div>
 
     <div id="experience">
