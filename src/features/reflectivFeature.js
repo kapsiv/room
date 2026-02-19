@@ -964,6 +964,122 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
     }
   }
 
+  function drawPeakHoursOnCanvas(canvas, scrobbles) {
+    const ctx = canvas?.getContext?.("2d");
+    if (!ctx) return;
+    const width = canvas.clientWidth || 720;
+    const height = canvas.clientHeight || 260;
+    canvas.width = width;
+    canvas.height = height;
+    ctx.clearRect(0, 0, width, height);
+
+    if (!scrobbles.length) {
+      ctx.fillStyle = "#4e4738";
+      ctx.font = "14px 'Ubuntu Mono', monospace";
+      ctx.fillText("No data available", 12, 20);
+      return;
+    }
+
+    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const dayColors = dayNames.map((_, idx) => {
+      const hue = 34 + ((idx * 31) % 56);
+      const saturation = 20 + ((idx * 17) % 18);
+      const lightness = 28 + ((idx * 13) % 30);
+      return `hsl(${hue} ${saturation}% ${lightness}%)`;
+    });
+    const counts = Array.from({ length: 7 }, () => Array(24).fill(0));
+
+    scrobbles.forEach((scrobble) => {
+      const date = new Date(Number(scrobble.uts) * 1000);
+      if (Number.isNaN(date.getTime())) return;
+      counts[date.getDay()][date.getHours()] += 1;
+    });
+
+    const maxCount = Math.max(...counts.flat(), 1);
+    const pad = { l: 38, r: 16, t: 14, b: 36 };
+    const usableW = width - pad.l - pad.r;
+    const usableH = height - pad.t - pad.b;
+    const xForHour = (hour) => pad.l + (hour / 23) * usableW;
+    const yForCount = (count) => pad.t + usableH - (count / maxCount) * usableH;
+
+    ctx.strokeStyle = "rgba(78,71,56,0.2)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(pad.l, pad.t + usableH);
+    ctx.lineTo(width - pad.r, pad.t + usableH);
+    ctx.stroke();
+
+    ctx.font = "10px 'Ubuntu Mono', monospace";
+    ctx.textBaseline = "top";
+    ctx.fillStyle = "rgba(78,71,56,0.82)";
+    ctx.strokeStyle = "rgba(78,71,56,0.12)";
+    [0, 3, 6, 9, 12, 15, 18, 21, 23].forEach((hour) => {
+      const x = xForHour(hour);
+      ctx.beginPath();
+      ctx.moveTo(x, pad.t + usableH);
+      ctx.lineTo(x, pad.t + usableH + 4);
+      ctx.stroke();
+      ctx.textAlign = x <= pad.l + 20 ? "left" : (x >= width - pad.r - 20 ? "right" : "center");
+      ctx.fillText(String(hour).padStart(2, "0"), x, pad.t + usableH + 7);
+    });
+
+    ctx.strokeStyle = "rgba(78,71,56,0.2)";
+    ctx.lineWidth = 1;
+    [0, 0.5, 1].forEach((ratio) => {
+      const count = Math.round(maxCount * ratio);
+      const y = yForCount(count);
+      ctx.beginPath();
+      ctx.moveTo(pad.l - 4, y);
+      ctx.lineTo(pad.l, y);
+      ctx.stroke();
+    });
+
+    counts.forEach((dayCounts, dayIdx) => {
+      const points = dayCounts.map((count, hour) => ({
+        x: xForHour(hour),
+        y: yForCount(count),
+      }));
+      const color = dayColors[dayIdx % dayColors.length];
+
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1.7;
+      ctx.lineJoin = "round";
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.moveTo(points[0].x, points[0].y);
+      for (let i = 0; i < points.length - 1; i += 1) {
+        const p0 = points[i - 1] || points[i];
+        const p1 = points[i];
+        const p2 = points[i + 1];
+        const p3 = points[i + 2] || p2;
+        const cp1x = p1.x + (p2.x - p0.x) / 6;
+        const cp1y = p1.y + (p2.y - p0.y) / 6;
+        const cp2x = p2.x - (p3.x - p1.x) / 6;
+        const cp2y = p2.y - (p3.y - p1.y) / 6;
+        ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
+      }
+      ctx.stroke();
+    });
+
+    const legendY = pad.t + 4;
+    const itemW = Math.max(58, Math.floor((width - pad.l - pad.r) / 7));
+    dayNames.forEach((label, i) => {
+      const x = pad.l + i * itemW;
+      const y = legendY;
+      ctx.strokeStyle = dayColors[i % dayColors.length];
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + 12, y);
+      ctx.stroke();
+      ctx.fillStyle = "rgba(78,71,56,0.9)";
+      ctx.font = "10px 'Ubuntu Mono', monospace";
+      ctx.textAlign = "left";
+      ctx.textBaseline = "middle";
+      ctx.fillText(label, x + 16, y);
+    });
+  }
+
   function drawGeoGeometry(ctx, geometry, project) {
     const drawRing = (ring) => {
       ring.forEach((point, i) => {
@@ -1229,6 +1345,7 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
 
   function renderReflectivCharts(modal) {
     const series = getSeriesForRange(reflectivState.range);
+    const scrobbles = getScrobblesForRange(reflectivState.range);
     const lineCanvas = modal.querySelector("#scrobblesOverTime");
 
     if (reflectivChartState.lineTween) {
@@ -1266,6 +1383,7 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
     }
 
     drawBarsOnCanvas(modal.querySelector("#tagPie"), reflectivState.topTags, "name", "count");
+    drawPeakHoursOnCanvas(modal.querySelector("#peakHours"), scrobbles);
 
     const tagStream = modal.querySelector("#tagStream");
     const ctx = tagStream?.getContext?.("2d");

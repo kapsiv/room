@@ -4,10 +4,14 @@ import gsap from "gsap";
 import * as THREE from 'three';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { getDocument, GlobalWorkerOptions } from "pdfjs-dist/build/pdf.mjs";
+import pdfWorkerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
 
 import { OrbitControls } from './utils/OrbitControls.js';
 import { createReflectivFeature } from './features/reflectivFeature.js';
 import { createModalManager } from './ui/modalManager.js';
+
+GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
 
 let isLoading = true;
 let loadingRevealStarted = false;
@@ -71,6 +75,8 @@ const modals = {
   libraryLookup: document.querySelector(".modal.library-lookup"),
   nowplaying: document.querySelector(".modal.nowplaying"),
   archive: document.querySelector(".modal.archive"),
+  calendar: document.querySelector(".modal.calendar"),
+  book: document.querySelector(".modal.book"),
 };
 
 let showModal;
@@ -122,6 +128,201 @@ const modalManager = createModalManager({
 
 modalManager.init();
 ({ showModal, hideModal, placeModalAt } = modalManager);
+
+const BOOK_PDF_URL = "/docs/Dissertation.pdf";
+
+function initBookViewer(modal) {
+  if (!modal) return null;
+
+  const shell = modal.querySelector("#bookShell");
+  const coverBtn = modal.querySelector("#bookCoverButton");
+  const openBtn = modal.querySelector("#bookOpenButton");
+  const openTabBtn = modal.querySelector("#bookOpenPdfTab");
+  const statusEl = modal.querySelector("#bookPageStatus");
+  const leftCanvas = modal.querySelector("#bookPageLeft");
+  const rightCanvas = modal.querySelector("#bookPageRight");
+
+  if (!shell || !coverBtn || !openBtn || !openTabBtn || !statusEl || !leftCanvas || !rightCanvas) {
+    return null;
+  }
+
+  const state = {
+    pdf: null,
+    pdfLoadPromise: null,
+    leftPage: 1,
+    isOpen: false,
+    renderToken: 0,
+  };
+
+  const clearCanvas = (canvas, text = "") => {
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    const w = Math.max(2, canvas.clientWidth || 300);
+    const h = Math.max(2, canvas.clientHeight || 300);
+    canvas.width = w;
+    canvas.height = h;
+    ctx.fillStyle = "#f8f4eb";
+    ctx.fillRect(0, 0, w, h);
+    if (!text) return;
+    ctx.fillStyle = "rgba(78,71,56,0.75)";
+    ctx.font = "14px 'Ubuntu Mono', monospace";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(text, w / 2, h / 2);
+  };
+
+  const ensurePdfLoaded = async () => {
+    if (state.pdf) return state.pdf;
+    if (!state.pdfLoadPromise) {
+      state.pdfLoadPromise = getDocument(BOOK_PDF_URL).promise
+        .then((pdf) => {
+          state.pdf = pdf;
+          return pdf;
+        })
+        .catch((err) => {
+          state.pdfLoadPromise = null;
+          throw err;
+        });
+    }
+    return state.pdfLoadPromise;
+  };
+
+  const maxLeftPage = () => {
+    const total = state.pdf?.numPages || 1;
+    return total % 2 === 0 ? total - 1 : total;
+  };
+
+  const updateControls = () => {
+    const total = state.pdf?.numPages || null;
+    const left = state.leftPage;
+    const right = left + 1;
+
+    if (!state.isOpen) {
+      statusEl.textContent = total ? `pages ${left}-${Math.min(right, total)} / ${total}` : "pages 1-2";
+      openBtn.textContent = "open";
+      openBtn.classList.remove("active");
+      return;
+    }
+
+    statusEl.textContent = total ? `pages ${left}-${Math.min(right, total)} / ${total}` : `pages ${left}-${right}`;
+    openBtn.textContent = "close";
+    openBtn.classList.add("active");
+  };
+
+  const renderPdfPage = async (pdf, pageNum, canvas, emptyLabel) => {
+    if (!pageNum || pageNum > pdf.numPages) {
+      clearCanvas(canvas, emptyLabel);
+      return;
+    }
+
+    const page = await pdf.getPage(pageNum);
+    const baseViewport = page.getViewport({ scale: 1 });
+    const pageContainer = canvas.parentElement;
+    const targetWidth = Math.max(120, pageContainer?.clientWidth || canvas.clientWidth || 300);
+    const targetHeight = Math.max(120, pageContainer?.clientHeight || canvas.clientHeight || 300);
+    const fitScale = Math.min(targetWidth / baseViewport.width, targetHeight / baseViewport.height);
+    const viewport = page.getViewport({ scale: fitScale });
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const ctx = canvas.getContext("2d", { alpha: true });
+    if (!ctx) return;
+
+    canvas.width = Math.max(2, Math.floor(viewport.width * dpr));
+    canvas.height = Math.max(2, Math.floor(viewport.height * dpr));
+    canvas.style.width = `${Math.floor(viewport.width)}px`;
+    canvas.style.height = `${Math.floor(viewport.height)}px`;
+
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const transform = dpr === 1 ? null : [dpr, 0, 0, dpr, 0, 0];
+    await page.render({ canvasContext: ctx, viewport, transform, background: "rgba(0,0,0,0)" }).promise;
+  };
+
+  const renderSpread = async () => {
+    const token = ++state.renderToken;
+    if (!state.isOpen) {
+      clearCanvas(leftCanvas);
+      clearCanvas(rightCanvas);
+      updateControls();
+      return;
+    }
+
+    statusEl.textContent = "loading...";
+    try {
+      const pdf = await ensurePdfLoaded();
+      if (token !== state.renderToken) return;
+      const left = Math.max(1, Math.min(state.leftPage, maxLeftPage()));
+      state.leftPage = left;
+
+      await Promise.all([
+        renderPdfPage(pdf, left, leftCanvas, ""),
+        renderPdfPage(pdf, left + 1, rightCanvas, "end"),
+      ]);
+      if (token !== state.renderToken) return;
+      updateControls();
+    } catch (err) {
+      console.error("Book PDF render failed:", err);
+      clearCanvas(leftCanvas, "couldn't load pdf");
+      clearCanvas(rightCanvas, "");
+      statusEl.textContent = "load failed";
+    }
+  };
+
+  const setOpenState = (nextOpen) => {
+    state.isOpen = Boolean(nextOpen);
+    shell.classList.toggle("is-open", state.isOpen);
+    updateControls();
+    void renderSpread();
+  };
+
+  const goToSpread = (leftPage) => {
+    state.leftPage = Math.max(1, leftPage);
+    if (!state.isOpen) {
+      setOpenState(true);
+      return;
+    }
+    void renderSpread();
+  };
+
+  coverBtn.addEventListener("click", () => setOpenState(true));
+  openBtn.addEventListener("click", () => setOpenState(!state.isOpen));
+  openTabBtn.addEventListener("click", () => {
+    const page = Math.max(1, state.leftPage);
+    const win = window.open(`${BOOK_PDF_URL}#page=${page}`, "_blank", "noopener,noreferrer");
+    if (win) win.opener = null;
+  });
+  leftCanvas.addEventListener("click", () => {
+    if (!state.isOpen) return;
+    goToSpread(state.leftPage - 2);
+  });
+  rightCanvas.addEventListener("click", () => {
+    if (!state.isOpen) return;
+    const total = state.pdf?.numPages || Number.POSITIVE_INFINITY;
+    const nextLeft = Math.min(state.leftPage + 2, total % 2 === 0 ? total - 1 : total);
+    goToSpread(nextLeft);
+  });
+
+  clearCanvas(leftCanvas);
+  clearCanvas(rightCanvas);
+  updateControls();
+
+  return {
+    reset() {
+      state.leftPage = 1;
+      state.renderToken += 1;
+      setOpenState(false);
+      clearCanvas(leftCanvas);
+      clearCanvas(rightCanvas);
+      updateControls();
+    },
+    renderIfOpen() {
+      if (!state.isOpen) return;
+      void renderSpread();
+    },
+  };
+}
+
+const bookViewer = initBookViewer(modals.book);
 
 const stringAudioByIndex = {
   1: new Audio("/audio/guitar-string-1.mp3"),
@@ -708,11 +909,16 @@ function handleRaycasterInteraction(e) {
 
   if (visualObject.name.includes("Blu_Body") || visualObject.name.includes("Rug")) {
     showModal(modals.blu);
+  } else if (visualObject.name.includes("Book_Blue")) {
+    bookViewer?.reset();
+    showModal(modals.book);
   } else if (visualObject.name.includes("Vinyl")) {
     showModal(modals.reflectiv);
   } else if (visualObject.name.includes("Bin")) {
     showModal(modals.reflectiv);
     setReflectivTab(modals.reflectiv, "library");
+  } else if (visualObject.name.includes("Calendar")) {
+    showModal(modals.calendar);
   }
 }
 
@@ -1098,6 +1304,8 @@ window.addEventListener("resize", ()=>{
     const rect = modal.getBoundingClientRect();
     placeModalAt(modal, rect.left, rect.top);
   });
+
+  bookViewer?.renderIfOpen();
 })
 
 function getHoverScaleMultiplier(name) {
