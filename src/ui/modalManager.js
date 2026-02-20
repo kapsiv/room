@@ -2,6 +2,7 @@ export function createModalManager({
   modals,
   gsap,
   onBeforeShow = null,
+  onShowAbout = null,
   onShowBlu = null,
   onShowNowPlaying = null,
   onShowReflectiv = null,
@@ -129,6 +130,10 @@ export function createModalManager({
       opacity: 1,
       duration: 0.5,
     });
+
+    if (modal === modals.about && typeof onShowAbout === "function") {
+      onShowAbout(modal, { showModal, hideModal });
+    }
 
     if (modal === modals.blu && typeof onShowBlu === "function") {
       onShowBlu(modal, { showModal, hideModal });

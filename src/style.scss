@@ -535,6 +535,13 @@ a:focus-visible {
   margin-bottom: 8px;
 }
 
+.blu-header-photo {
+  display: block;
+  width: 100%;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
 .nowplaying-body {
   display: grid;
   gap: 10px;
