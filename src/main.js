@@ -76,6 +76,7 @@ const modals = {
   nowplaying: document.querySelector(".modal.nowplaying"),
   archive: document.querySelector(".modal.archive"),
   calendar: document.querySelector(".modal.calendar"),
+  modelling: document.querySelector(".modal.modelling"),
   book: document.querySelector(".modal.book"),
 };
 
@@ -323,6 +324,43 @@ function initBookViewer(modal) {
 }
 
 const bookViewer = initBookViewer(modals.book);
+
+function initModellingViewer(modal) {
+  if (!modal) return null;
+
+  const frame = modal.querySelector("#modellingVideoFrame");
+  if (!frame) return null;
+
+  const embedSrc = frame.dataset.embedSrc || "";
+  if (!embedSrc) return null;
+
+  const stop = () => {
+    if (frame.src) {
+      frame.src = "";
+    }
+  };
+
+  const play = () => {
+    if (!frame.src || frame.src !== embedSrc) {
+      frame.src = embedSrc;
+    }
+  };
+
+  const onClose = (event) => {
+    if (!event.target.closest(".modal-exit-button")) return;
+    stop();
+  };
+
+  modal.addEventListener("click", onClose);
+  modal.addEventListener("touchend", onClose, { passive: true });
+
+  return {
+    play,
+    stop,
+  };
+}
+
+const modellingViewer = initModellingViewer(modals.modelling);
 
 const stringAudioByIndex = {
   1: new Audio("/audio/guitar-string-1.mp3"),
@@ -919,6 +957,9 @@ function handleRaycasterInteraction(e) {
     setReflectivTab(modals.reflectiv, "library");
   } else if (visualObject.name.includes("Calendar")) {
     showModal(modals.calendar);
+  } else if (visualObject.name.includes("Photo_Frame")) {
+    modellingViewer?.play();
+    showModal(modals.modelling);
   }
 }
 
@@ -990,7 +1031,7 @@ loader.load("/models/Room_Portfolio_V4.glb", (glb) => {
         "_Fifth",
         "_Sixth",
       ];
-      if (raycasterNameTags.some((tag) => child.name.includes(tag))) {
+      if (raycasterNameTags.some((tag) => child.name.includes(tag)) || child.name.includes("Photo_Frame")) {
         createDetachedHitboxForTarget(child);
       }
 
