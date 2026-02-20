@@ -70,6 +70,7 @@ const sizes ={
 }
 
 const modals = {
+  about: document.querySelector(".modal.about"),
   blu: document.querySelector(".modal.blu"),
   reflectiv: document.querySelector(".modal.reflectiv"),
   libraryLookup: document.querySelector(".modal.library-lookup"),
@@ -108,7 +109,7 @@ const modalManager = createModalManager({
     document.body.style.cursor = "default";
     currentIntersects = [];
   },
-  onShowBlu: (modal, { showModal }) => {
+  onShowAbout: (modal, { showModal }) => {
     initAboutModal(modal);
     const pill = modal.querySelector(".now-playing-pill");
     if (pill && modal.dataset.aboutBound !== "true") {
@@ -945,8 +946,10 @@ function handleRaycasterInteraction(e) {
     return;
   }
 
-  if (visualObject.name.includes("Blu_Body") || visualObject.name.includes("Rug")) {
+  if (visualObject.name.includes("Blu_Body")) {
     showModal(modals.blu);
+  } else if (visualObject.name.includes("Rug")) {
+    showModal(modals.about);
   } else if (visualObject.name.includes("Book_Blue")) {
     bookViewer?.reset();
     showModal(modals.book);
