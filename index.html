@@ -442,7 +442,13 @@
 
     <div class="nowplaying modal modal--nowplaying" role="dialog" aria-modal="true" aria-labelledby="window-title-nowplaying">
       <div class="modal-window-bar">
-        <div id="window-title-nowplaying" class="modal-window-title">now playing</div>
+        <div id="window-title-nowplaying" class="modal-window-title">
+          now playing
+          <span class="ui-tooltip">
+            <span class="ui-tooltip-trigger" aria-label="Now playing data notes" tabindex="0">i</span>
+            <span class="ui-tooltip-content" role="tooltip">this data is live updating! configured using pano scrobbler set to sync to last.fm. track metadata retrieved using last.fm api</span>
+          </span>
+        </div>
         <button class="modal-exit-button" type="button" aria-label="Close window">X</button>
       </div>
       <div class="modal-window-content">
@@ -469,6 +475,89 @@
             </ol>
           </div>
         </div>
+      </div>
+    </div>
+
+    <div class="guitar modal modal--guitar" role="dialog" aria-modal="true" aria-labelledby="window-title-guitar">
+      <div class="modal-window-bar">
+        <div id="window-title-guitar" class="modal-window-title">classical guitar</div>
+        <button class="modal-exit-button" type="button" aria-label="Close window">X</button>
+      </div>
+      <div class="modal-tab-strip" role="tablist" aria-label="classical guitar tabs">
+        <button
+          type="button"
+          class="modal-tab is-active"
+          data-guitar-tab="repertoire"
+          role="tab"
+          aria-selected="true"
+          aria-controls="guitar-repertoire-panel"
+          id="guitar-repertoire-tab-button"
+        >
+          repertoire
+          <span class="ui-tooltip">
+            <span class="ui-tooltip-trigger" aria-label="Repertoire tab description" tabindex="0">i</span>
+            <span class="ui-tooltip-content" role="tooltip">pieces i'm learning!</span>
+          </span>
+        </button>
+        <button
+          type="button"
+          class="modal-tab"
+          data-guitar-tab="other"
+          role="tab"
+          aria-selected="false"
+          aria-controls="guitar-other-panel"
+          id="guitar-other-tab-button"
+        >
+          other
+        </button>
+      </div>
+      <div class="modal-window-content modal-window-content--offwhite">
+        <section
+          id="guitar-repertoire-panel"
+          class="guitar-panel is-active"
+          data-guitar-panel="repertoire"
+          role="tabpanel"
+          aria-labelledby="guitar-repertoire-tab-button"
+        >
+          <div class="guitar-repertoire">
+          <h3>classical guitar repertoire</h3>
+          <div class="repertoire-table">
+            <div class="repertoire-row"><span class="repertoire-composer">Isaac Albeniz</span><span class="repertoire-title">Asturias (Leyenda)</span><span class="repertoire-arranger"></span></div>
+            <div class="repertoire-row"><span class="repertoire-composer">Anonymous</span><span class="repertoire-title">Spanish Romance (Romance Anonimo)</span><span class="repertoire-arranger"></span></div>
+            <div class="repertoire-row"><span class="repertoire-composer">David Kellner</span><span class="repertoire-title">Phantasia in A minor</span><span class="repertoire-arranger"></span></div>
+            <div class="repertoire-row"><span class="repertoire-composer">Napoleon Coste</span><span class="repertoire-title">Serenade (Les Soirees d'Auteuil, Op. 23 No. 1)</span><span class="repertoire-arranger"></span></div>
+            <div class="repertoire-row"><span class="repertoire-composer">Francisco Tarrega</span><span class="repertoire-title">Capricho Arabe</span><span class="repertoire-arranger"></span></div>
+            <div class="repertoire-row"><span class="repertoire-composer">Gaspar Sanz</span><span class="repertoire-title">Pavanas por la D</span><span class="repertoire-arranger"></span></div>
+            <div class="repertoire-row"><span class="repertoire-composer">Madame Sidney Pratten</span><span class="repertoire-title">Forgotten</span><span class="repertoire-arranger"></span></div>
+            <div class="repertoire-row"><span class="repertoire-composer">Francisco Tarrega</span><span class="repertoire-title">Rosita</span><span class="repertoire-arranger"></span></div>
+            <div class="repertoire-row"><span class="repertoire-composer">Ernesto Lecuona</span><span class="repertoire-title">Malaguena</span><span class="repertoire-arranger"></span></div>
+            <div class="repertoire-row"><span class="repertoire-composer">Francisco Tarrega</span><span class="repertoire-title">Lagrima</span><span class="repertoire-arranger"></span></div>
+            <div class="repertoire-row"><span class="repertoire-composer">Frederic Chopin</span><span class="repertoire-title">Nocturne in E-flat major, Op. 9 No. 2</span><span class="repertoire-arranger"></span></div>
+            <div class="repertoire-row"><span class="repertoire-composer">Claude Debussy</span><span class="repertoire-title">Arabesque No. 1</span><span class="repertoire-arranger">arr. Rene Izquierdo</span></div>
+            <div class="repertoire-row"><span class="repertoire-composer">Claude Debussy</span><span class="repertoire-title">Clair de lune</span><span class="repertoire-arranger">arr. J. Edwards</span></div>
+          </div>
+
+          <h3>ghibli songbook (mostly by Joe Hisaishi)</h3>
+          <div class="repertoire-table">
+            <div class="repertoire-row"><span class="repertoire-composer">Joe Hisaishi</span><span class="repertoire-title">Spirited Away: One Summer's Day</span><span class="repertoire-arranger"></span></div>
+            <div class="repertoire-row"><span class="repertoire-composer">Joe Hisaishi</span><span class="repertoire-title">Kiki's Delivery Service: A Town with an Ocean View</span><span class="repertoire-arranger"></span></div>
+            <div class="repertoire-row"><span class="repertoire-composer">Joe Hisaishi</span><span class="repertoire-title">Howl's Moving Castle: Merry-Go-Round of Life</span><span class="repertoire-arranger"></span></div>
+            <div class="repertoire-row"><span class="repertoire-composer">Joe Hisaishi</span><span class="repertoire-title">My Neighbor Totoro: Main Theme</span><span class="repertoire-arranger"></span></div>
+          </div>
+
+          <h3>jazz standards</h3>
+          <div class="repertoire-table">
+            <div class="repertoire-row"><span class="repertoire-composer">Joseph Kosma</span><span class="repertoire-title">Autumn Leaves</span><span class="repertoire-arranger">arr. Yenne Lee</span></div>
+          </div>
+          </div>
+        </section>
+        <section
+          id="guitar-other-panel"
+          class="guitar-panel"
+          data-guitar-panel="other"
+          role="tabpanel"
+          aria-labelledby="guitar-other-tab-button"
+        ></section>
       </div>
     </div>
 

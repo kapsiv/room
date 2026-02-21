@@ -944,6 +944,33 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
       ctx.stroke();
     }
 
+    const peakBin = bins.reduce((best, bin) => (bin.count > best.count ? bin : best), bins[0]);
+    if (peakBin && peakBin.count > 0) {
+      const peakX = xForDuration(peakBin.duration);
+      const peakY = yForCount(peakBin.count);
+      const peakLabel = `${peakBin.count} songs`;
+      const labelX = Math.max(pad.l + 6, peakX - 56);
+      const labelY = Math.max(peakY - 10, pad.t + 14);
+
+      ctx.beginPath();
+      ctx.arc(peakX, peakY, 3, 0, Math.PI * 2);
+      ctx.fillStyle = "#4e4738";
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(labelX + 2, labelY - 2);
+      ctx.lineTo(peakX - 4, peakY - 2);
+      ctx.strokeStyle = "rgba(78,71,56,0.55)";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      ctx.font = "11px 'Ubuntu Mono', monospace";
+      ctx.fillStyle = "rgba(78,71,56,0.92)";
+      ctx.textBaseline = "bottom";
+      ctx.textAlign = "right";
+      ctx.fillText(peakLabel, labelX, labelY);
+    }
+
     ctx.font = "11px 'Ubuntu Mono', monospace";
     ctx.textBaseline = "top";
     ctx.fillStyle = "rgba(78,71,56,0.85)";

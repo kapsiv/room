@@ -100,10 +100,19 @@ a:focus-visible {
 }
 
 .modal-window-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 17px;
   font-weight: 700;
   color: vars.$base-white;
   letter-spacing: 0.02em;
+}
+
+.modal-window-title .ui-tooltip-trigger {
+  color: vars.$base-white;
+  background: transparent;
+  border-color: rgba(249, 249, 249, 0.7);
 }
 
 .modal-exit-button {
@@ -184,6 +193,14 @@ a:focus-visible {
   display: block;
 }
 
+.guitar-panel {
+  display: none;
+}
+
+.guitar-panel.is-active {
+  display: block;
+}
+
 .modal-window-header {
   padding: 14px 20px;
   background: #ece5da;
@@ -255,6 +272,7 @@ a:focus-visible {
   width: min(420px, calc(100vw - 32px));
   min-width: min(320px, calc(100vw - 32px));
   background: #f5f0e8;
+  overflow: visible;
 }
 
 .modal--lookup {
@@ -270,6 +288,56 @@ a:focus-visible {
 .modal--modelling {
   width: min(980px, calc(100vw - 32px));
   min-width: min(360px, calc(100vw - 32px));
+}
+
+.modal--guitar {
+  width: min(860px, calc(100vw - 32px));
+  min-width: min(340px, calc(100vw - 32px));
+}
+
+.guitar-repertoire h2 {
+  margin-bottom: 10px;
+}
+
+.guitar-repertoire h3 {
+  margin-top: 14px;
+}
+
+.repertoire-table {
+  margin: 8px 0 0;
+  border: 1px solid rgba(78, 71, 56, 0.18);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.repertoire-row {
+  display: grid;
+  grid-template-columns: minmax(150px, 0.85fr) minmax(0, 2.2fr) minmax(120px, 0.95fr);
+  gap: 12px;
+  align-items: baseline;
+  padding: 8px 11px;
+  border-bottom: 1px solid rgba(78, 71, 56, 0.12);
+}
+
+.repertoire-row:last-child {
+  border-bottom: 0;
+}
+
+.repertoire-composer {
+  font-size: 14px;
+  color: rgba(78, 71, 56, 0.88);
+}
+
+.repertoire-title {
+  min-width: 0;
+}
+
+.repertoire-arranger {
+  font-size: 13px;
+  color: rgba(78, 71, 56, 0.56);
+  text-align: right;
+  white-space: nowrap;
+  font-style: italic;
 }
 
 .modal-window-content--modelling {
@@ -454,6 +522,17 @@ a:focus-visible {
 .modal--nowplaying .modal-window-content {
   max-height: min(64vh, 520px);
   padding: 14px;
+}
+
+.modal--nowplaying .modal-window-bar {
+  overflow: visible;
+}
+
+.modal--nowplaying .modal-window-title .ui-tooltip-content {
+  left: 0;
+  top: auto;
+  bottom: calc(100% + 8px);
+  transform: none;
 }
 
 .about-banner {
@@ -1210,6 +1289,15 @@ a:focus-visible {
   .book-spread {
     grid-template-columns: 1fr;
     grid-template-rows: 1fr 1fr;
+  }
+
+  .repertoire-row {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+
+  .repertoire-arranger {
+    text-align: left;
   }
 }
 
