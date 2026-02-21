@@ -72,6 +72,7 @@ const sizes ={
 const modals = {
   about: document.querySelector(".modal.about"),
   blu: document.querySelector(".modal.blu"),
+  guitar: document.querySelector(".modal.guitar"),
   reflectiv: document.querySelector(".modal.reflectiv"),
   libraryLookup: document.querySelector(".modal.library-lookup"),
   nowplaying: document.querySelector(".modal.nowplaying"),
@@ -130,6 +131,39 @@ const modalManager = createModalManager({
 
 modalManager.init();
 ({ showModal, hideModal, placeModalAt } = modalManager);
+
+function initGuitarModal(modal) {
+  if (!modal || modal.dataset.guitarBound === "true") return;
+  modal.dataset.guitarBound = "true";
+
+  const tabs = modal.querySelectorAll(".modal-tab[data-guitar-tab]");
+  const panels = modal.querySelectorAll(".guitar-panel[data-guitar-panel]");
+
+  if (!tabs.length || !panels.length) return;
+
+  const setGuitarTab = (tabName) => {
+    tabs.forEach((tab) => {
+      const isActive = tab.dataset.guitarTab === tabName;
+      tab.classList.toggle("is-active", isActive);
+      tab.setAttribute("aria-selected", isActive ? "true" : "false");
+    });
+
+    panels.forEach((panel) => {
+      const isActive = panel.dataset.guitarPanel === tabName;
+      panel.classList.toggle("is-active", isActive);
+    });
+  };
+
+  tabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      const tabName = tab.dataset.guitarTab;
+      if (!tabName) return;
+      setGuitarTab(tabName);
+    });
+  });
+}
+
+initGuitarModal(modals.guitar);
 
 const BOOK_PDF_URL = "/docs/Dissertation.pdf";
 
@@ -466,14 +500,25 @@ let bookBlue,
 
 const raycasterObjects = [];
 const raycastHitToVisualObject = new Map();
+const raycastHitboxesFollowingTarget = [];
 let currentIntersects = [];
 let currentHoveredObject = null;
+let hoveredGuitarStringIndex = null;
 
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
+let pointerClientX = null;
+let pointerClientY = null;
 
-function createDetachedHitboxForTarget(target) {
+function isPointerOverModal() {
+  if (pointerClientX === null || pointerClientY === null) return false;
+  const el = document.elementFromPoint(pointerClientX, pointerClientY);
+  return Boolean(el?.closest?.(".modal"));
+}
+
+function createDetachedHitboxForTarget(target, options = {}) {
   if (!target?.isMesh || !target.geometry) return null;
+  const { followTargetTransform = false } = options;
 
   target.updateWorldMatrix(true, false);
   const worldPosition = new THREE.Vector3();
@@ -501,7 +546,30 @@ function createDetachedHitboxForTarget(target) {
   scene.add(hitbox);
   raycastHitToVisualObject.set(hitbox, target);
   raycasterObjects.push(hitbox);
+
+  if (followTargetTransform) {
+    raycastHitboxesFollowingTarget.push({ hitbox, target });
+  }
+
   return hitbox;
+}
+
+function syncFollowingRaycastHitboxes() {
+  if (!raycastHitboxesFollowingTarget.length) return;
+
+  const worldPosition = new THREE.Vector3();
+  const worldQuaternion = new THREE.Quaternion();
+  const worldScale = new THREE.Vector3();
+
+  raycastHitboxesFollowingTarget.forEach(({ hitbox, target }) => {
+    if (!hitbox || !target) return;
+    target.updateWorldMatrix(true, false);
+    target.matrixWorld.decompose(worldPosition, worldQuaternion, worldScale);
+    hitbox.position.copy(worldPosition);
+    hitbox.quaternion.copy(worldQuaternion);
+    hitbox.scale.copy(worldScale);
+    hitbox.updateMatrixWorld(true);
+  });
 }
 
 function resolveRaycastVisualObject(hitObject) {
@@ -786,21 +854,21 @@ function toTerminalLabel(rawName) {
 
 const hoverMessages = {
   guitar: [
-    "click the strings to play",
-    "yamaha c40",
+    "classical guitar repertoire",
+    "hover over strings to play",
   ],
   vinyl: [
-    "analogue music",
-    "vinyl spinning at 33.3",
-    "reflectiv",
+    "kaps' music data",
+    "music library",
+    "reflectIV",
   ],
   blu: [
     "meow meow",
     "meow meow meow",
-    "meow x3",
+    "blu",
   ],
   bin: [
-    "old stuff",
+    "archive",
   ],
   marimo: [
     "bob the marimo",
@@ -916,12 +984,16 @@ function applyScreenGlassOverlay(screenMesh) {
 window.addEventListener("mousemove", (e) => {
   pointer.x = ( e.clientX / window.innerWidth) * 2 - 1;
   pointer.y = -(e.clientY / window.innerHeight) * 2 + 1;
+  pointerClientX = e.clientX;
+  pointerClientY = e.clientY;
 });
 
 window.addEventListener("touchstart", (e) => {
   e.preventDefault();
   pointer.x = ( e.touches[0].clientX / window.innerWidth) * 2 - 1;
   pointer.y = -(e.touches[0].clientY / window.innerHeight) * 2 + 1;
+  pointerClientX = e.touches[0].clientX;
+  pointerClientY = e.touches[0].clientY;
   },
   { passive: false }
 );
@@ -940,12 +1012,6 @@ function handleRaycasterInteraction(e) {
   const hitObject = currentIntersects[0].object;
   const visualObject = resolveRaycastVisualObject(hitObject);
 
-  const stringIndex = getGuitarStringIndex(visualObject);
-  if (stringIndex) {
-    playStringSoundByIndex(stringIndex);
-    return;
-  }
-
   if (visualObject.name.includes("Blu_Body")) {
     showModal(modals.blu);
   } else if (visualObject.name.includes("Rug")) {
@@ -953,6 +1019,8 @@ function handleRaycasterInteraction(e) {
   } else if (visualObject.name.includes("Book_Blue")) {
     bookViewer?.reset();
     showModal(modals.book);
+  } else if (visualObject.name.includes("Guitar")) {
+    showModal(modals.guitar);
   } else if (visualObject.name.includes("Vinyl")) {
     showModal(modals.reflectiv);
   } else if (visualObject.name.includes("Bin")) {
@@ -1035,7 +1103,9 @@ loader.load("/models/Room_Portfolio_V4.glb", (glb) => {
         "_Sixth",
       ];
       if (raycasterNameTags.some((tag) => child.name.includes(tag)) || child.name.includes("Photo_Frame")) {
-        createDetachedHitboxForTarget(child);
+        createDetachedHitboxForTarget(child, {
+          followTargetTransform: getGuitarStringIndex(child) !== null,
+        });
       }
 
       if (child.name.includes("Hover")) {
@@ -1605,6 +1675,20 @@ const render = (timestamp = 0) => {
 
   // Raycaster
   if (!isLoading) {
+    if (isPointerOverModal()) {
+      currentIntersects = [];
+      hoveredGuitarStringIndex = null;
+      if (currentHoveredObject) {
+        playHoverAnimation(currentHoveredObject, false);
+        currentHoveredObject = null;
+      }
+      document.body.style.cursor = "default";
+      renderer.render(scene, camera);
+      window.requestAnimationFrame(render);
+      return;
+    }
+
+    syncFollowingRaycastHitboxes();
     raycaster.setFromCamera(pointer, camera);
 
     currentIntersects = raycaster.intersectObjects(raycasterObjects, true);
@@ -1614,6 +1698,14 @@ const render = (timestamp = 0) => {
       const visualObject = resolveRaycastVisualObject(hitObject);
       const hoverRoot = getHoverRoot(visualObject);
       const hoverLogKey = hoverRoot.name.includes("Hover") ? hoverRoot.name : visualObject.name;
+      const stringIndex = getGuitarStringIndex(visualObject);
+
+      if (stringIndex && stringIndex !== hoveredGuitarStringIndex) {
+        playStringSoundByIndex(stringIndex);
+        hoveredGuitarStringIndex = stringIndex;
+      } else if (!stringIndex) {
+        hoveredGuitarStringIndex = null;
+      }
 
       if (hoverLogKey && hoverLogKey !== lastTerminalHoverKey) {
         const line = buildHoverTerminalLine(hoverLogKey);
@@ -1642,6 +1734,7 @@ const render = (timestamp = 0) => {
         }
       }
     } else {
+      hoveredGuitarStringIndex = null;
       if (currentHoveredObject) {
         playHoverAnimation(currentHoveredObject, false);
         currentHoveredObject = null;
