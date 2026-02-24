@@ -10,58 +10,29 @@ import pdfWorkerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
 import { OrbitControls } from './utils/OrbitControls.js';
 import { createReflectivFeature } from './features/reflectivFeature.js';
 import { createModalManager } from './ui/modalManager.js';
+import { createFabManager } from './ui/fabManager.js';
 
 GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
 
 let isLoading = true;
-let loadingRevealStarted = false;
 const manager = new THREE.LoadingManager();
 
 const loadingScreen = document.querySelector(".loading-screen");
+const fabManager = createFabManager({
+  gsap,
+  loadingScreen,
+  getModals: () => modals,
+  getShowModal: () => showModal,
+  onLoadingComplete: () => {
+    isLoading = false;
+    playIntroAnimation();
+  },
+});
 
-if (loadingScreen) {
-  const logoPath = document.querySelector("#logo");
-  if (logoPath) {
-    const pathLength = logoPath.getTotalLength();
-
-    logoPath.style.strokeDasharray = pathLength;
-    logoPath.style.strokeDashoffset = pathLength;
-
-    gsap.to(logoPath, {
-      strokeDashoffset: 0,
-      duration: 2,
-      ease: "power2.inOut",
-    });
-  }
-}
-
-function playLoadingReveal() {
-  if (loadingRevealStarted) return;
-  loadingRevealStarted = true;
-  const tl = gsap.timeline();
-  tl.to(loadingScreen, {
-    scale: 0.54,
-    duration: 2,
-    ease: "power4.inOut",
-  }).to(
-    loadingScreen,
-    {
-      y: "220vh",
-      opacity: 0,
-      duration: 1.2,
-      ease: "power4.inOut",
-      onComplete: () => {
-        isLoading = false;
-        playIntroAnimation();
-        loadingScreen.remove();
-      },
-    },
-    "-=0.1"
-  );
-}
-
-
-manager.onLoad = () => playLoadingReveal();
+fabManager.init();
+manager.onLoad = () => {
+  fabManager.markAssetsLoaded();
+};
 
 const canvas = document.querySelector("#experience-canvas")
 const sizes ={
@@ -85,6 +56,7 @@ const modals = {
 let showModal;
 let hideModal;
 let placeModalAt;
+let controls;
 
 const reflectivFeature = createReflectivFeature({
   gsap,
@@ -1382,7 +1354,7 @@ const renderer = new THREE.WebGLRenderer({canvas:canvas, antialias: true });
 renderer.setSize(sizes.width , sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
-const controls = new OrbitControls( camera, renderer.domElement );
+controls = new OrbitControls( camera, renderer.domElement );
 controls.minDistance = 5;
 controls.maxDistance = 70;
 controls.minPolarAngle = 0;
