@@ -46,6 +46,21 @@ a:focus-visible {
   color: inherit;
 }
 
+[lang="ta"],
+.tamil-text {
+  font-family: "director-tamil", "fit-tamil-variable", sans-serif !important;
+  font-weight: 400 !important;
+  font-style: normal;
+}
+
+.tamil-text-sample {
+  display: inline-block;
+  margin: 0 0.18em;
+  font-size: 1.55em;
+  line-height: 0.9;
+  vertical-align: -0.08em;
+}
+
 ::selection {
   background: #e7ddcd;
   color: vars.$base-black;
@@ -288,6 +303,176 @@ a:focus-visible {
 .modal--modelling {
   width: min(980px, calc(100vw - 32px));
   min-width: min(360px, calc(100vw - 32px));
+}
+
+.modal--logo {
+  width: min(920px, calc(100vw - 32px));
+  min-width: min(360px, calc(100vw - 32px));
+}
+
+.logo-modal-content {
+  padding: 18px 20px 22px;
+  background: #f5f0e8;
+}
+
+.logo-modal-hero {
+  width: min(100%, 760px);
+  margin: 18px auto 48px;
+}
+
+.logo-modal-wordmark {
+  display: block;
+  width: min(100%, 760px);
+  max-height: min(34vh, 220px);
+  margin: 0 auto;
+}
+
+#logo-modal-ka path,
+#logo-modal-pi path,
+#logo-modal-la,
+#logo-modal-n path {
+  cursor: pointer;
+  pointer-events: stroke;
+}
+
+.logo-modal-syllables {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  width: min(100%, 760px);
+  margin: 10px auto 0;
+  color: rgba(78, 71, 56, 0.84);
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: lowercase;
+}
+
+.logo-modal-syllables span {
+  position: relative;
+  min-height: 1.2em;
+  text-align: center;
+}
+
+.logo-modal-type.is-typing::after {
+  content: "|";
+  position: absolute;
+  margin-left: 2px;
+  animation: logo-modal-cursor-blink 0.9s steps(1, end) infinite;
+}
+
+@keyframes logo-modal-cursor-blink {
+  0%, 49% {
+    opacity: 1;
+  }
+
+  50%, 100% {
+    opacity: 0;
+  }
+}
+
+.logo-modal-copy {
+  margin: 0;
+  color: inherit;
+  text-align: center;
+  min-height: 1.4em;
+  position: relative;
+}
+
+.logo-stroke-control {
+  width: 100%;
+  margin: 0;
+  display: grid;
+  gap: 14px;
+}
+
+.logo-stroke-control label {
+  text-align: left;
+  font-size: 14px;
+  color: rgba(78, 71, 56, 0.84);
+  text-transform: lowercase;
+}
+
+.logo-mask-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.logo-mask-toggle input {
+  accent-color: #4e4738;
+}
+
+.logo-stroke-slider-wrap {
+  display: grid;
+  gap: 8px;
+}
+
+.logo-stroke-slider {
+  width: 100%;
+  accent-color: #4e4738;
+}
+
+.logo-stroke-slider:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.logo-modal-body {
+  margin: 52px 0 0;
+  text-align: justify;
+}
+
+.logo-modal-body h3 {
+  margin-bottom: 4px;
+  text-align: left;
+}
+
+.logo-modal-body p + p {
+  margin-top: 18px;
+}
+
+.logo-modal-body h3 + p {
+  margin-top: 0;
+}
+
+.logo-modal-body p + h3 {
+  margin-top: 28px;
+}
+
+.logo-typeface-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 24px;
+  align-items: start;
+  margin-top: 18px;
+}
+
+.logo-typeface-copy {
+  min-width: 0;
+}
+
+.logo-typeface-copy--secondary p {
+  margin: 0;
+}
+
+.logo-stroke-control-card {
+  border: 1px solid rgba(78, 71, 56, 0.18);
+  border-radius: 12px;
+  background: #ece5da;
+  padding: 14px;
+}
+
+.logo-typeface-layout + h3 {
+  margin-top: 34px;
+}
+
+@media (max-width: 640px) {
+  .logo-typeface-layout {
+    grid-template-columns: 1fr;
+  }
 }
 
 .modal--guitar {
@@ -975,6 +1160,21 @@ a:focus-visible {
   padding: 0;
 }
 
+.ui-tooltip-trigger--inline {
+  width: auto;
+  height: auto;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  line-height: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  vertical-align: baseline;
+  padding: 0;
+}
+
 .ui-tooltip-content {
   position: absolute;
   left: calc(100% + 8px);
@@ -1004,6 +1204,13 @@ a:focus-visible {
 .ui-tooltip:focus-within .ui-tooltip-content {
   opacity: 1;
   visibility: visible;
+  pointer-events: auto;
+}
+
+.ui-tooltip-content a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 .musiclib-year-filter {

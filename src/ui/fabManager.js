@@ -156,6 +156,7 @@ export function createFabManager({
       guitar: "guitar",
       archive: "archive",
       reflectiv: "reflectiv",
+      logo: "logo",
       music: "nowplaying",
       "now playing": "nowplaying",
       blu: "blu",
@@ -164,9 +165,15 @@ export function createFabManager({
 
     const openCurrentPage = () => {
       const page = PAGES[wrapPageIndex(currentPageIndex)];
+      if (!page) return;
+      if (typeof page.url === "string" && /^https?:\/\//.test(page.url)) {
+        window.open(page.url, "_blank", "noopener,noreferrer");
+        return;
+      }
+
       const showModal = typeof getShowModal === "function" ? getShowModal() : null;
       const modals = typeof getModals === "function" ? getModals() : null;
-      if (!page || !showModal || !modals) return;
+      if (!showModal || !modals) return;
       const modalKey = modalNameMap[(page.name || "").toLowerCase()];
       const modal = modalKey ? modals[modalKey] : null;
       if (!modal) return;
