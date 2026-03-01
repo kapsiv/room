@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="projects" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+        stroke: #4e4738;
+        stroke-miterlimit: 10;
+        stroke-width: 50px;
+      }
+    </style>
+  </defs>
+  <path class="cls-1" d="M152.74,331.95h258.26s17.84-102.28-66.68-102.79c0,0,.39-80.4-78.5-81.9s-83.78,62.92-83.78,62.92c0,0-54.1-4.3-66.86,62.94-6.77,35.67-6.77,58.83-6.77,58.83h44.33Z"/>
+</svg>

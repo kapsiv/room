@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="projects" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+        stroke: #4e4738;
+        stroke-miterlimit: 10;
+        stroke-width: 50px;
+      }
+
+      .cls-2 {
+        fill: #4e4738;
+      }
+    </style>
+  </defs>
+  <path class="cls-1" d="M118.69,137.69h143.38c66.23,0,120,53.77,120,120v104.62h-143.38c-66.23,0-120-53.77-120-120v-104.62h0Z" transform="translate(500.38 -.38) rotate(90)"/>
+  <rect class="cls-2" x="196.83" y="237.48" width="106.54" height="25.03"/>
+  <path class="cls-2" d="M196.83,218.05h106.54s0-25.03,0-25.03h-83.24c-12.87,0-23.31,11.21-23.31,25.03h0Z"/>
+  <path class="cls-2" d="M196.83,306.99h83.24c12.87,0,23.31-11.21,23.31-25.03h0s-106.54,0-106.54,0v25.03Z"/>
+</svg>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="about" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+        stroke: #4e4738;
+        stroke-miterlimit: 10;
+        stroke-width: 50px;
+      }
+    </style>
+  </defs>
+  <g id="Black">
+    <path class="cls-1" d="M362.74,250c0-62.16-50.58-112.74-112.74-112.74-62.16,0-112.74,50.58-112.74,112.74,0,62.16,50.58,112.74,112.74,112.74h112.74s0-112.74,0-112.74Z"/>
+  </g>
+</svg>

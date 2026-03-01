@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="projects" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+        stroke: #4e4738;
+        stroke-miterlimit: 10;
+        stroke-width: 50px;
+      }
+    </style>
+  </defs>
+  <path class="cls-1" d="M118.31,137.69h143.38c66.23,0,120,53.77,120,120v104.62h-143.38c-66.23,0-120-53.77-120-120v-104.62h0Z" transform="translate(500 0) rotate(90)"/>
+</svg>

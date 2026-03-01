@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="about" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+        stroke: #4e4738;
+        stroke-miterlimit: 10;
+        stroke-width: 50px;
+      }
+    </style>
+  </defs>
+  <g id="Black">
+    <path class="cls-1" d="M220.91,387.11c26.64,0,48.09-22.67,46.06-49.74-1.7-22.58-19.93-40.81-42.51-42.51-27.06-2.03-49.74,19.41-49.74,46.06h0c0,25.51,20.68,46.19,46.19,46.19h0Z"/>
+  </g>
+  <path class="cls-1" d="M358.13,193.3c0-50.28-40.76-91.03-91.03-91.03v238.65"/>
+</svg>

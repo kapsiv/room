@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="projects" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+        stroke: #4e4738;
+        stroke-miterlimit: 10;
+        stroke-width: 50px;
+      }
+
+      .cls-2 {
+        fill: #4e4738;
+      }
+    </style>
+  </defs>
+  <path class="cls-1" d="M133.31,374.74v-138.59c0-66.58,53.98-120.56,120.56-120.56h-7.75c66.58,0,120.56,53.98,120.56,120.56v138.59h-233.37Z"/>
+  <circle class="cls-2" cx="304.25" cy="270.54" r="25.85"/>
+</svg>

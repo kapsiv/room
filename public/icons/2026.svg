@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="projects" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
+  <defs>
+    <style>
+      @font-face {
+        font-family: 'Ubuntu Mono Embedded';
+        src: url('/fonts/UbuntuMono-Bold.woff2') format('woff2'),
+             url('/fonts/UbuntuMono-Bold.woff') format('woff');
+        font-weight: 700;
+        font-style: normal;
+      }
+
+      .cls-1 {
+        fill: none;
+        stroke: #4e4738;
+        stroke-miterlimit: 10;
+        stroke-width: 50px;
+      }
+
+      .cls-2 {
+        fill: #4e4738;
+        font-family: 'Ubuntu Mono Embedded', 'Ubuntu Mono', monospace;
+        font-size: 150.9px;
+        font-weight: 700;
+      }
+    </style>
+  </defs>
+  <path class="cls-1" d="M118.31,137.69h143.38c66.23,0,120,53.77,120,120v104.62h-143.38c-66.23,0-120-53.77-120-120v-104.62h0Z"/>
+  <text class="cls-2" transform="translate(174.55 301.04)"><tspan x="0" y="0">26</tspan></text>
+</svg>
