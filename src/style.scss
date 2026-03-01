@@ -124,6 +124,21 @@ a:focus-visible {
   letter-spacing: 0.02em;
 }
 
+.modal-window-title-icon {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  background-color: vars.$base-white;
+  -webkit-mask-image: var(--modal-title-icon);
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+  mask-image: var(--modal-title-icon);
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+}
+
 .modal-window-title .ui-tooltip-trigger {
   color: vars.$base-white;
   background: transparent;
@@ -701,6 +716,52 @@ a:focus-visible {
   height: auto;
   max-width: calc(100vw - 64px);
   max-height: calc(100vh - 124px);
+  object-fit: contain;
+}
+
+.modal--info {
+  width: auto;
+  min-width: 0;
+  max-width: calc(100vw - 32px);
+}
+
+.modal-window-content--info {
+  display: grid;
+  gap: 12px;
+  width: min(680px, calc(100vw - 64px));
+  max-width: calc(100vw - 64px);
+  padding: 14px;
+  background: #f5f0e8;
+  max-height: min(76vh, 760px);
+  overflow-y: auto;
+}
+
+.modal-window-content--info h2 {
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.1;
+  text-align: center;
+}
+
+.modal-window-content--info p {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+}
+
+.info-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+}
+
+.info-room-image {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: min(520px, calc(100vw - 180px));
+  max-height: calc(100vh - 360px);
+  justify-self: center;
   object-fit: contain;
 }
 

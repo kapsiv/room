@@ -2,33 +2,33 @@ const CLOSED_FAB_SIZE_FACTOR = 0.82;
 const OPEN_FAB_VISUAL_SCALE = 1.32;
 
 const PAGES = [
-  { name: "info", url: "/info", icon: "/icons/info.png" },
+  { name: "info", url: "/info", icon: "/icons/info.svg" },
   { name: "random", url: "/random", icon: "/icons/random.png" },
-  { name: "cv", url: "/cv", icon: "/icons/cv.png" },
-  { name: "data pipelines", url: "", icon: "/icons/data_pipelines.png" },
-  { name: "gear", url: "/gear", icon: "/icons/gear.png" },
-  { name: "guitar", url: "/guitar", icon: "/icons/classical_guitar.png" },
-  { name: "typography", url: "/typography", icon: "/icons/typography.png" },
-  { name: "github", url: "https://github.com/kapsiv", icon: "/icons/github.png" },
-  { name: "about", url: "/about", icon: "/icons/about.png" },
-  { name: "portfolio", url: "/portfolio", icon: "/icons/portfolio.png" },
-  { name: "projects", url: "/projects", icon: "/icons/projects.png" },
-  { name: "room", url: "/", icon: "/icons/room.png" },
-  { name: "gallery", url: "/gallery", icon: "/icons/gallery.png" },
-  { name: "archive", url: "/archive", icon: "/icons/archive.png" },
-  { name: "bloomba", url: "/bloomba", icon: "/icons/bloomba.png" },
-  { name: "blog", url: "/blog", icon: "/icons/blog.png" },
-  { name: "reflectIV", url: "/reflectIV", icon: "/icons/reflectIV.png" },
-  { name: "vinaflow", url: "/vinaflow", icon: "/icons/vinaflow.png" },
-  { name: "informatIV", url: "/informatIV", icon: "/icons/informatIV.png" },
-  { name: "404", url: "/404", icon: "/icons/404.png" },
-  { name: "design philosophy", url: "/blog", icon: "/icons/design_philosophy.png" },
-  { name: "logo", url: "/logo", icon: "/icons/logo.png" },
-  { name: "now playing", url: "/music", icon: "/icons/music.png" },
-  { name: "2026", url: "/2026", icon: "/icons/2026.png" },
-  { name: "faq", url: "/faq", icon: "/icons/faq.png" },
-  { name: "blu", url: "/faq", icon: "/icons/blu.png" },
-  { name: "dissertation", url: "/faq", icon: "/icons/book.png" },
+  { name: "cv", url: "/cv", icon: "/icons/cv.svg" },
+  { name: "data pipelines", url: "", icon: "/icons/data_pipelines.svg" },
+  { name: "gear", url: "/gear", icon: "/icons/gear.svg" },
+  { name: "guitar", url: "/guitar", icon: "/icons/classical_guitar.svg" },
+  { name: "typography", url: "/typography", icon: "/icons/typography.svg" },
+  { name: "github", url: "https://github.com/kapsiv", icon: "/icons/github.svg" },
+  { name: "about", url: "/about", icon: "/icons/about.svg" },
+  { name: "portfolio", url: "/portfolio", icon: "/icons/portfolio.svg" },
+  { name: "projects", url: "/projects", icon: "/icons/projects.svg" },
+  { name: "room", url: "/", icon: "/icons/room.svg" },
+  { name: "gallery", url: "/gallery", icon: "/icons/gallery.svg" },
+  { name: "archive", url: "/archive", icon: "/icons/archive.svg" },
+  { name: "bloomba", url: "/bloomba", icon: "/icons/bloomba.svg" },
+  { name: "blog", url: "/blog", icon: "/icons/blog.svg" },
+  { name: "reflectIV", url: "/reflectIV", icon: "/icons/reflectIV.svg" },
+  { name: "vinaflow", url: "/vinaflow", icon: "/icons/vinaflow.svg" },
+  { name: "informatIV", url: "/informatIV", icon: "/icons/informatIV.svg" },
+  { name: "404", url: "/404", icon: "/icons/404.svg" },
+  { name: "design philosophy", url: "/blog", icon: "/icons/design_philosophy.svg" },
+  { name: "logo", url: "/logo", icon: "/icons/logo.svg" },
+  { name: "now playing", url: "/music", icon: "/icons/music.svg" },
+  { name: "2026", url: "/2026", icon: "/icons/2026.svg" },
+  { name: "faq", url: "/faq", icon: "/icons/faq.svg" },
+  { name: "blu", url: "/faq", icon: "/icons/blu.svg" },
+  { name: "dissertation", url: "/faq", icon: "/icons/book.svg" },
 ];
 
 function buildFabMarkSvg() {
@@ -152,15 +152,24 @@ export function createFabManager({
     const wrapPageIndex = (idx) => ((idx % PAGES.length) + PAGES.length) % PAGES.length;
 
     const modalNameMap = {
+      info: "info",
       about: "about",
+      faq: "faq",
       guitar: "guitar",
       archive: "archive",
       reflectiv: "reflectiv",
+      "2026": "calendar",
       logo: "logo",
       music: "nowplaying",
       "now playing": "nowplaying",
       blu: "blu",
       dissertation: "book",
+    };
+
+    const getRandomModal = (modals) => {
+      const candidates = Object.values(modals).filter((modal) => modal && modal.dataset.randomExclude !== "true");
+      if (!candidates.length) return null;
+      return candidates[Math.floor(Math.random() * candidates.length)];
     };
 
     const openCurrentPage = () => {
@@ -174,6 +183,11 @@ export function createFabManager({
       const showModal = typeof getShowModal === "function" ? getShowModal() : null;
       const modals = typeof getModals === "function" ? getModals() : null;
       if (!showModal || !modals) return;
+      if ((page.name || "").toLowerCase() === "random") {
+        const randomModal = getRandomModal(modals);
+        if (randomModal) showModal(randomModal);
+        return;
+      }
       const modalKey = modalNameMap[(page.name || "").toLowerCase()];
       const modal = modalKey ? modals[modalKey] : null;
       if (!modal) return;

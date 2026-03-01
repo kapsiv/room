@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="projects" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
+  <defs>
+    <style>
+      .cls-1, .cls-2 {
+        fill: none;
+        stroke: #4e4738;
+        stroke-linejoin: round;
+        stroke-width: 50px;
+      }
+
+      .cls-2 {
+        stroke-linecap: square;
+      }
+    </style>
+  </defs>
+  <path class="cls-1" d="M250,225.18v69.25c0,38.24-31,69.25-69.25,69.25s-69.25-31-69.25-69.25h0c0-38.24,31-69.25,69.25-69.25h69.25"/>
+  <path class="cls-2" d="M250,274.82v-69.25c0-38.24,31-69.25,69.25-69.25s69.25,31,69.25,69.25h0c0,38.24-31,69.25-69.25,69.25h-69.25"/>
+</svg>

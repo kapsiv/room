@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="projects" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+        stroke: #4e4738;
+        stroke-miterlimit: 10;
+        stroke-width: 50px;
+      }
+
+      .cls-2 {
+        fill: #4e4738;
+      }
+    </style>
+  </defs>
+  <path class="cls-1" d="M250,200.53v177.77"/>
+  <path class="cls-2" d="M225,121.7h50v17.01c0,18.21-14.78,32.99-32.99,32.99h-17.01v-50h0Z" transform="translate(500 293.39) rotate(180)"/>
+</svg>

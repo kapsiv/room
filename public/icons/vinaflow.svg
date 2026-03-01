@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="projects" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
+  <defs>
+    <style>
+      @font-face {
+        font-family: 'Ubuntu Mono Embedded';
+        src: url('/fonts/UbuntuMono-Bold.woff2') format('woff2'),
+             url('/fonts/UbuntuMono-Bold.woff') format('woff');
+        font-weight: 700;
+        font-style: normal;
+      }
+
+      .cls-1 {
+        fill: #4e4738;
+      }
+
+      .cls-2 {
+        fill: #dad3c6;
+        font-family: 'Ubuntu Mono Embedded', 'Ubuntu Mono', monospace;
+        font-size: 70.45px;
+        font-weight: 700;
+      }
+    </style>
+  </defs>
+  <path class="cls-1" d="M214.49,305.81l-24.12,41.78c-15.4,26.67,3.85,60,34.64,60h48.25c30.79,0,50.04-33.33,34.64-60l-24.12-41.78c-15.4-26.67-53.89-26.67-69.28,0Z"/>
+  <path class="cls-1" d="M386.51,230.48l-45.39-78.62c-8.95-15.51-25.5-25.06-43.41-25.06h-97.15c-17.91,0-34.46,9.55-43.41,25.06l-42.59,73.78c-12.27,21.24-9.86,47.91,6.01,66.61l36.04,42.47s.05.06.07.08c3.53,4.15,10.14,3.47,12.86-1.25l36.18-62.67c9.06-15.69,25.29-25.06,43.41-25.06s34.35,9.37,43.41,25.06l36.18,62.67c2.72,4.72,9.33,5.4,12.86,1.25.02-.03.05-.06.07-.08l39.66-46.73c13.7-16.15,15.78-39.16,5.19-57.5Z"/>
+  <text class="cls-2" transform="translate(229.55 371.24)"><tspan x="0" y="0">f</tspan></text>
+</svg>

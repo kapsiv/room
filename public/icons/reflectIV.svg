@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="projects" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
+  <defs>
+    <style>
+      .cls-1 {
+        stroke-width: 50px;
+      }
+
+      .cls-1, .cls-2 {
+        fill: none;
+        stroke: #4e4738;
+        stroke-miterlimit: 10;
+      }
+
+      .cls-2 {
+        stroke-width: 25px;
+      }
+
+      .cls-3 {
+        fill: #4e4738;
+      }
+    </style>
+  </defs>
+  <circle class="cls-1" cx="255.31" cy="256.45" r="130.28"/>
+  <circle class="cls-3" cx="255.31" cy="256.45" r="22.12"/>
+  <polyline class="cls-2" points="260.18 326.99 310.77 300.89 400.53 141.66"/>
+</svg>

@@ -41,6 +41,7 @@ const sizes ={
 }
 
 const modals = {
+  info: document.querySelector(".modal.info"),
   about: document.querySelector(".modal.about"),
   blu: document.querySelector(".modal.blu"),
   guitar: document.querySelector(".modal.guitar"),
@@ -48,6 +49,7 @@ const modals = {
   libraryLookup: document.querySelector(".modal.library-lookup"),
   nowplaying: document.querySelector(".modal.nowplaying"),
   archive: document.querySelector(".modal.archive"),
+  faq: document.querySelector(".modal.faq"),
   logo: document.querySelector(".modal.logo"),
   calendar: document.querySelector(".modal.calendar"),
   modelling: document.querySelector(".modal.modelling"),
@@ -108,6 +110,16 @@ const modalManager = createModalManager({
 
 modalManager.init();
 ({ showModal, hideModal, placeModalAt } = modalManager);
+
+document.querySelectorAll("[data-modal-target]").forEach((link) => {
+  link.addEventListener("click", (e) => {
+    e.preventDefault();
+    const modalKey = link.getAttribute("data-modal-target") || "";
+    const modal = modals[modalKey];
+    if (!modal) return;
+    showModal(modal);
+  });
+});
 
 function playLogoModalAnimation(modal) {
   if (!modal) return;

@@ -42,6 +42,18 @@ export function createModalManager({
     placeModalAt(modal, left, top);
   }
 
+  function setupModalTitleIcon(modal) {
+    const iconPath = modal?.dataset.modalIcon;
+    const titleEl = modal?.querySelector(".modal-window-title");
+    if (!iconPath || !titleEl || titleEl.querySelector(".modal-window-title-icon")) return;
+
+    const iconEl = document.createElement("span");
+    iconEl.className = "modal-window-title-icon";
+    iconEl.setAttribute("aria-hidden", "true");
+    iconEl.style.setProperty("--modal-title-icon", `url("${iconPath}")`);
+    titleEl.prepend(iconEl);
+  }
+
   function setupDraggableModal(modal) {
     const handle = modal.querySelector(".modal-window-bar");
     if (!handle) return;
@@ -108,6 +120,13 @@ export function createModalManager({
     });
   }
 
+  function hideAllModals() {
+    Object.values(modals).forEach((modal) => {
+      if (!modal || modal.style.display === "none") return;
+      hideModal(modal);
+    });
+  }
+
   function showModal(modal) {
     if (!modal) return;
 
@@ -166,6 +185,11 @@ export function createModalManager({
         { passive: false }
       );
 
+      button.addEventListener("contextmenu", (e) => {
+        e.preventDefault();
+        hideAllModals();
+      });
+
       button.addEventListener(
         "click",
         (e) => {
@@ -181,7 +205,9 @@ export function createModalManager({
 
   function init() {
     Object.values(modals).forEach((modal) => {
-      if (modal) setupDraggableModal(modal);
+      if (!modal) return;
+      setupModalTitleIcon(modal);
+      setupDraggableModal(modal);
     });
     setupCloseButtons();
   }

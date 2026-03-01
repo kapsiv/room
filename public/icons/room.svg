@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="projects" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
+  <defs>
+    <style>
+      .cls-1 {
+        stroke-width: 50px;
+      }
+
+      .cls-1, .cls-2 {
+        fill: none;
+        stroke: #4e4738;
+        stroke-miterlimit: 10;
+      }
+
+      .cls-2 {
+        stroke-width: 25px;
+      }
+
+      .cls-3 {
+        fill: #4e4738;
+      }
+    </style>
+  </defs>
+  <polygon class="cls-1" points="137.31 234.05 250 137.69 362.69 234.05 362.69 362.31 137.31 362.31 137.31 234.05"/>
+  <rect class="cls-3" x="216" y="281.64" width="67.99" height="80.67"/>
+  <path class="cls-2" d="M353.5,205.52v-87.2h-40.59c-10.06,0-18.22,8.16-18.22,18.22v33.34"/>
+</svg>
