@@ -48,6 +48,7 @@ const modals = {
   libraryLookup: document.querySelector(".modal.library-lookup"),
   nowplaying: document.querySelector(".modal.nowplaying"),
   archive: document.querySelector(".modal.archive"),
+  logo: document.querySelector(".modal.logo"),
   calendar: document.querySelector(".modal.calendar"),
   modelling: document.querySelector(".modal.modelling"),
   book: document.querySelector(".modal.book"),
@@ -70,6 +71,7 @@ const {
   initReflectivModal,
   setReflectivTab,
 } = reflectivFeature;
+const logoModalTimelines = new WeakMap();
 
 const modalManager = createModalManager({
   modals,
@@ -99,10 +101,250 @@ const modalManager = createModalManager({
   onShowReflectiv: (modal) => {
     initReflectivModal(modal);
   },
+  onShowLogo: (modal) => {
+    playLogoModalAnimation(modal);
+  },
 });
 
 modalManager.init();
 ({ showModal, hideModal, placeModalAt } = modalManager);
+
+function playLogoModalAnimation(modal) {
+  if (!modal) return;
+
+  const kaTarget = modal.querySelector("#logo-modal-ka");
+  const piTarget = modal.querySelector("#logo-modal-pi");
+  const laTarget = modal.querySelector("#logo-modal-la");
+  const nTarget = modal.querySelector("#logo-modal-n");
+  const kaPaths = Array.from(modal.querySelectorAll("#logo-modal-ka path"));
+  const piPaths = Array.from(modal.querySelectorAll("#logo-modal-pi path"));
+  const laPaths = Array.from(modal.querySelectorAll("#logo-modal-la"));
+  const nPaths = Array.from(modal.querySelectorAll("#logo-modal-n path"));
+  const allLogoPaths = [...kaPaths, ...piPaths, ...laPaths, ...nPaths];
+  const syllableEls = Array.from(modal.querySelectorAll(".logo-modal-syllables [data-syllable]"));
+  const introCopyEl = modal.querySelector(".logo-modal-copy[data-copy-text]");
+  const strokeControlEl = modal.querySelector(".logo-stroke-control");
+  const maskToggleEl = modal.querySelector("#logoMaskToggle");
+  const strokeSliderEl = modal.querySelector("#logoStrokeWidth");
+  const maskedGroups = Array.from(modal.querySelectorAll("svg > g[mask]"));
+  const orderedGroups = [kaPaths, piPaths, laPaths, nPaths].filter((paths) => paths.length > 0);
+
+  if (!orderedGroups.length) return;
+
+  const priorTimeline = logoModalTimelines.get(modal);
+  if (priorTimeline) {
+    priorTimeline.kill();
+  }
+
+  orderedGroups.flat().forEach((pathEl) => {
+    const length = pathEl.getTotalLength();
+    const isLaPath = pathEl.id === "logo-modal-la";
+    pathEl.style.strokeDasharray = isLaPath ? `${length} ${length}` : `${length}`;
+    pathEl.style.strokeDashoffset = isLaPath ? `${-length}` : `${length}`;
+  });
+
+  const resetLetterPaths = (paths) => {
+    paths.forEach((pathEl) => {
+      const length = pathEl.getTotalLength();
+      const isLaPath = pathEl.id === "logo-modal-la";
+      pathEl.style.strokeDasharray = isLaPath ? `${length} ${length}` : `${length}`;
+      pathEl.style.strokeDashoffset = isLaPath ? `${-length}` : `${length}`;
+    });
+  };
+
+  const replayLetter = (paths, options = {}) => {
+    if (!paths.length) return;
+    gsap.killTweensOf(paths);
+    resetLetterPaths(paths);
+    gsap.to(paths, {
+      strokeDashoffset: 0,
+      duration: options.duration ?? 1.05,
+      ease: "sine.inOut",
+      stagger: options.stagger ?? 0,
+      overwrite: true,
+    });
+  };
+
+  const bindReplayTarget = (target, paths, options = {}) => {
+    if (!target || target.dataset.replayBound === "true") return;
+    target.dataset.replayBound = "true";
+    target.setAttribute("role", "button");
+    target.setAttribute("tabindex", "0");
+    target.setAttribute("aria-label", options.label || "Replay letter animation");
+
+    const triggerReplay = () => replayLetter(paths, options);
+
+    target.addEventListener("click", (e) => {
+      e.stopPropagation();
+      triggerReplay();
+    });
+    target.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      e.preventDefault();
+      triggerReplay();
+    });
+  };
+
+  bindReplayTarget(kaTarget, kaPaths, { duration: 1.05, stagger: 0.12, label: "Replay ka animation" });
+  bindReplayTarget(piTarget, piPaths, { duration: 1.05, stagger: 0.12, label: "Replay pi animation" });
+  bindReplayTarget(laTarget, laPaths, { duration: 1.12, label: "Replay la animation" });
+  bindReplayTarget(nTarget, nPaths, { duration: 1.05, stagger: 0.12, label: "Replay n animation" });
+
+  syllableEls.forEach((el) => {
+    el.textContent = "";
+    el.classList.remove("is-typing");
+  });
+
+  if (introCopyEl) {
+    introCopyEl.textContent = "";
+    introCopyEl.classList.remove("is-typing");
+  }
+
+  const defaultStrokeWidth = Number(strokeSliderEl?.defaultValue || strokeSliderEl?.value || 300);
+  const applyStrokeWidth = (value) => {
+    allLogoPaths.forEach((pathEl) => {
+      pathEl.style.strokeWidth = `${value}px`;
+    });
+  };
+
+  const applyMaskState = (maskEnabled) => {
+    maskedGroups.forEach((groupEl) => {
+      const originalMask = groupEl.dataset.originalMask || groupEl.getAttribute("mask") || "";
+      if (!groupEl.dataset.originalMask && originalMask) {
+        groupEl.dataset.originalMask = originalMask;
+      }
+      if (maskEnabled) {
+        if (groupEl.dataset.originalMask) {
+          groupEl.setAttribute("mask", groupEl.dataset.originalMask);
+        }
+      } else {
+        groupEl.removeAttribute("mask");
+      }
+    });
+
+    if (strokeSliderEl) {
+      strokeSliderEl.disabled = maskEnabled;
+    }
+  };
+
+  if (strokeSliderEl && strokeSliderEl.dataset.bound !== "true") {
+    strokeSliderEl.dataset.bound = "true";
+    strokeSliderEl.addEventListener("input", () => {
+      applyStrokeWidth(strokeSliderEl.value);
+    });
+  }
+
+  if (maskToggleEl && maskToggleEl.dataset.bound !== "true") {
+    maskToggleEl.dataset.bound = "true";
+    maskToggleEl.addEventListener("change", () => {
+      if (maskToggleEl.checked && strokeSliderEl) {
+        strokeSliderEl.value = String(defaultStrokeWidth);
+        applyStrokeWidth(defaultStrokeWidth);
+      }
+      applyMaskState(maskToggleEl.checked);
+    });
+  }
+
+  if (strokeSliderEl) {
+    strokeSliderEl.value = String(defaultStrokeWidth);
+  }
+  applyStrokeWidth(defaultStrokeWidth);
+
+  if (maskToggleEl) {
+    maskToggleEl.checked = true;
+  }
+  applyMaskState(true);
+
+  const getRenderedTypingText = (text, isHtml = false) => {
+    if (!isHtml) return text;
+    const temp = document.createElement("div");
+    temp.innerHTML = text;
+    return temp.textContent || temp.innerText || "";
+  };
+
+  const addTypingTween = (tl, el, text, position, options = {}) => {
+    if (!el || !text) return;
+
+    const isHtml = options.isHtml === true;
+    const renderedText = getRenderedTypingText(text, isHtml);
+    const state = { count: 0 };
+    const duration = options.duration ?? Math.max(0.48, renderedText.length * 0.24);
+    const keepCursor = options.keepCursor === true;
+
+    tl.call(() => {
+      el.textContent = "";
+      el.classList.add("is-typing");
+    }, null, position);
+
+    tl.to(state, {
+      count: renderedText.length,
+      duration,
+      ease: "none",
+      snap: { count: 1 },
+      onUpdate: () => {
+        el.textContent = renderedText.slice(0, state.count);
+      },
+      onComplete: () => {
+        if (isHtml) {
+          el.innerHTML = text;
+        } else {
+          el.textContent = text;
+        }
+        if (!keepCursor) {
+          el.classList.remove("is-typing");
+        }
+      },
+    }, position);
+  };
+
+  const timeline = gsap.timeline();
+  timeline
+    .addLabel("kaStart")
+    .to(kaPaths, {
+      strokeDashoffset: 0,
+      duration: 1.05,
+      ease: "sine.inOut",
+      stagger: 0.12,
+    }, "kaStart")
+    .addLabel("piStart", "-=0.12")
+    .to(piPaths, {
+      strokeDashoffset: 0,
+      duration: 1.05,
+      ease: "sine.inOut",
+      stagger: 0.12,
+    }, "piStart")
+    .addLabel("laStart", "-=0.84")
+    .to(laPaths, {
+      strokeDashoffset: 0,
+      duration: 1.12,
+      ease: "sine.inOut",
+    }, "laStart")
+    .addLabel("nStart", "-=0.82")
+    .to(nPaths, {
+      strokeDashoffset: 0,
+      duration: 1.05,
+      ease: "sine.inOut",
+      stagger: 0.12,
+    }, "nStart");
+
+  addTypingTween(timeline, syllableEls[0], syllableEls[0]?.dataset.syllable || "", "kaStart");
+  addTypingTween(timeline, syllableEls[1], syllableEls[1]?.dataset.syllable || "", "piStart");
+  addTypingTween(timeline, syllableEls[2], syllableEls[2]?.dataset.syllable || "", "laStart");
+  addTypingTween(timeline, syllableEls[3], syllableEls[3]?.dataset.syllable || "", "nStart");
+  addTypingTween(
+    timeline,
+    introCopyEl,
+    introCopyEl?.dataset.copyText || "",
+    "nStart+=0.9",
+    {
+      duration: Math.max(1.9, getRenderedTypingText(introCopyEl?.dataset.copyText || "", true).length * 0.038),
+      keepCursor: true,
+      isHtml: true,
+    }
+  );
+
+  logoModalTimelines.set(modal, timeline);
+}
 
 function initGuitarModal(modal) {
   if (!modal || modal.dataset.guitarBound === "true") return;

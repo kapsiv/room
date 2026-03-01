@@ -1536,6 +1536,35 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
     return [...values].sort((a, b) => String(a).localeCompare(String(b), "en-GB", { sensitivity: "base" }));
   }
 
+  function normalizeLibrarySongKey(value) {
+    return String(value || "").trim().toLowerCase();
+  }
+
+  function buildArtistSongCountExclusions(rows) {
+    const exclusions = new Set();
+    const dusterArtist = "Duster";
+    const dusterBoxSet = "Capsule Losing Contact";
+    const dusterSongsOutsideBoxSet = new Set();
+
+    rows.forEach((row) => {
+      const artist = (row.Artist || "").trim();
+      const album = (row.Album || "").trim();
+      const songKey = normalizeLibrarySongKey(row.Song);
+      if (artist !== dusterArtist || !songKey || album === dusterBoxSet) return;
+      dusterSongsOutsideBoxSet.add(songKey);
+    });
+
+    rows.forEach((row, index) => {
+      const artist = (row.Artist || "").trim();
+      const album = (row.Album || "").trim();
+      const songKey = normalizeLibrarySongKey(row.Song);
+      if (artist !== dusterArtist || album !== dusterBoxSet || !songKey) return;
+      if (dusterSongsOutsideBoxSet.has(songKey)) exclusions.add(index);
+    });
+
+    return exclusions;
+  }
+
   function updateLibraryLookupToggle(lookupModal) {
     const toggle = lookupModal?.querySelector("#libraryLookupGroupToggle");
     if (!toggle) return;
@@ -1600,6 +1629,7 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
   }
 
   function renderMusicLibraryPanel(modal, rows) {
+    const artistSongCountExclusions = buildArtistSongCountExclusions(rows);
     const albums = new Set();
     const artists = new Set();
     const genres = new Set();
@@ -1614,7 +1644,7 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
     const albumYearByKey = new Map();
     const albumCountriesByKey = new Map();
 
-    rows.forEach((r) => {
+    rows.forEach((r, index) => {
       const artist = (r.Artist || "").trim();
       const album = (r.Album || "").trim();
       const albumKey = artist && album ? `${artist.toLowerCase()}::${album.toLowerCase()}` : "";
@@ -1633,7 +1663,9 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
         const umbrella = normalizedGenreUmbrellaMap[normalizeGenreKey(g)] || "other";
         umbrellaGenreCounts.set(umbrella, (umbrellaGenreCounts.get(umbrella) || 0) + 1);
       });
-      if (artist) artistSongCounts.set(artist, (artistSongCounts.get(artist) || 0) + 1);
+      if (artist && !artistSongCountExclusions.has(index)) {
+        artistSongCounts.set(artist, (artistSongCounts.get(artist) || 0) + 1);
+      }
 
       const duration = parseDurationToSeconds(r.Duration);
       if (Number.isFinite(duration) && duration > 0) durationValues.push(duration);
