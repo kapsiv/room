@@ -325,6 +325,11 @@ a:focus-visible {
   min-width: min(360px, calc(100vw - 32px));
 }
 
+.modal--inventory {
+  width: min(980px, calc(100vw - 32px));
+  min-width: min(360px, calc(100vw - 32px));
+}
+
 .logo-modal-content {
   padding: 18px 20px 22px;
   background: #f5f0e8;
@@ -538,6 +543,122 @@ a:focus-visible {
   text-align: right;
   white-space: nowrap;
   font-style: italic;
+}
+
+.inventory-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 16px 6px;
+}
+
+.inventory-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+
+.inventory-organize-toggle {
+  min-width: 116px;
+}
+
+.inventory-grid--organized {
+  align-items: start;
+  gap: 20px 10px;
+}
+
+.inventory-category {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+}
+
+.inventory-category-title {
+  margin: 0;
+  display: grid;
+  gap: 2px;
+  justify-items: center;
+  text-align: center;
+}
+
+.inventory-category-letter {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+  color: vars.$base-brown;
+}
+
+.inventory-category-name {
+  font-size: 12px;
+  line-height: 1.1;
+  text-transform: lowercase;
+  color: rgba(78, 71, 56, 0.78);
+}
+
+.inventory-category-items {
+  display: grid;
+  gap: 16px 6px;
+  justify-items: center;
+}
+
+.inventory-empty {
+  font-size: 12px;
+  color: rgba(78, 71, 56, 0.56);
+}
+
+.inventory-item {
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  padding: 0;
+  text-align: center;
+}
+
+.inventory-item-button {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+
+.inventory-item-squircle {
+  width: 80px;
+  height: 80px;
+  border-radius: 23px;
+  background: vars.$base-brown;
+  display: grid;
+  place-items: center;
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
+}
+
+.inventory-item-button:hover .inventory-item-squircle,
+.inventory-item-button:focus-visible .inventory-item-squircle {
+  transform: scale(1.08);
+  box-shadow: 0 6px 14px rgba(78, 71, 56, 0.22);
+}
+
+.inventory-item-button:focus-visible {
+  outline: none;
+}
+
+.inventory-item-icon {
+  width: 65px;
+  height: 65px;
+  background-color: vars.$base-beige;
+  -webkit-mask-image: var(--inventory-icon);
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+  mask-image: var(--inventory-icon);
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+}
+
+.inventory-item-label {
+  font-size: 13px;
+  line-height: 1.2;
+  text-transform: lowercase;
 }
 
 .modal-window-content--modelling {
@@ -1370,6 +1491,14 @@ a:focus-visible {
 }
 
 .library-ranking-columns span:nth-child(2),
+.top-artists-list--three-cols .artist-count {
+  text-align: center;
+}
+
+.library-ranking-columns span:nth-child(2) {
+  text-align: center;
+}
+
 .library-ranking-columns span:nth-child(3) {
   text-align: left;
 }
@@ -1410,7 +1539,6 @@ a:focus-visible {
   white-space: nowrap;
 }
 
-.top-artists-list--three-cols .artist-count,
 .top-artists-list--three-cols .artist-share {
   text-align: left;
 }
@@ -1566,6 +1694,14 @@ a:focus-visible {
 
   .repertoire-arranger {
     text-align: left;
+  }
+
+  .inventory-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .inventory-grid--organized {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 

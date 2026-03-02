@@ -49,10 +49,20 @@ const modals = {
   libraryLookup: document.querySelector(".modal.library-lookup"),
   nowplaying: document.querySelector(".modal.nowplaying"),
   archive: document.querySelector(".modal.archive"),
+  gallery: document.querySelector(".modal.gallery"),
+  projects: document.querySelector(".modal.projects"),
+  designPhilosophy: document.querySelector(".modal.design-philosophy"),
+  dataPipelines: document.querySelector(".modal.data-pipelines"),
+  utilities: document.querySelector(".modal.utilities"),
+  vinaflow: document.querySelector(".modal.vinaflow"),
+  links: document.querySelector(".modal.links"),
+  inventory: document.querySelector(".modal.inventory"),
+  cv: document.querySelector(".modal.cv"),
   faq: document.querySelector(".modal.faq"),
   logo: document.querySelector(".modal.logo"),
   calendar: document.querySelector(".modal.calendar"),
   modelling: document.querySelector(".modal.modelling"),
+  informativ: document.querySelector(".modal.informativ"),
   book: document.querySelector(".modal.book"),
 };
 
@@ -106,6 +116,9 @@ const modalManager = createModalManager({
   onShowLogo: (modal) => {
     playLogoModalAnimation(modal);
   },
+  onShowModelling: () => {
+    modellingViewer?.play();
+  },
 });
 
 modalManager.init();
@@ -120,6 +133,126 @@ document.querySelectorAll("[data-modal-target]").forEach((link) => {
     showModal(modal);
   });
 });
+
+function getModalInventoryLabel(modal) {
+  const titleId = modal?.getAttribute("aria-labelledby");
+  const titleEl = titleId ? document.getElementById(titleId) : modal?.querySelector(".modal-window-title");
+  if (!titleEl) return "";
+  const clone = titleEl.cloneNode(true);
+  clone.querySelectorAll(".ui-tooltip, .modal-window-title-icon").forEach((el) => el.remove());
+  return clone.textContent.replace(/\s+/g, " ").trim();
+}
+
+const inventoryState = {
+  organized: false,
+};
+
+const INVENTORY_CATEGORY_DEFS = [
+  { key: "K", label: "knowledge", items: ["book", "info", "logo", "libraryLookup", "faq"] },
+  { key: "A", label: "art", items: ["guitar", "modelling", "projects", "designPhilosophy"] },
+  { key: "P", label: "profession", items: ["cv", "archive", "dataPipelines", "utilities", "vinaflow"] },
+  { key: "S", label: "social", items: ["blu", "calendar", "gallery", "links"] },
+  { key: "I", label: "introspection", items: ["about", "nowplaying", "reflectiv"] },
+  { key: "V", label: "vitality", items: ["informativ"] },
+];
+
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function buildInventoryItemMarkup(item) {
+  return `
+    <div class="inventory-item">
+      <button type="button" class="inventory-item-button" data-inventory-modal="${escapeHtml(item.key)}" aria-label="Open ${escapeHtml(item.label)}">
+        <span class="inventory-item-squircle">
+          <span class="inventory-item-icon" style="--inventory-icon: url('${item.icon}')"></span>
+        </span>
+      </button>
+      <span class="inventory-item-label">${escapeHtml(item.label)}</span>
+    </div>
+  `;
+}
+
+function initInventoryModal() {
+  const grid = document.querySelector("#inventoryGrid");
+  const toggle = document.querySelector("#inventoryOrganizeToggle");
+  if (!grid || !toggle) return;
+
+  const items = Object.entries(modals)
+    .filter(([key, modal]) => modal && key !== "inventory")
+    .map(([key, modal]) => ({
+      key,
+      modal,
+      label: getModalInventoryLabel(modal),
+      icon: modal.dataset.modalIcon || "",
+    }))
+    .filter((item) => item.icon && item.label);
+
+  const itemsByKey = new Map(items.map((item) => [item.key, item]));
+
+  const bindInventoryButtons = () => {
+    grid.querySelectorAll("[data-inventory-modal]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const modalKey = button.getAttribute("data-inventory-modal") || "";
+        const modal = modals[modalKey];
+        if (!modal) return;
+        showModal(modal);
+      });
+    });
+  };
+
+  const renderInventory = () => {
+    toggle.textContent = `organise: ${inventoryState.organized ? "on" : "off"}`;
+    grid.classList.toggle("inventory-grid--organized", inventoryState.organized);
+
+    if (!inventoryState.organized) {
+      grid.innerHTML = items.map(buildInventoryItemMarkup).join("");
+      bindInventoryButtons();
+      return;
+    }
+
+    grid.innerHTML = INVENTORY_CATEGORY_DEFS
+      .map((category) => {
+        const categoryItems = category.items
+          .map((key) => itemsByKey.get(key))
+          .filter(Boolean);
+
+        const itemMarkup = categoryItems.length
+          ? categoryItems.map(buildInventoryItemMarkup).join("")
+          : '<div class="inventory-empty">coming soon</div>';
+
+        return `
+          <section class="inventory-category">
+            <h3 class="inventory-category-title">
+              <span class="inventory-category-letter">${escapeHtml(category.key)}</span>
+              <span class="inventory-category-name">${escapeHtml(category.label)}</span>
+            </h3>
+            <div class="inventory-category-items">${itemMarkup}</div>
+          </section>
+        `;
+      })
+      .join("");
+
+    bindInventoryButtons();
+  };
+
+  if (toggle.dataset.bound !== "true") {
+    toggle.dataset.bound = "true";
+    toggle.addEventListener("click", () => {
+      inventoryState.organized = !inventoryState.organized;
+      renderInventory();
+    });
+  }
+
+  renderInventory();
+}
+
+initInventoryModal();
 
 function playLogoModalAnimation(modal) {
   if (!modal) return;
@@ -1252,10 +1385,11 @@ function handleRaycasterInteraction(e) {
   } else if (visualObject.name.includes("Bin")) {
     showModal(modals.reflectiv);
     setReflectivTab(modals.reflectiv, "library");
+  } else if (visualObject.name.includes("Box")) {
+    showModal(modals.inventory);
   } else if (visualObject.name.includes("Calendar")) {
     showModal(modals.calendar);
   } else if (visualObject.name.includes("Photo_Frame")) {
-    modellingViewer?.play();
     showModal(modals.modelling);
   }
 }

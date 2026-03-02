@@ -1634,10 +1634,13 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
     const artists = new Set();
     const genres = new Set();
     const artistSongCounts = new Map();
+    const artistDurationTotals = new Map();
     const genreSongCounts = new Map();
+    const genreDurationTotals = new Map();
     const umbrellaGenreCounts = new Map();
     const fileTypeCounts = new Map();
     const durationValues = [];
+    let totalDurationSeconds = 0;
     const albumUmbrellasByKey = new Map();
     const artistAlbumSets = new Map();
     const genreAlbumSets = new Map();
@@ -1668,7 +1671,16 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
       }
 
       const duration = parseDurationToSeconds(r.Duration);
-      if (Number.isFinite(duration) && duration > 0) durationValues.push(duration);
+      if (Number.isFinite(duration) && duration > 0) {
+        durationValues.push(duration);
+        totalDurationSeconds += duration;
+        if (artist) {
+          artistDurationTotals.set(artist, (artistDurationTotals.get(artist) || 0) + duration);
+        }
+        rowGenres.forEach((genre) => {
+          genreDurationTotals.set(genre, (genreDurationTotals.get(genre) || 0) + duration);
+        });
+      }
       const year = Number.parseInt((r.Year || "").trim(), 10);
       if (albumKey && Number.isInteger(year) && year >= 1900 && year <= 2100 && !albumYearByKey.has(albumKey)) {
         albumYearByKey.set(albumKey, year);
@@ -1766,16 +1778,21 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
       const metric = reflectivState.libraryMetric;
       const topArtists = (metric === "albums"
         ? [...artistAlbumSets.entries()].map(([name, albumSet]) => [name, albumSet.size])
-        : [...artistSongCounts.entries()])
+        : metric === "duration"
+          ? [...artistDurationTotals.entries()]
+          : [...artistSongCounts.entries()])
         .sort((a, b) => b[1] - a[1])
         .slice(0, 100);
-      const totalForPercent = metric === "albums" ? albums.size : rows.length;
+      const totalForPercent = metric === "albums" ? albums.size : metric === "duration" ? totalDurationSeconds : rows.length;
       const percentFormatter = new Intl.NumberFormat("en-GB", { maximumFractionDigits: 1 });
-      if (topArtistsCountLabel) topArtistsCountLabel.textContent = metric;
+      const valueFormatter = metric === "duration"
+        ? (value) => `${Math.round(value / 60).toLocaleString("en-GB")}`
+        : (value) => value.toLocaleString();
+      if (topArtistsCountLabel) topArtistsCountLabel.textContent = metric === "duration" ? "duration (mins)" : metric;
       topArtistsList.innerHTML = topArtists
         .map(([name, count], i) => {
           const share = totalForPercent > 0 ? `${percentFormatter.format((count / totalForPercent) * 100)}%` : "0%";
-          return `<li><span class="artist-name">${i + 1}. ${name}</span><span class="artist-count">${count.toLocaleString()}</span><span class="artist-share">${share}</span></li>`;
+          return `<li><span class="artist-name">${i + 1}. ${name}</span><span class="artist-count">${valueFormatter(count)}</span><span class="artist-share">${share}</span></li>`;
         })
         .join("");
     }
@@ -1785,16 +1802,21 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
       const metric = reflectivState.libraryMetric;
       const topGenres = (metric === "albums"
         ? [...genreAlbumSets.entries()].map(([name, albumSet]) => [name, albumSet.size])
-        : [...genreSongCounts.entries()])
+        : metric === "duration"
+          ? [...genreDurationTotals.entries()]
+          : [...genreSongCounts.entries()])
         .sort((a, b) => b[1] - a[1])
         .slice(0, 50);
-      const totalForPercent = metric === "albums" ? albums.size : rows.length;
+      const totalForPercent = metric === "albums" ? albums.size : metric === "duration" ? totalDurationSeconds : rows.length;
       const percentFormatter = new Intl.NumberFormat("en-GB", { maximumFractionDigits: 1 });
-      if (topGenresCountLabel) topGenresCountLabel.textContent = metric;
+      const valueFormatter = metric === "duration"
+        ? (value) => `${Math.round(value / 60).toLocaleString("en-GB")}`
+        : (value) => value.toLocaleString();
+      if (topGenresCountLabel) topGenresCountLabel.textContent = metric === "duration" ? "duration (mins)" : metric;
       topGenresList.innerHTML = topGenres
         .map(([name, count], i) => {
           const share = totalForPercent > 0 ? `${percentFormatter.format((count / totalForPercent) * 100)}%` : "0%";
-          return `<li><span class="artist-name">${i + 1}. ${name}</span><span class="artist-count">${count.toLocaleString()}</span><span class="artist-share">${share}</span></li>`;
+          return `<li><span class="artist-name">${i + 1}. ${name}</span><span class="artist-count">${valueFormatter(count)}</span><span class="artist-share">${share}</span></li>`;
         })
         .join("");
     }
