@@ -3,6 +3,7 @@ const OPEN_FAB_VISUAL_SCALE = 1.32;
 
 const PAGES = [
   { name: "info", url: "/info", icon: "/icons/info.svg" },
+  { name: "links", url: "/links", icon: "/icons/links.svg" },
   { name: "random", url: "/random", icon: "/icons/random.png" },
   { name: "cv", url: "/cv", icon: "/icons/cv.svg" },
   { name: "data pipelines", url: "", icon: "/icons/data_pipelines.svg" },
@@ -153,6 +154,7 @@ export function createFabManager({
 
     const modalNameMap = {
       info: "info",
+      links: "links",
       about: "about",
       cv: "cv",
       faq: "faq",

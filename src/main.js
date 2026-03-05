@@ -1,4 +1,5 @@
-import './style.scss'
+import "./style.scss";
+import { inject } from "@vercel/analytics";
 
 import gsap from "gsap";
 import * as THREE from 'three';
@@ -13,6 +14,8 @@ import { createModalManager } from './ui/modalManager.js';
 import { createFabManager } from './ui/fabManager.js';
 
 GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
+
+inject({ mode: import.meta.env.DEV ? "development" : "production" });
 
 let isLoading = true;
 const manager = new THREE.LoadingManager();
@@ -56,6 +59,7 @@ const modals = {
   utilities: document.querySelector(".modal.utilities"),
   vinaflow: document.querySelector(".modal.vinaflow"),
   links: document.querySelector(".modal.links"),
+  food: document.querySelector(".modal.food"),
   inventory: document.querySelector(".modal.inventory"),
   cv: document.querySelector(".modal.cv"),
   faq: document.querySelector(".modal.faq"),
@@ -153,7 +157,7 @@ const INVENTORY_CATEGORY_DEFS = [
   { key: "P", label: "profession", items: ["cv", "archive", "dataPipelines", "utilities", "vinaflow"] },
   { key: "S", label: "social", items: ["blu", "calendar", "gallery", "links"] },
   { key: "I", label: "introspection", items: ["about", "nowplaying", "reflectiv"] },
-  { key: "V", label: "vitality", items: ["informativ"] },
+  { key: "V", label: "vitality", items: ["informativ", "food"] },
 ];
 
 function escapeHtml(value) {
@@ -981,8 +985,34 @@ Object.entries(textureMap).forEach(([key, paths])=>{
   const dayTexture = textureLoader.load(paths.day);
   dayTexture.flipY = false
   dayTexture.colorSpace = THREE.SRGBColorSpace
+  dayTexture.minFilter = THREE.LinearFilter;
+  dayTexture.magFilter = THREE.LinearFilter;
+  dayTexture.generateMipmaps = false;
+  dayTexture.needsUpdate = true;
   loadedTextures.day[key] = dayTexture;
 });
+
+function createWarmTextureMaterial(map) {
+  const material = new THREE.MeshBasicMaterial({ map });
+
+  material.onBeforeCompile = (shader) => {
+    shader.fragmentShader = shader.fragmentShader.replace(
+      "#include <tonemapping_fragment>",
+      `
+        vec3 gradedColor = gl_FragColor.rgb;
+        float gradedLuma = dot(gradedColor, vec3(0.2126, 0.7152, 0.0722));
+        gradedColor = mix(vec3(gradedLuma), gradedColor, 1.12);
+        gradedColor = ((gradedColor - 0.5) * 0.92) + 0.5;
+        gradedColor = mix(gradedColor, gradedColor * vec3(1.14, 1.05, 0.9), 0.26);
+        gradedColor += vec3(0.029, 0.02, 0.011);
+        gl_FragColor.rgb = clamp(gradedColor, 0.0, 1.0);
+        #include <tonemapping_fragment>
+      `
+    );
+  };
+
+  return material;
+}
 
 const glassMaterial = new THREE.MeshPhysicalMaterial({
   transmission: 1,
@@ -1024,6 +1054,21 @@ videoTexture.needsUpdate = true;
 const screenVideoMaterial = new THREE.MeshBasicMaterial({
   map: videoTexture,
 });
+
+screenVideoMaterial.onBeforeCompile = (shader) => {
+  shader.fragmentShader = shader.fragmentShader.replace(
+    "#include <tonemapping_fragment>",
+    `
+      vec3 washedColor = gl_FragColor.rgb;
+      float washedLuma = dot(washedColor, vec3(0.2126, 0.7152, 0.0722));
+      washedColor = mix(vec3(washedLuma), washedColor, 0.84);
+      washedColor = ((washedColor - 0.5) * 0.93) + 0.5;
+      washedColor += vec3(0.045, 0.045, 0.045);
+      gl_FragColor.rgb = clamp(washedColor, 0.0, 1.0);
+      #include <tonemapping_fragment>
+    `
+  );
+};
 
 // screen 1 texture
 
@@ -1581,18 +1626,12 @@ loader.load("/models/Room_Portfolio_V4.glb", (glb) => {
         } else {
           Object.keys(textureMap).forEach((key) => {
             if (child.name.includes(key)) {
-              const material = new THREE.MeshBasicMaterial({
-                map: loadedTextures.day[key],
-              });
+              const material = createWarmTextureMaterial(loadedTextures.day[key]);
 
             child.material = material;
 
             if(child.name.includes("Vinyl")){
               yAxisVinyl.push(child);
-            }
-
-            if(child.material.map){
-            child.material.map.minFilter = THREE.LinearFilter;
             }
           }
         });
@@ -1736,11 +1775,14 @@ camera.position.set(
   -39.38105389743106
 );
 
-scene.background = new THREE.Color("#b8aaa5");
+scene.background = new THREE.Color("#e7ddcd");
 
 const renderer = new THREE.WebGLRenderer({canvas:canvas, antialias: true });
 renderer.setSize(sizes.width , sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.NeutralToneMapping;
+renderer.toneMappingExposure = 0.98;
 
 controls = new OrbitControls( camera, renderer.domElement );
 controls.minDistance = 5;
