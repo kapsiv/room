@@ -15,10 +15,18 @@ function normalizeAuth(header) {
   return header.trim();
 }
 
+function getAuthHeader(request) {
+  if (!request?.headers) return "";
+  if (typeof request.headers.get === "function") {
+    return request.headers.get("authorization") || "";
+  }
+  return request.headers.authorization || request.headers.Authorization || "";
+}
+
 function isAuthorized(request) {
   const secret = process.env.CRON_SECRET;
   if (!secret) return true;
-  const authHeader = request.headers.get("authorization");
+  const authHeader = getAuthHeader(request);
   return normalizeAuth(authHeader) === secret;
 }
 
