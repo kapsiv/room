@@ -1208,7 +1208,10 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
 
   async function loadScrobblesCsv() {
     if (cacheState.scrobbles) return cacheState.scrobbles;
-    const res = await fetch("/data/scrobbles.csv");
+    let res = await fetch("/api/scrobbles");
+    if (!res.ok) {
+      res = await fetch("/data/scrobbles.csv");
+    }
     if (!res.ok) throw new Error(`scrobbles.csv fetch failed: ${res.status}`);
     const text = await res.text();
     cacheState.scrobbles = parseCsv(text).filter((r) => r.uts && r.artist && r.track);
