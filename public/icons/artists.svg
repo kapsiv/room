@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="about" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 500 500">
+  <defs>
+    <style>
+      .cls-1 {
+        mask: url(#mask);
+      }
+
+      .cls-2 {
+        fill: none;
+        stroke: #4e4738;
+        stroke-miterlimit: 10;
+        stroke-width: 50px;
+      }
+
+      .cls-3 {
+        filter: url(#luminosity-invert-noclip);
+      }
+
+      .cls-4 {
+        fill: #fff;
+      }
+
+      .cls-5 {
+        fill: #4e4738;
+      }
+    </style>
+    <filter id="luminosity-invert-noclip" x="63.03" y="75.99" width="402.71" height="348.01" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+      <feColorMatrix result="cm" values="-1 0 0 0 1 0 -1 0 0 1 0 0 -1 0 1 0 0 0 1 0"/>
+      <feFlood flood-color="#fff" result="bg"/>
+      <feBlend in="cm" in2="bg"/>
+    </filter>
+    <mask id="mask" x="63.03" y="75.99" width="402.71" height="348.01" maskUnits="userSpaceOnUse">
+      <g class="cls-3">
+        <path class="cls-4" d="M335.84,377.36c-37.38,0-67.78-30.41-67.78-67.78,0-18.78,7.91-36.89,21.7-49.69,11.39-10.57,25.92-16.83,41.34-17.92V110.47h36.26c54.25,0,98.38,44.13,98.38,98.38v10.36h-62.12v100.73h-.82c-2.05,13.32-8.01,25.74-17.27,35.72-12.79,13.79-30.9,21.7-49.69,21.7Z"/>
+      </g>
+    </mask>
+  </defs>
+  <g class="cls-1">
+    <path class="cls-2" d="M276.63,230.01c10.31-13.12,16.6-29.54,17-47.42.99-44.1-34.5-80.98-78.61-81.59-44.57-.62-80.9,35.33-80.9,79.76,0,18.64,6.4,35.79,17.12,49.37,3.73,4.73,2.48,11.68-2.66,14.81-36.31,22.08-60.56,62.02-60.56,107.62v46.45h251.73v-46.45c0-45.6-24.25-85.53-60.55-107.61-5.2-3.16-6.33-10.15-2.57-14.93Z"/>
+  </g>
+  <path class="cls-5" d="M367.36,120.83h-25.9v131.62c-.42-.04-.84-.09-1.26-.12-15.89-1.19-31.72,4.33-43.4,15.16-11.68,10.84-18.39,26.18-18.39,42.09,0,31.66,25.76,57.42,57.42,57.42,15.91,0,31.25-6.7,42.09-18.39,9.84-10.61,15.28-24.63,15.31-39.04h.02v-126.03c6.38,6.53,10.32,15.46,10.32,25.29h51.8c0-48.54-39.49-88.02-88.02-88.02Z"/>
+</svg>
