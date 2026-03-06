@@ -279,7 +279,15 @@
 
           <section class="chart-section">
             <h3 class="chart-title">scrobbles over time</h3>
-            <canvas id="scrobblesOverTime"></canvas>
+            <div class="chart-canvas-wrap">
+              <canvas id="scrobblesOverTime"></canvas>
+              <span class="ui-tooltip chart-marker-tooltip" id="scrobblesMobileTooltip">
+                <span class="ui-tooltip-trigger" aria-label="Scrobble note" tabindex="0">i</span>
+                <span class="ui-tooltip-content" role="tooltip">
+                  this is when i finally configured scrobbling on mobile, hence the sudden increase in frequency!
+                </span>
+              </span>
+            </div>
           </section>
 
           <section class="chart-row">
@@ -299,7 +307,15 @@
               </div>
             </div>
             <div class="chart-section half">
-              <h3 class="chart-title">top tags</h3>
+              <div class="chart-title-row">
+                <h3 class="chart-title">top tags</h3>
+                <span class="ui-tooltip">
+                  <span class="ui-tooltip-trigger" aria-label="Top tags note" tabindex="0">i</span>
+                  <span class="ui-tooltip-content" role="tooltip">
+                    obtained by matching last.fm scrobble data against my own music collection data
+                  </span>
+                </span>
+              </div>
               <canvas id="tagPie"></canvas>
             </div>
           </section>
@@ -425,12 +441,26 @@
 
             <section class="chart-row">
               <div class="chart-section half">
-                <div class="chart-title-row">
-                  <h3 class="chart-title">genre distribution</h3>
-                  <span class="ui-tooltip">
-                    <button type="button" class="ui-tooltip-trigger" aria-label="Genre distribution notes">i</button>
-                    <span class="ui-tooltip-content" role="tooltip">subgenres have been grouped under genre groups</span>
-                  </span>
+                <div class="chart-title-row chart-title-row--split">
+                  <div class="chart-title-row-left">
+                    <h3 class="chart-title">genre distribution</h3>
+                    <span class="ui-tooltip">
+                      <button type="button" class="ui-tooltip-trigger" aria-label="Genre distribution notes">i</button>
+                      <span class="ui-tooltip-content" role="tooltip">subgenres have been grouped under genre groups (click a slice to drill down)</span>
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    class="chart-open-button"
+                    data-modal-target="genreDistribution"
+                    aria-label="Open genre distribution"
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                      <path d="M7 7h10v10H7z" fill="none" stroke="currentColor" stroke-width="1.6"/>
+                      <path d="M11 7h6v6" fill="none" stroke="currentColor" stroke-width="1.6"/>
+                      <path d="M11 13l6-6" fill="none" stroke="currentColor" stroke-width="1.6"/>
+                    </svg>
+                  </button>
                 </div>
                 <canvas id="libraryGenreUmbrellaPie"></canvas>
               </div>
@@ -463,6 +493,38 @@
             <li>loading...</li>
           </ul>
         </div>
+      </div>
+    </div>
+
+    <div class="albums-by-year modal modal--lookup" data-modal-icon="/icons/2026.svg" role="dialog" aria-modal="true" aria-labelledby="window-title-albums-by-year">
+      <div class="modal-window-bar">
+        <div id="window-title-albums-by-year" class="modal-window-title">albums in year</div>
+        <button class="modal-exit-button" type="button" aria-label="Close window">X</button>
+      </div>
+      <div class="modal-window-content">
+        <div class="library-lookup-scroll">
+          <ul id="albumsByYearList" class="library-lookup-list">
+            <li>loading...</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="genre-distribution modal modal--wide" data-modal-icon="/icons/reflectIV.svg" role="dialog" aria-modal="true" aria-labelledby="window-title-genre-distribution">
+      <div class="modal-window-bar">
+        <div id="window-title-genre-distribution" class="modal-window-title">
+          genre distribution
+          <span class="ui-tooltip">
+            <button type="button" class="ui-tooltip-trigger" aria-label="Genre distribution notes">i</button>
+            <span class="ui-tooltip-content" role="tooltip">subgenres have been grouped under genre groups (click a slice to drill down)</span>
+          </span>
+        </div>
+        <button class="modal-exit-button" type="button" aria-label="Close window">X</button>
+      </div>
+      <div class="modal-window-content">
+        <section class="chart-section">
+          <canvas id="libraryGenreUmbrellaPieModal"></canvas>
+        </section>
       </div>
     </div>
 

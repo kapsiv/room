@@ -67,6 +67,8 @@ const modals = {
   links: document.querySelector(".modal.links"),
   food: document.querySelector(".modal.food"),
   inventory: document.querySelector(".modal.inventory"),
+  genreDistribution: document.querySelector(".modal.genre-distribution"),
+  albumsByYear: document.querySelector(".modal.albums-by-year"),
   cv: document.querySelector(".modal.cv"),
   faq: document.querySelector(".modal.faq"),
   logo: document.querySelector(".modal.logo"),
