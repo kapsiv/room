@@ -1,10 +1,11 @@
 import { get, put } from "@vercel/blob";
-import { kv } from "@vercel/kv";
+import { createClient } from "redis";
 
 const CSV_HEADER = "uts,utc_time,artist,artist_mbid,album,album_mbid,track,track_mbid";
 const CSV_PATH = process.env.SCROBBLES_BLOB_PATH || "reflectiv/scrobbles.csv";
 const BLOB_ACCESS = process.env.SCROBBLES_BLOB_ACCESS || "private";
 const LAST_UTS_KEY = "lastfm:last_uts";
+const REDIS_URL = process.env.REDIS_URL || process.env.STORAGE_REDIS_URL;
 const LASTFM_USER = process.env.LASTFM_USER || "kapsiv";
 const LASTFM_API_KEY = process.env.LASTFM_API_KEY;
 const MAX_PAGE_SIZE = 200;
@@ -76,6 +77,17 @@ async function fetchExistingCsv(seedUrl) {
   }
 
   return { text: `${CSV_HEADER}\n` };
+}
+
+async function withRedisClient(fn) {
+  if (!REDIS_URL) return null;
+  const client = createClient({ url: REDIS_URL });
+  await client.connect();
+  try {
+    return await fn(client);
+  } finally {
+    await client.quit();
+  }
 }
 
 async function fetchRecentTracks(fromUts) {
@@ -172,7 +184,14 @@ export default async function handler(request, response) {
   const seedUrl = baseOrigin ? new URL("/data/scrobbles.csv", baseOrigin).toString() : null;
   const { text: existingCsv } = await fetchExistingCsv(seedUrl);
   const fallbackLastUts = getLastUtsFromCsv(existingCsv);
-  const storedLastUts = Number(await kv.get(LAST_UTS_KEY));
+  let storedLastUts = NaN;
+  if (REDIS_URL) {
+    storedLastUts = Number(
+      await withRedisClient(async (client) => {
+        return client.get(LAST_UTS_KEY);
+      })
+    );
+  }
   const lastUts = Number.isFinite(storedLastUts) && storedLastUts > 0 ? storedLastUts : fallbackLastUts;
 
   const tracks = await fetchRecentTracks(lastUts + 1);
@@ -197,7 +216,11 @@ export default async function handler(request, response) {
   });
 
   const newLastUts = Math.max(lastUts, uniqueTracks[uniqueTracks.length - 1]?.uts || lastUts);
-  await kv.set(LAST_UTS_KEY, newLastUts);
+  if (REDIS_URL) {
+    await withRedisClient(async (client) => {
+      await client.set(LAST_UTS_KEY, String(newLastUts));
+    });
+  }
 
   response.status(200).json({
     appended: uniqueTracks.length,
