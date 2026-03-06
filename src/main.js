@@ -14,6 +14,27 @@ import { createFabManager } from './ui/fabManager.js';
 
 GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
 
+const LASTFM_USER = "kapsiv";
+const LASTFM_API_KEY = "683650a829cee53959e8d505e8841726";
+const LASTFM_ENDPOINT = "https://ws.audioscrobbler.com/2.0/";
+
+async function fetchNowPlayingTrack() {
+  const url = `${LASTFM_ENDPOINT}?method=user.getrecenttracks&user=${encodeURIComponent(LASTFM_USER)}&api_key=${LASTFM_API_KEY}&format=json&limit=1`;
+  const res = await fetch(url);
+  if (!res.ok) return null;
+  const data = await res.json();
+  const trackData = data?.recenttracks?.track;
+  if (!trackData) return null;
+  const track = Array.isArray(trackData) ? trackData[0] : trackData;
+  const title = track?.name || "";
+  const artist = track?.artist?.["#text"] || "";
+  const album = track?.album?.["#text"] || "";
+  const images = track?.image || [];
+  const imageUrl = images.length ? images[images.length - 1]?.["#text"] || "" : "";
+  if (!title || !artist) return null;
+  return { title, artist, album, imageUrl };
+}
+
 if (import.meta.env.PROD) {
   import("@vercel/analytics").then(({ inject }) => {
     inject({ mode: "production" });
@@ -32,6 +53,7 @@ const fabManager = createFabManager({
   loadingScreen,
   getModals: () => modals,
   getShowModal: () => showModal,
+  getNowPlayingTrack: fetchNowPlayingTrack,
   onLoadingComplete: () => {
     isLoading = false;
     playIntroAnimation();

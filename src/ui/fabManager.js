@@ -71,6 +71,7 @@ export function createFabManager({
   loadingScreen,
   getModals,
   getShowModal,
+  getNowPlayingTrack,
   onLoadingComplete,
 }) {
   let loadingRevealStarted = false;
@@ -152,6 +153,77 @@ export function createFabManager({
 
     const wrapPageIndex = (idx) => ((idx % PAGES.length) + PAGES.length) % PAGES.length;
 
+    const escapeHtml = (value) =>
+      String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+
+    const isNowPlayingPage = (page) => (page?.name || "").toLowerCase() === "now playing";
+
+    const NOWPLAYING_IDLE_MS = 2200;
+    let nowPlayingIdleTimer = null;
+    let nowPlayingActive = false;
+    let nowPlayingPayload = null;
+    let nowPlayingText = "";
+
+    const clearNowPlayingIdle = () => {
+      if (nowPlayingIdleTimer) clearTimeout(nowPlayingIdleTimer);
+      nowPlayingIdleTimer = null;
+    };
+
+    const resetNowPlayingPreview = () => {
+      clearNowPlayingIdle();
+      nowPlayingActive = false;
+      nowPlayingPayload = null;
+      nowPlayingText = "";
+      centerIconWrap.classList.remove("fab-center-icon--nowplaying");
+      centerIconWrap.classList.remove("fab-center-icon--loaded");
+      centerIconWrap.style.width = "";
+      centerIconWrap.style.height = "";
+      const page = PAGES[wrapPageIndex(currentPageIndex)];
+      if (page) {
+        centerIconImg.src = page.icon;
+        centerIconImg.alt = page.name;
+      }
+    };
+
+    const scheduleNowPlayingPreview = () => {
+      clearNowPlayingIdle();
+      if (!fabExpanded) return;
+      const page = PAGES[wrapPageIndex(currentPageIndex)];
+      if (!isNowPlayingPage(page) || nowPlayingActive) return;
+      nowPlayingIdleTimer = window.setTimeout(async () => {
+        if (!fabExpanded) return;
+        const currentPage = PAGES[wrapPageIndex(currentPageIndex)];
+        if (!isNowPlayingPage(currentPage)) return;
+        let track = null;
+        if (typeof getNowPlayingTrack === "function") {
+          track = await getNowPlayingTrack();
+        }
+        if (!track || !track.title) return;
+        const descriptor = track.artist || track.album || "";
+        nowPlayingText = `now playing: ${track.title}${descriptor ? ` - ${descriptor}` : ""}`;
+        nowPlayingPayload = track;
+        nowPlayingActive = true;
+        centerIconWrap.classList.add("fab-center-icon--nowplaying");
+        centerIconWrap.classList.remove("fab-center-icon--loaded");
+        centerIconImg.onload = () => {
+          centerIconWrap.classList.add("fab-center-icon--loaded");
+        };
+        if (loadingScreen) {
+          const rect = loadingScreen.getBoundingClientRect();
+          const borderWidth = parseFloat(getComputedStyle(loadingScreen).borderTopWidth || "0");
+          const size = Math.round((rect.width || 84) - borderWidth * 2);
+          centerIconWrap.style.width = `${size}px`;
+          centerIconWrap.style.height = `${size}px`;
+        }
+        renderWheel();
+      }, NOWPLAYING_IDLE_MS);
+    };
+
     const modalNameMap = {
       info: "info",
       links: "links",
@@ -221,9 +293,19 @@ export function createFabManager({
 
     const renderWheel = () => {
       const centerPage = PAGES[wrapPageIndex(currentPageIndex)];
+      const isNowPlayingCenter = isNowPlayingPage(centerPage);
+      if (nowPlayingActive && (!fabExpanded || !isNowPlayingCenter)) {
+        resetNowPlayingPreview();
+      }
+
       if (centerPage) {
-        centerIconImg.src = centerPage.icon;
-        centerIconImg.alt = centerPage.name;
+        if (nowPlayingActive && isNowPlayingCenter && nowPlayingPayload?.imageUrl) {
+          centerIconImg.src = nowPlayingPayload.imageUrl;
+          centerIconImg.alt = nowPlayingPayload.title || centerPage.name;
+        } else {
+          centerIconImg.src = centerPage.icon;
+          centerIconImg.alt = centerPage.name;
+        }
       }
 
       wheelButtons.forEach((button, slotIndex) => {
@@ -234,13 +316,30 @@ export function createFabManager({
 
         const { x, y, fontSize, opacity } = getWheelMetrics(slotOffset);
 
-        button.textContent = page.name;
+        const isCenter = slotOffset === 0;
+        const shouldShowNowPlaying = isCenter && nowPlayingActive && isNowPlayingCenter && nowPlayingText;
+        if (shouldShowNowPlaying) {
+          button.classList.add("fab-wheel-item--nowplaying");
+          const safeText = escapeHtml(nowPlayingText);
+          button.innerHTML = `
+            <span class="fab-nowplaying-wrap">
+              <span class="fab-nowplaying-inner is-animating">
+                <span class="fab-nowplaying-text">${safeText}</span>
+                <span class="fab-nowplaying-text fab-nowplaying-duplicate" aria-hidden="true">${safeText}</span>
+              </span>
+            </span>
+          `;
+          button.setAttribute("aria-label", nowPlayingText);
+        } else {
+          button.classList.remove("fab-wheel-item--nowplaying");
+          button.textContent = page.name;
+          button.setAttribute("aria-label", page.name);
+        }
         button.dataset.relative = String(slotOffset);
         button.dataset.pageIndex = String(pageIndex);
         button.classList.toggle("is-center", slotOffset === 0);
         button.style.zIndex = String(20 - Math.abs(slotOffset));
         button.style.pointerEvents = Math.abs(slotOffset) <= visibleLimit ? "auto" : "none";
-        button.setAttribute("aria-label", page.name);
         gsap.set(button, {
           x,
           y,
@@ -250,6 +349,10 @@ export function createFabManager({
           force3D: false,
         });
       });
+
+      if (isNowPlayingCenter && fabExpanded && !nowPlayingActive) {
+        scheduleNowPlayingPreview();
+      }
     };
 
     const animateWheelStep = (dir, onDone) => {
@@ -294,6 +397,7 @@ export function createFabManager({
 
     const shiftSelection = (delta) => {
       if (!delta) return;
+      resetNowPlayingPreview();
       const clamped = Math.max(-(PAGES.length - 1), Math.min(PAGES.length - 1, delta));
       queuedWheelSteps += clamped;
       processWheelQueue();
@@ -368,6 +472,7 @@ export function createFabManager({
       if (fabOrbitAnimating || fabExpanded) return;
       fabOrbitAnimating = true;
       positionWheelToFab();
+      resetNowPlayingPreview();
 
       gsap.to(fabMark, {
         opacity: 0.98,
@@ -396,6 +501,7 @@ export function createFabManager({
           fabExpanded = true;
           loadingScreen.setAttribute("aria-label", "Fab open");
           positionWheelToFab();
+          scheduleNowPlayingPreview();
           gsap.to(wheel, {
             opacity: 1,
             duration: 0.38,
@@ -435,6 +541,7 @@ export function createFabManager({
     const closeFab = () => {
       if (fabOrbitAnimating || !fabExpanded) return;
       fabOrbitAnimating = true;
+      resetNowPlayingPreview();
       gsap.to(pathEl, {
         strokeDashoffset: pathLength,
         duration: 0.6,

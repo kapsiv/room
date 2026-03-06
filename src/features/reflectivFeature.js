@@ -441,6 +441,21 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
       .trim();
   }
 
+  const IGNORED_ALBUM_KEYS = new Set(
+    [
+      { album: "(removed)", artist: "Fjarri" },
+      { album: "Dose 1", artist: "Diagnose Me Doc" },
+      { album: "The Fjarri Collection", artist: "Fjarri" },
+    ].map(({ album, artist }) => `${normalizeKey(artist)}::${normalizeKey(album)}`),
+  );
+
+  function isIgnoredAlbumRow(row) {
+    const artistKey = normalizeKey(row?.Artist);
+    const albumKey = normalizeKey(row?.Album);
+    if (!artistKey || !albumKey) return false;
+    return IGNORED_ALBUM_KEYS.has(`${artistKey}::${albumKey}`);
+  }
+
   function formatUmbrellaCenterLabel(name) {
     const key = String(name || "").toLowerCase();
     if (key === "experimental / sound art") return "experimental";
@@ -1316,17 +1331,24 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
     });
   }
 
-  function updateAlbumsByYearModal(modal, year, albums) {
+  function updateAlbumsByYearModal(modal, label, albums) {
     const albumsModal = modals.albumsByYear;
     if (!albumsModal) return;
     const titleEl = albumsModal.querySelector("#window-title-albums-by-year");
     const listEl = albumsModal.querySelector("#albumsByYearList");
-    if (titleEl) titleEl.textContent = `albums in ${year}`;
+    const numeric = Number(label);
+    const title = Number.isFinite(numeric) ? `albums in ${numeric}` : String(label || "albums");
+    if (titleEl) titleEl.textContent = title;
     if (listEl) {
       if (!albums.length) {
         listEl.innerHTML = "<li>no albums found</li>";
       } else {
-        listEl.innerHTML = albums.map((label) => `<li>${label}</li>`).join("");
+        listEl.innerHTML = albums
+          .map((entry) => {
+            if (typeof entry === "string") return `<li>${entry}</li>`;
+            return `<li>${entry.label}</li>`;
+          })
+          .join("");
       }
     }
   }
@@ -1569,7 +1591,7 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
     const res = await fetch("/data/collection.csv");
     if (!res.ok) throw new Error(`collection.csv fetch failed: ${res.status}`);
     const text = await res.text();
-    cacheState.collection = parseCsv(text);
+    cacheState.collection = parseCsv(text).filter((row) => !isIgnoredAlbumRow(row));
     return cacheState.collection;
   }
 
@@ -1885,6 +1907,25 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
     return [...values].sort((a, b) => String(a).localeCompare(String(b), "en-GB", { sensitivity: "base" }));
   }
 
+  function sortAlphaIgnoringArticles(values) {
+    const stripArticle = (value) => {
+      const raw = String(value || "").trim();
+      if (!raw) return "";
+      const lower = raw.toLowerCase();
+      if (lower.startsWith("the ")) return raw.slice(4).trim() || raw;
+      if (lower.startsWith("an ")) return raw.slice(3).trim() || raw;
+      if (lower.startsWith("a ")) return raw.slice(2).trim() || raw;
+      return raw;
+    };
+    return [...values].sort((a, b) => {
+      const aKey = stripArticle(a);
+      const bKey = stripArticle(b);
+      const cmp = aKey.localeCompare(bKey, "en-GB", { sensitivity: "base" });
+      if (cmp !== 0) return cmp;
+      return String(a).localeCompare(String(b), "en-GB", { sensitivity: "base" });
+    });
+  }
+
   function normalizeLibrarySongKey(value) {
     return String(value || "").trim().toLowerCase();
   }
@@ -1994,15 +2035,19 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
     const artistAlbumSets = new Map();
     const genreAlbumSets = new Map();
     const albumYearByKey = new Map();
-    const albumLabelByKey = new Map();
+    const albumEntryByKey = new Map();
     const albumCountriesByKey = new Map();
 
     rows.forEach((r, index) => {
       const artist = (r.Artist || "").trim();
       const album = (r.Album || "").trim();
       const albumKey = artist && album ? `${artist.toLowerCase()}::${album.toLowerCase()}` : "";
-      if (albumKey && !albumLabelByKey.has(albumKey)) {
-        albumLabelByKey.set(albumKey, `${artist} — ${album}`);
+      if (albumKey && !albumEntryByKey.has(albumKey)) {
+        albumEntryByKey.set(albumKey, {
+          artist,
+          album,
+          label: `${album} — ${artist}`,
+        });
       }
 
       if (artist) artists.add(artist);
@@ -2102,15 +2147,36 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
     }
     const filteredYearCountsMap = new Map();
     const albumsByYearMap = new Map();
+    const filteredAlbumEntries = [];
     albumYearByKey.forEach((year, albumKey) => {
       const umbrellas = albumUmbrellasByKey.get(albumKey);
       if (reflectivState.libraryYearGenreFilter !== "all" && !umbrellas?.has(reflectivState.libraryYearGenreFilter)) return;
       filteredYearCountsMap.set(year, (filteredYearCountsMap.get(year) || 0) + 1);
       if (!albumsByYearMap.has(year)) albumsByYearMap.set(year, []);
-      const label = albumLabelByKey.get(albumKey) || albumKey;
-      albumsByYearMap.get(year).push(label);
+      const entry = albumEntryByKey.get(albumKey) || { album: albumKey, artist: "", label: albumKey };
+      albumsByYearMap.get(year).push(entry);
+      filteredAlbumEntries.push(entry);
     });
-    albumsByYearMap.forEach((list) => list.sort((a, b) => a.localeCompare(b)));
+    const sortAlbumEntries = (a, b) => {
+      const normalizeAlbumSort = (value) => {
+        const raw = String(value || "").trim();
+        if (!raw) return "";
+        const lower = raw.toLowerCase();
+        if (lower.startsWith("the ")) return raw.slice(4).trim() || raw;
+        if (lower.startsWith("an ")) return raw.slice(3).trim() || raw;
+        if (lower.startsWith("a ")) return raw.slice(2).trim() || raw;
+        return raw;
+      };
+      const albumCompare = normalizeAlbumSort(a.album || "").localeCompare(
+        normalizeAlbumSort(b.album || ""),
+        undefined,
+        { sensitivity: "base" },
+      );
+      if (albumCompare !== 0) return albumCompare;
+      return (a.artist || "").localeCompare(b.artist || "", undefined, { sensitivity: "base" });
+    };
+    albumsByYearMap.forEach((list) => list.sort(sortAlbumEntries));
+    filteredAlbumEntries.sort(sortAlbumEntries);
     const filteredAlbumsByYear = [...filteredYearCountsMap.entries()]
       .map(([year, count]) => ({ year: Number(year), count }))
       .sort((a, b) => a.year - b.year);
@@ -2133,7 +2199,7 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
     setText("#musiclib-total-artists", artists.size.toLocaleString());
     setText("#musiclib-total-genres", genres.size.toLocaleString());
 
-    reflectivState.libraryArtists = sortAlpha(artists);
+    reflectivState.libraryArtists = sortAlphaIgnoringArticles(artists);
     reflectivState.libraryGenres = sortAlpha(genres);
 
     const topArtistsList = modal.querySelector("#libraryTopArtistsList");
@@ -2193,20 +2259,28 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
     });
 
     const albumsByYearCanvas = modal.querySelector("#libraryAlbumsByYear");
+    const activeYear =
+      Number.isFinite(Number(reflectivState.libraryAlbumsYearFocus))
+        ? Number(reflectivState.libraryAlbumsYearFocus)
+        : null;
     if (albumsByYearCanvas) {
       drawAlbumsByYearCanvas(albumsByYearCanvas, filteredAlbumsByYear, {
         useProportion: true,
-        activeYear: reflectivState.libraryAlbumsYearFocus,
+        activeYear,
       });
       albumsByYearCanvas._yearAlbumsMap = albumsByYearMap;
       bindAlbumsByYearInteractions(modal, albumsByYearCanvas);
     }
     if (reflectivState.libraryAlbumsYearFocus) {
-      const albums = albumsByYearMap.get(reflectivState.libraryAlbumsYearFocus) || [];
-      if (!albums.length) {
-        reflectivState.libraryAlbumsYearFocus = null;
+      if (reflectivState.libraryAlbumsYearFocus === "all") {
+        updateAlbumsByYearModal(modal, "all albums", filteredAlbumEntries);
       } else {
-        updateAlbumsByYearModal(modal, reflectivState.libraryAlbumsYearFocus, albums);
+        const albums = albumsByYearMap.get(activeYear) || [];
+        if (!albums.length) {
+          reflectivState.libraryAlbumsYearFocus = null;
+        } else {
+          updateAlbumsByYearModal(modal, activeYear, albums);
+        }
       }
     }
     renderMusicLibraryWorldMap(modal, countryAlbumCounts);
@@ -2323,6 +2397,23 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
     bindLookupCard("#musiclib-artists-card", "artists");
     bindLookupCard("#musiclib-genres-card", "genres");
 
+    const albumsCard = modal.querySelector("#musiclib-albums-card");
+    if (albumsCard) {
+      const openAllAlbums = () => {
+        if (!cacheState.collection?.length) return;
+        reflectivState.libraryAlbumsYearFocus = "all";
+        renderMusicLibraryPanel(modal, cacheState.collection);
+        const showModal = getShowModal?.();
+        if (showModal && modals.albumsByYear) showModal(modals.albumsByYear);
+      };
+      albumsCard.addEventListener("click", openAllAlbums);
+      albumsCard.addEventListener("keydown", (e) => {
+        if (e.key !== "Enter" && e.key !== " ") return;
+        e.preventDefault();
+        openAllAlbums();
+      });
+    }
+
     const yearGenreFilterSelect = modal.querySelector("#libraryYearGenreFilter");
     if (yearGenreFilterSelect) {
       yearGenreFilterSelect.addEventListener("change", () => {
@@ -2357,6 +2448,7 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
   }
 
   async function initReflectivModal(modal) {
+    reflectivState.libraryAlbumsYearFocus = null;
     const overlay = modal.querySelector("#reflectiv-loading-overlay");
     const loadingText = modal.querySelector("#reflectiv-loading-main");
     if (overlay) overlay.classList.add("visible");
