@@ -166,7 +166,10 @@ export default async function handler(request, response) {
     return;
   }
 
-  const seedUrl = new URL("/data/scrobbles.csv", new URL(request.url).origin).toString();
+  const host = request.headers?.host || request.headers?.["x-forwarded-host"];
+  const proto = request.headers?.["x-forwarded-proto"] || "https";
+  const baseOrigin = host ? `${proto}://${host}` : null;
+  const seedUrl = baseOrigin ? new URL("/data/scrobbles.csv", baseOrigin).toString() : null;
   const { text: existingCsv } = await fetchExistingCsv(seedUrl);
   const fallbackLastUts = getLastUtsFromCsv(existingCsv);
   const storedLastUts = Number(await kv.get(LAST_UTS_KEY));
