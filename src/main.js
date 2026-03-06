@@ -1,6 +1,4 @@
 import "./style.scss";
-import { inject } from "@vercel/analytics";
-import { injectSpeedInsights } from "@vercel/speed-insights";
 
 import gsap from "gsap";
 import * as THREE from 'three';
@@ -16,8 +14,14 @@ import { createFabManager } from './ui/fabManager.js';
 
 GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
 
-inject({ mode: import.meta.env.DEV ? "development" : "production" });
-injectSpeedInsights();
+if (import.meta.env.PROD) {
+  import("@vercel/analytics").then(({ inject }) => {
+    inject({ mode: "production" });
+  });
+  import("@vercel/speed-insights").then(({ injectSpeedInsights }) => {
+    injectSpeedInsights();
+  });
+}
 
 let isLoading = true;
 const manager = new THREE.LoadingManager();
