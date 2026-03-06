@@ -1497,6 +1497,69 @@ b {
   margin-bottom: 0;
 }
 
+.chart-title-row-left {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.chart-open-button {
+  width: 26px;
+  height: 26px;
+  border: 1px solid rgba(78, 71, 56, 0.55);
+  border-radius: 6px;
+  background: #f5f0e8;
+  color: rgba(78, 71, 56, 0.85);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+}
+
+.chart-open-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+.chart-open-button:hover,
+.chart-open-button:focus-visible {
+  color: #4e4738;
+  border-color: rgba(78, 71, 56, 0.8);
+}
+
+.genre-distribution .chart-section canvas {
+  height: 420px;
+}
+
+.genre-distribution .modal-window-content {
+  background: #ece5da;
+  padding: 14px;
+  overflow-x: hidden;
+  font-size: 15px;
+}
+
+.genre-distribution .chart-title {
+  font-size: 18px;
+}
+
+.genre-distribution .chart-section {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+}
+
+.chart-canvas-wrap {
+  position: relative;
+}
+
+.chart-marker-tooltip {
+  position: absolute;
+  top: 0;
+  transform: translate(-50%, -100%);
+}
+
 .ui-tooltip {
   position: relative;
   display: inline-flex;
@@ -1559,6 +1622,26 @@ b {
   pointer-events: none;
   transition: opacity 0.14s ease, visibility 0.14s ease;
   z-index: 2000;
+}
+
+.ui-tooltip--ribbon .ui-tooltip-content {
+  left: 0;
+  top: auto;
+  bottom: calc(100% + 8px);
+  transform: none;
+  background: rgba(78, 71, 56, 0.95);
+  color: #f5f0e8;
+  border-color: rgba(249, 249, 249, 0.25);
+}
+
+.genre-distribution .modal-window-bar .ui-tooltip-trigger {
+  color: vars.$base-white;
+  background: transparent;
+  border-color: rgba(249, 249, 249, 0.7);
+}
+
+.genre-distribution .modal-window-bar {
+  overflow: visible;
 }
 
 .ui-tooltip:hover .ui-tooltip-content,
