@@ -2087,6 +2087,23 @@ b {
   display: block;
 }
 
+.fab-center-icon--nowplaying {
+  border-radius: 999px 0 999px 999px;
+  overflow: hidden;
+  background: #ece5da;
+}
+
+.fab-center-icon--nowplaying img {
+  object-fit: cover;
+  border-radius: 999px 0 999px 999px;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.fab-center-icon--nowplaying.fab-center-icon--loaded img {
+  opacity: 1;
+}
+
 .fab-wheel {
   width: 1px;
   height: 1px;
@@ -2156,6 +2173,32 @@ b {
   font-weight: 400;
 }
 
+.fab-wheel-item--nowplaying {
+  font-size: 16px;
+  padding: 2px 0;
+}
+
+.fab-wheel-item--nowplaying .fab-nowplaying-wrap {
+  display: inline-block;
+  max-width: 280px;
+  overflow: hidden;
+  vertical-align: middle;
+}
+
+.fab-wheel-item--nowplaying .fab-nowplaying-inner {
+  display: inline-flex;
+  gap: 48px;
+  white-space: nowrap;
+  transform: translateX(0);
+}
+
+.fab-wheel-item--nowplaying .fab-nowplaying-inner.is-animating {
+  animation: nowPlayingMarquee 11s linear infinite;
+}
+
+.fab-wheel-item--nowplaying .fab-nowplaying-text {
+  display: inline-block;
+}
 .fab-plus-icon {
   position: absolute;
   left: 48%;
