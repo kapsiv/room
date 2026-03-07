@@ -529,11 +529,33 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
     }));
   }
 
+  function isUtcMonthComplete(date) {
+    if (!(date instanceof Date) || Number.isNaN(date.getTime())) return false;
+    const monthEndDay = new Date(Date.UTC(
+      date.getUTCFullYear(),
+      date.getUTCMonth() + 1,
+      0,
+    )).getUTCDate();
+    return date.getUTCDate() === monthEndDay;
+  }
+
+  function dropIncompleteTrailingMonth(monthlySeries, daily) {
+    if (!monthlySeries.length || !daily.length) return monthlySeries;
+    const latestDay = daily[daily.length - 1];
+    const latestDate = latestDay?.date;
+    if (isUtcMonthComplete(latestDate)) return monthlySeries;
+
+    const trailingMonthKey = latestDay.day.slice(0, 7);
+    const lastSeriesPoint = monthlySeries[monthlySeries.length - 1];
+    if (lastSeriesPoint?.label !== trailingMonthKey) return monthlySeries;
+    return monthlySeries.slice(0, -1);
+  }
+
   function getSeriesForRange(range) {
     if (range === "all") {
       const daily = reflectivState.daily;
       if (!daily.length) return [];
-      return aggregateMonthly(daily);
+      return dropIncompleteTrailingMonth(aggregateMonthly(daily), daily);
     }
 
     const scrobbles = getScrobblesForRange(range);
@@ -569,7 +591,85 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
     return scrobbles.filter((s) => Number(s.uts) >= cutoffUts);
   }
 
-  function drawLineOnCanvas(canvas, series, range = "all") {
+  function buildScrobblesLinePath(points, tension = 0.95) {
+    if (typeof Path2D !== "function" || points.length < 2) return null;
+    const path = new Path2D();
+    path.moveTo(points[0].x, points[0].y);
+    for (let i = 0; i < points.length - 1; i += 1) {
+      const p0 = points[i - 1] || points[i];
+      const p1 = points[i];
+      const p2 = points[i + 1];
+      const p3 = points[i + 2] || p2;
+
+      const cp1x = p1.x + ((p2.x - p0.x) / 6) * tension;
+      const cp1y = p1.y + ((p2.y - p0.y) / 6) * tension;
+      const cp2x = p2.x - ((p3.x - p1.x) / 6) * tension;
+      const cp2y = p2.y - ((p3.y - p1.y) / 6) * tension;
+
+      path.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
+    }
+    return path;
+  }
+
+  function formatScrobbleHoverBinLabel(point, range) {
+    const date = point?.date;
+    if (!(date instanceof Date) || Number.isNaN(date.getTime())) return String(point?.label || "");
+    if (range === "all") {
+      return date.toLocaleDateString("en-GB", {
+        month: "short",
+        year: "numeric",
+        timeZone: "UTC",
+      });
+    }
+    return date.toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+      timeZone: "UTC",
+    });
+  }
+
+  function drawLineHoverLabel(ctx, point, range, bounds) {
+    if (!point || !bounds) return;
+    const count = Math.max(0, Math.round(Number(point.count) || 0));
+    const primary = `${count.toLocaleString()} scrobble${count === 1 ? "" : "s"}`;
+    const secondary = formatScrobbleHoverBinLabel(point, range);
+
+    ctx.save();
+    ctx.font = "700 11px 'Ubuntu Mono', monospace";
+    const primaryWidth = ctx.measureText(primary).width;
+    ctx.font = "10px 'Ubuntu Mono', monospace";
+    const secondaryWidth = ctx.measureText(secondary).width;
+    const bubbleW = Math.max(primaryWidth, secondaryWidth) + 16;
+    const bubbleH = 34;
+    const bubbleX = Math.min(
+      Math.max(point.x - bubbleW / 2, bounds.left),
+      bounds.right - bubbleW,
+    );
+    const prefersBelow = point.y - bubbleH - 14 < bounds.top;
+    const bubbleY = prefersBelow ? Math.min(point.y + 14, bounds.bottom - bubbleH) : point.y - bubbleH - 14;
+
+    ctx.fillStyle = "rgba(245,240,232,0.96)";
+    ctx.strokeStyle = "rgba(78,71,56,0.22)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect(bubbleX, bubbleY, bubbleW, bubbleH, 10);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = "#353027";
+    ctx.font = "700 11px 'Ubuntu Mono', monospace";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "top";
+    ctx.fillText(primary, bubbleX + 8, bubbleY + 7);
+
+    ctx.fillStyle = "rgba(78,71,56,0.82)";
+    ctx.font = "10px 'Ubuntu Mono', monospace";
+    ctx.fillText(secondary, bubbleX + 8, bubbleY + 20);
+    ctx.restore();
+  }
+
+  function drawLineOnCanvas(canvas, series, range = "all", { hoverIndex = null } = {}) {
     const ctx = canvas?.getContext?.("2d");
     if (!ctx) return;
     const width = canvas.clientWidth || 720;
@@ -579,6 +679,11 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
     ctx.clearRect(0, 0, width, height);
 
     if (!series.length) {
+      canvas._lineMeta = null;
+      canvas._lineSeries = series;
+      canvas._lineRange = range;
+      canvas._lineHoverIndex = null;
+      canvas.style.cursor = "default";
       ctx.fillStyle = "#4e4738";
       ctx.font = "14px 'Ubuntu Mono', monospace";
       ctx.fillText("No data available", 12, 20);
@@ -597,14 +702,21 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
     ctx.lineTo(width - pad.r, pad.t + usableH);
     ctx.stroke();
 
+    const points = series.map((p, i) => ({
+      x: pad.l + (i / Math.max(series.length - 1, 1)) * usableW,
+      y: pad.t + usableH - (p.count / max) * usableH,
+      ...p,
+    }));
+    const linePath = buildScrobblesLinePath(points);
+    const activeHoverIndex =
+      Number.isInteger(hoverIndex) && hoverIndex >= 0 && hoverIndex < points.length
+        ? hoverIndex
+        : null;
+
     ctx.strokeStyle = "#4e4738";
     ctx.lineWidth = 2;
     ctx.lineJoin = "round";
     ctx.lineCap = "round";
-    const points = series.map((p, i) => ({
-      x: pad.l + (i / Math.max(series.length - 1, 1)) * usableW,
-      y: pad.t + usableH - (p.count / max) * usableH,
-    }));
 
     if (points.length === 1) {
       ctx.beginPath();
@@ -612,23 +724,27 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
       ctx.fillStyle = "#4e4738";
       ctx.fill();
     } else {
-      const tension = 0.95;
-      ctx.beginPath();
-      ctx.moveTo(points[0].x, points[0].y);
-      for (let i = 0; i < points.length - 1; i += 1) {
-        const p0 = points[i - 1] || points[i];
-        const p1 = points[i];
-        const p2 = points[i + 1];
-        const p3 = points[i + 2] || p2;
+      if (linePath) {
+        ctx.stroke(linePath);
+      } else {
+        const tension = 0.95;
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, points[0].y);
+        for (let i = 0; i < points.length - 1; i += 1) {
+          const p0 = points[i - 1] || points[i];
+          const p1 = points[i];
+          const p2 = points[i + 1];
+          const p3 = points[i + 2] || p2;
 
-        const cp1x = p1.x + ((p2.x - p0.x) / 6) * tension;
-        const cp1y = p1.y + ((p2.y - p0.y) / 6) * tension;
-        const cp2x = p2.x - ((p3.x - p1.x) / 6) * tension;
-        const cp2y = p2.y - ((p3.y - p1.y) / 6) * tension;
+          const cp1x = p1.x + ((p2.x - p0.x) / 6) * tension;
+          const cp1y = p1.y + ((p2.y - p0.y) / 6) * tension;
+          const cp2x = p2.x - ((p3.x - p1.x) / 6) * tension;
+          const cp2y = p2.y - ((p3.y - p1.y) / 6) * tension;
 
-        ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
+          ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
+        }
+        ctx.stroke();
       }
-      ctx.stroke();
     }
 
     const markerDate = new Date("2024-01-01T00:00:00Z");
@@ -732,6 +848,114 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
       else if (x >= width - pad.r - 20) ctx.textAlign = "right";
       else ctx.textAlign = "center";
       ctx.fillText(tick.label, x, pad.t + usableH + 8);
+    });
+
+    if (activeHoverIndex !== null) {
+      const activePoint = points[activeHoverIndex];
+      if (activePoint) {
+        ctx.save();
+        ctx.strokeStyle = "rgba(78,71,56,0.18)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(activePoint.x, pad.t);
+        ctx.lineTo(activePoint.x, pad.t + usableH);
+        ctx.stroke();
+
+        ctx.fillStyle = "#f5f0e8";
+        ctx.strokeStyle = "#4e4738";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(activePoint.x, activePoint.y, 4.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+
+        drawLineHoverLabel(ctx, activePoint, range, {
+          left: pad.l,
+          right: width - pad.r,
+          top: pad.t,
+          bottom: pad.t + usableH,
+        });
+      }
+    }
+
+    canvas._lineSeries = series;
+    canvas._lineRange = range;
+    canvas._lineHoverIndex = activeHoverIndex;
+    canvas._lineMeta = {
+      points,
+      path: linePath,
+      bounds: {
+        left: pad.l,
+        right: width - pad.r,
+        top: pad.t,
+        bottom: pad.t + usableH,
+      },
+    };
+  }
+
+  function bindScrobblesLineInteractions(canvas) {
+    if (!canvas || canvas.dataset.lineBound === "true") return;
+    canvas.dataset.lineBound = "true";
+
+    const getCanvasPoint = (event) => {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top,
+      };
+    };
+
+    const getHoverIndex = (event) => {
+      const meta = canvas._lineMeta;
+      if (!meta?.points?.length) return null;
+      const { x, y } = getCanvasPoint(event);
+      const { bounds, points, path } = meta;
+      const ctx = canvas.getContext?.("2d");
+
+      if (x < bounds.left || x > bounds.right || y < bounds.top - 12 || y > bounds.bottom + 12) return null;
+
+      if (points.length === 1) {
+        const dist = Math.hypot(x - points[0].x, y - points[0].y);
+        return dist <= 14 ? 0 : null;
+      }
+
+      if (ctx && path && typeof ctx.isPointInStroke === "function") {
+        ctx.save();
+        ctx.lineWidth = 14;
+        const hit = ctx.isPointInStroke(path, x, y);
+        ctx.restore();
+        if (!hit) return null;
+      }
+
+      let nearestIndex = null;
+      let nearestDistance = Infinity;
+      points.forEach((point, index) => {
+        const distance = Math.abs(point.x - x);
+        if (distance < nearestDistance) {
+          nearestDistance = distance;
+          nearestIndex = index;
+        }
+      });
+      return nearestIndex;
+    };
+
+    const setHoverIndex = (index) => {
+      const nextHoverIndex = Number.isInteger(index) ? index : null;
+      if (canvas._lineHoverIndex === nextHoverIndex) return;
+      canvas._lineHoverIndex = nextHoverIndex;
+      canvas.style.cursor = nextHoverIndex !== null ? "pointer" : "default";
+      drawLineOnCanvas(canvas, canvas._lineSeries || [], canvas._lineRange || "all", {
+        hoverIndex: nextHoverIndex,
+      });
+    };
+
+    canvas.addEventListener("mousemove", (event) => {
+      setHoverIndex(getHoverIndex(event));
+    });
+
+    canvas.addEventListener("mouseleave", () => {
+      setHoverIndex(null);
     });
   }
 
@@ -969,6 +1193,7 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
     const rawMaxValue = Math.max(...years.map((y) => y.value), 0);
     const maxValue = useProportion ? Math.max(rawMaxValue, 0.0001) : Math.max(rawMaxValue, 1);
     const barW = Math.max(1, usableW / years.length);
+    const focusYear = hoverYear ?? activeYear ?? null;
 
     ctx.strokeStyle = "rgba(78,71,56,0.28)";
     ctx.lineWidth = 1;
@@ -993,6 +1218,7 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
       ctx.fillRect(x, y, Math.max(1, barW - 1), h);
       barRects.push({
         year: entry.year,
+        count: entry.count,
         x,
         y,
         w: Math.max(1, barW - 1),
@@ -1021,6 +1247,46 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
       else if (x >= width - pad.r - 20) ctx.textAlign = "right";
       else ctx.textAlign = "center";
       ctx.fillText(String(decade), x, pad.t + usableH + 8);
+    }
+
+    if (focusYear !== null) {
+      const focusBar = barRects.find((bar) => bar.year === focusYear);
+      if (focusBar) {
+        const yearLabel = String(focusBar.year);
+        const countLabel = `${focusBar.count.toLocaleString()} album${focusBar.count === 1 ? "" : "s"}`;
+
+        ctx.save();
+        ctx.textAlign = "left";
+        ctx.textBaseline = "top";
+        ctx.font = "700 11px 'Ubuntu Mono', monospace";
+        const yearWidth = ctx.measureText(yearLabel).width;
+        ctx.font = "10px 'Ubuntu Mono', monospace";
+        const countWidth = ctx.measureText(countLabel).width;
+        const bubbleW = Math.max(yearWidth, countWidth) + 16;
+        const bubbleH = 34;
+        const bubbleX = Math.min(
+          Math.max(focusBar.x + focusBar.w / 2 - bubbleW / 2, pad.l),
+          width - pad.r - bubbleW,
+        );
+        const bubbleY = Math.max(4, focusBar.y - bubbleH - 8);
+
+        ctx.fillStyle = "rgba(245,240,232,0.96)";
+        ctx.strokeStyle = "rgba(78,71,56,0.22)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.roundRect(bubbleX, bubbleY, bubbleW, bubbleH, 10);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = "#353027";
+        ctx.font = "700 11px 'Ubuntu Mono', monospace";
+        ctx.fillText(yearLabel, bubbleX + 8, bubbleY + 7);
+
+        ctx.fillStyle = "rgba(78,71,56,0.82)";
+        ctx.font = "10px 'Ubuntu Mono', monospace";
+        ctx.fillText(countLabel, bubbleX + 8, bubbleY + 20);
+        ctx.restore();
+      }
     }
 
     canvas._yearBars = barRects;
@@ -1180,6 +1446,186 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
       const ss = String(sec % 60).padStart(2, "0");
       ctx.fillText(`${mm}:${ss}`, x, pad.t + usableH + 8);
     }
+  }
+
+  function formatDurationAxisLabel(seconds) {
+    const totalSeconds = Math.max(0, Math.round(Number(seconds) || 0));
+    const minutes = Math.floor(totalSeconds / 60);
+    const remainderSeconds = String(totalSeconds % 60).padStart(2, "0");
+    return `${minutes}:${remainderSeconds}`;
+  }
+
+  function formatDurationCardLabel(seconds) {
+    const totalSeconds = Math.max(0, Math.round(Number(seconds) || 0));
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const remainderSeconds = totalSeconds % 60;
+    const parts = [];
+
+    if (hours > 0) parts.push(`${hours} hr${hours === 1 ? "" : "s"}`);
+    if (minutes > 0) parts.push(`${minutes} min${minutes === 1 ? "" : "s"}`);
+    if (!parts.length || (hours === 0 && minutes === 0 && remainderSeconds > 0)) {
+      parts.push(`${remainderSeconds} sec${remainderSeconds === 1 ? "" : "s"}`);
+    } else if (remainderSeconds > 0 && hours === 0) {
+      parts.push(`${remainderSeconds} sec${remainderSeconds === 1 ? "" : "s"}`);
+    }
+
+    return parts.join(" ");
+  }
+
+  function compareTextValues(a, b) {
+    return String(a || "").localeCompare(String(b || ""), undefined, {
+      sensitivity: "base",
+    });
+  }
+
+  function drawSongLengthOverTimeScatter(canvas, points) {
+    const ctx = canvas?.getContext?.("2d");
+    if (!ctx) return;
+    const width = canvas.clientWidth || 720;
+    const height = canvas.clientHeight || 220;
+    canvas.width = width;
+    canvas.height = height;
+    ctx.clearRect(0, 0, width, height);
+
+    if (!points.length) {
+      ctx.fillStyle = "#4e4738";
+      ctx.font = "14px 'Ubuntu Mono', monospace";
+      ctx.fillText("No duration/year data available", 12, 20);
+      return;
+    }
+
+    const minVisibleDuration = 2 * 60;
+    const maxVisibleDuration = 15 * 60;
+    const visiblePoints = points.filter(
+      (point) => point.duration >= minVisibleDuration && point.duration <= maxVisibleDuration,
+    );
+    if (!visiblePoints.length) {
+      ctx.fillStyle = "#4e4738";
+      ctx.font = "14px 'Ubuntu Mono', monospace";
+      ctx.fillText("No songs between 2:00 and 15:00", 12, 20);
+      return;
+    }
+
+    const years = visiblePoints.map((point) => point.year);
+    const durationTotalsByYear = new Map();
+    const durationCountsByYear = new Map();
+    visiblePoints.forEach((point) => {
+      durationTotalsByYear.set(point.year, (durationTotalsByYear.get(point.year) || 0) + point.duration);
+      durationCountsByYear.set(point.year, (durationCountsByYear.get(point.year) || 0) + 1);
+    });
+    const averagePoints = [...durationTotalsByYear.entries()]
+      .map(([year, totalDuration]) => ({
+        year,
+        duration: totalDuration / Math.max(durationCountsByYear.get(year) || 1, 1),
+      }))
+      .sort((a, b) => a.year - b.year);
+    const minYear = Math.min(...years);
+    const maxYear = Math.max(...years);
+    const yTicks = [120, 180, 240, 300, 420, 600, 900];
+    const pad = { l: 40, r: 14, t: 14, b: 36 };
+    const usableW = width - pad.l - pad.r;
+    const usableH = height - pad.t - pad.b;
+    const xForYear = (year) => {
+      const pct = (year - minYear) / Math.max(maxYear - minYear, 1);
+      return pad.l + pct * usableW;
+    };
+    const yForDuration = (duration) => {
+      const clamped = Math.min(maxVisibleDuration, Math.max(minVisibleDuration, Number(duration) || 0));
+      const pct = (clamped - minVisibleDuration) / Math.max(maxVisibleDuration - minVisibleDuration, 1);
+      return pad.t + usableH - pct * usableH;
+    };
+
+    ctx.strokeStyle = "rgba(78,71,56,0.18)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(pad.l, pad.t + usableH);
+    ctx.lineTo(width - pad.r, pad.t + usableH);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(pad.l, pad.t);
+    ctx.lineTo(pad.l, pad.t + usableH);
+    ctx.stroke();
+
+    ctx.font = "10px 'Ubuntu Mono', monospace";
+    ctx.textBaseline = "middle";
+    ctx.textAlign = "right";
+    ctx.fillStyle = "rgba(78,71,56,0.82)";
+    ctx.strokeStyle = "rgba(78,71,56,0.1)";
+    yTicks.forEach((duration) => {
+      const y = yForDuration(duration);
+      ctx.beginPath();
+      ctx.moveTo(pad.l, y);
+      ctx.lineTo(width - pad.r, y);
+      ctx.stroke();
+      ctx.fillText(formatDurationAxisLabel(duration), pad.l - 6, y);
+    });
+
+    const yearSpan = Math.max(maxYear - minYear, 1);
+    const yearStep = yearSpan <= 12 ? 1 : yearSpan <= 30 ? 5 : 10;
+    ctx.textBaseline = "top";
+    ctx.textAlign = "center";
+    ctx.strokeStyle = "rgba(78,71,56,0.14)";
+    for (let year = Math.ceil(minYear / yearStep) * yearStep; year <= maxYear; year += yearStep) {
+      const x = xForYear(year);
+      ctx.beginPath();
+      ctx.moveTo(x, pad.t + usableH);
+      ctx.lineTo(x, pad.t + usableH + 4);
+      ctx.stroke();
+      ctx.fillText(String(year), x, pad.t + usableH + 8);
+    }
+    if (minYear === maxYear) {
+      ctx.fillText(String(minYear), pad.l + usableW / 2, pad.t + usableH + 8);
+    }
+
+    ctx.fillStyle = "rgba(78,71,56,0.12)";
+    visiblePoints.forEach((point) => {
+      ctx.beginPath();
+      ctx.arc(xForYear(point.year), yForDuration(point.duration), 2.2, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    const trendPoints = averagePoints.map((point) => ({
+      x: xForYear(point.year),
+      y: yForDuration(point.duration),
+      ...point,
+    }));
+
+    if (trendPoints.length === 1) {
+      ctx.beginPath();
+      ctx.arc(trendPoints[0].x, trendPoints[0].y, 3.2, 0, Math.PI * 2);
+      ctx.fillStyle = "#4e4738";
+      ctx.fill();
+    } else if (trendPoints.length > 1) {
+      const tension = 0.82;
+      ctx.save();
+      ctx.strokeStyle = "rgba(78,71,56,0.92)";
+      ctx.lineWidth = 2.4;
+      ctx.lineJoin = "round";
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.moveTo(trendPoints[0].x, trendPoints[0].y);
+      for (let i = 0; i < trendPoints.length - 1; i += 1) {
+        const p0 = trendPoints[i - 1] || trendPoints[i];
+        const p1 = trendPoints[i];
+        const p2 = trendPoints[i + 1];
+        const p3 = trendPoints[i + 2] || p2;
+        const cp1x = p1.x + ((p2.x - p0.x) / 6) * tension;
+        const cp1y = p1.y + ((p2.y - p0.y) / 6) * tension;
+        const cp2x = p2.x - ((p3.x - p1.x) / 6) * tension;
+        const cp2y = p2.y - ((p3.y - p1.y) / 6) * tension;
+        ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
+      }
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    ctx.fillStyle = "#4e4738";
+    trendPoints.forEach((point) => {
+      ctx.beginPath();
+      ctx.arc(point.x, point.y, 2.8, 0, Math.PI * 2);
+      ctx.fill();
+    });
   }
 
   function bindGenreUmbrellaPieInteractions(modal, canvas) {
@@ -1353,7 +1799,25 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
     }
   }
 
-  function drawPeakHoursOnCanvas(canvas, scrobbles) {
+  function buildPeakHoursCurvePath(points) {
+    if (typeof Path2D !== "function" || !points.length) return null;
+    const path = new Path2D();
+    path.moveTo(points[0].x, points[0].y);
+    for (let i = 0; i < points.length - 1; i += 1) {
+      const p0 = points[i - 1] || points[i];
+      const p1 = points[i];
+      const p2 = points[i + 1];
+      const p3 = points[i + 2] || p2;
+      const cp1x = p1.x + (p2.x - p0.x) / 6;
+      const cp1y = p1.y + (p2.y - p0.y) / 6;
+      const cp2x = p2.x - (p3.x - p1.x) / 6;
+      const cp2y = p2.y - (p3.y - p1.y) / 6;
+      path.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
+    }
+    return path;
+  }
+
+  function drawPeakHoursOnCanvas(canvas, scrobbles, { hoverDay = null } = {}) {
     const ctx = canvas?.getContext?.("2d");
     if (!ctx) return;
     const width = canvas.clientWidth || 720;
@@ -1363,6 +1827,10 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
     ctx.clearRect(0, 0, width, height);
 
     if (!scrobbles.length) {
+      canvas._peakHoursMeta = null;
+      canvas._peakHoursScrobbles = scrobbles;
+      canvas._peakHoursHoverDay = null;
+      canvas.style.cursor = "default";
       ctx.fillStyle = "#4e4738";
       ctx.font = "14px 'Ubuntu Mono', monospace";
       ctx.fillText("No data available", 12, 20);
@@ -1390,6 +1858,8 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
     const usableH = height - pad.t - pad.b;
     const xForHour = (hour) => pad.l + (hour / 23) * usableW;
     const yForCount = (count) => pad.t + usableH - (count / maxCount) * usableH;
+    const activeDay = Number.isInteger(hoverDay) ? hoverDay : null;
+    const hasActiveDay = activeDay !== null;
 
     ctx.strokeStyle = "rgba(78,71,56,0.2)";
     ctx.lineWidth = 1;
@@ -1423,49 +1893,165 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
       ctx.stroke();
     });
 
-    counts.forEach((dayCounts, dayIdx) => {
+    const lineEntries = counts.map((dayCounts, dayIdx) => {
       const points = dayCounts.map((count, hour) => ({
         x: xForHour(hour),
         y: yForCount(count),
       }));
-      const color = dayColors[dayIdx % dayColors.length];
+      return {
+        dayIdx,
+        color: dayColors[dayIdx % dayColors.length],
+        points,
+        path: buildPeakHoursCurvePath(points),
+      };
+    });
 
-      ctx.strokeStyle = color;
-      ctx.lineWidth = 1.7;
+    const drawLineEntry = (entry, { emphasise = false, muted = false } = {}) => {
+      const fallbackPath = () => {
+        ctx.beginPath();
+        ctx.moveTo(entry.points[0].x, entry.points[0].y);
+        for (let i = 0; i < entry.points.length - 1; i += 1) {
+          const p0 = entry.points[i - 1] || entry.points[i];
+          const p1 = entry.points[i];
+          const p2 = entry.points[i + 1];
+          const p3 = entry.points[i + 2] || p2;
+          const cp1x = p1.x + (p2.x - p0.x) / 6;
+          const cp1y = p1.y + (p2.y - p0.y) / 6;
+          const cp2x = p2.x - (p3.x - p1.x) / 6;
+          const cp2y = p2.y - (p3.y - p1.y) / 6;
+          ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
+        }
+      };
+
+      ctx.save();
+      ctx.strokeStyle = entry.color;
       ctx.lineJoin = "round";
       ctx.lineCap = "round";
-      ctx.beginPath();
-      ctx.moveTo(points[0].x, points[0].y);
-      for (let i = 0; i < points.length - 1; i += 1) {
-        const p0 = points[i - 1] || points[i];
-        const p1 = points[i];
-        const p2 = points[i + 1];
-        const p3 = points[i + 2] || p2;
-        const cp1x = p1.x + (p2.x - p0.x) / 6;
-        const cp1y = p1.y + (p2.y - p0.y) / 6;
-        const cp2x = p2.x - (p3.x - p1.x) / 6;
-        const cp2y = p2.y - (p3.y - p1.y) / 6;
-        ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
+      ctx.globalAlpha = muted ? 0.18 : 0.88;
+      ctx.lineWidth = emphasise ? 3.4 : 1.7;
+      if (emphasise) {
+        ctx.globalAlpha = 1;
+        ctx.shadowColor = entry.color;
+        ctx.shadowBlur = 10;
       }
-      ctx.stroke();
+      if (entry.path) {
+        ctx.stroke(entry.path);
+      } else {
+        fallbackPath();
+        ctx.stroke();
+      }
+      ctx.restore();
+    };
+
+    lineEntries.forEach((entry) => {
+      if (hasActiveDay && entry.dayIdx === activeDay) return;
+      drawLineEntry(entry, { muted: hasActiveDay });
     });
+
+    if (hasActiveDay) {
+      const activeEntry = lineEntries[activeDay];
+      if (activeEntry) drawLineEntry(activeEntry, { emphasise: true });
+    }
 
     const legendY = pad.t + 4;
     const itemW = Math.max(58, Math.floor((width - pad.l - pad.r) / 7));
+    const legendItems = [];
     dayNames.forEach((label, i) => {
       const x = pad.l + i * itemW;
       const y = legendY;
+      const isActive = activeDay === i;
+      const isMuted = hasActiveDay && !isActive;
+      const labelWidth = Math.max(34, ctx.measureText(label).width + 20);
+      legendItems.push({
+        dayIdx: i,
+        x,
+        y: y - 9,
+        w: Math.max(itemW - 4, labelWidth),
+        h: 18,
+      });
+      ctx.save();
       ctx.strokeStyle = dayColors[i % dayColors.length];
-      ctx.lineWidth = 2;
+      ctx.lineWidth = isActive ? 3 : 2;
+      ctx.globalAlpha = isMuted ? 0.28 : 1;
+      if (isActive) {
+        ctx.shadowColor = dayColors[i % dayColors.length];
+        ctx.shadowBlur = 6;
+      }
       ctx.beginPath();
       ctx.moveTo(x, y);
       ctx.lineTo(x + 12, y);
       ctx.stroke();
-      ctx.fillStyle = "rgba(78,71,56,0.9)";
       ctx.font = "10px 'Ubuntu Mono', monospace";
       ctx.textAlign = "left";
       ctx.textBaseline = "middle";
+      ctx.fillStyle = isActive ? "rgba(53,48,39,1)" : (isMuted ? "rgba(78,71,56,0.42)" : "rgba(78,71,56,0.9)");
       ctx.fillText(label, x + 16, y);
+      ctx.restore();
+    });
+
+    canvas._peakHoursScrobbles = scrobbles;
+    canvas._peakHoursHoverDay = activeDay;
+    canvas._peakHoursMeta = {
+      lines: lineEntries.map((entry) => ({
+        dayIdx: entry.dayIdx,
+        path: entry.path,
+      })),
+      legendItems,
+    };
+  }
+
+  function bindPeakHoursInteractions(canvas) {
+    if (!canvas || canvas.dataset.peakHoursBound === "true") return;
+    canvas.dataset.peakHoursBound = "true";
+
+    const getCanvasPoint = (event) => {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top,
+      };
+    };
+
+    const getLegendDayAtPoint = (x, y) => {
+      const legendItems = canvas._peakHoursMeta?.legendItems || [];
+      return legendItems.find((item) => x >= item.x && x <= item.x + item.w && y >= item.y && y <= item.y + item.h)?.dayIdx ?? null;
+    };
+
+    const getLineDayAtPoint = (x, y) => {
+      const ctx = canvas.getContext?.("2d");
+      const lines = canvas._peakHoursMeta?.lines || [];
+      if (!ctx || !lines.length || typeof ctx.isPointInStroke !== "function") return null;
+      for (let i = lines.length - 1; i >= 0; i -= 1) {
+        const line = lines[i];
+        if (!line.path) continue;
+        ctx.save();
+        ctx.lineWidth = 12;
+        if (ctx.isPointInStroke(line.path, x, y)) {
+          ctx.restore();
+          return line.dayIdx;
+        }
+        ctx.restore();
+      }
+      return null;
+    };
+
+    const setHoverDay = (dayIdx) => {
+      const nextHoverDay = Number.isInteger(dayIdx) ? dayIdx : null;
+      if (canvas._peakHoursHoverDay === nextHoverDay) return;
+      canvas._peakHoursHoverDay = nextHoverDay;
+      canvas.style.cursor = nextHoverDay !== null ? "pointer" : "default";
+      drawPeakHoursOnCanvas(canvas, canvas._peakHoursScrobbles || [], { hoverDay: nextHoverDay });
+    };
+
+    canvas.addEventListener("mousemove", (event) => {
+      const { x, y } = getCanvasPoint(event);
+      const legendDay = getLegendDayAtPoint(x, y);
+      const lineDay = legendDay === null ? getLineDayAtPoint(x, y) : null;
+      setHoverDay(legendDay ?? lineDay);
+    });
+
+    canvas.addEventListener("mouseleave", () => {
+      setHoverDay(null);
     });
   }
 
@@ -1745,6 +2331,7 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
     const series = getSeriesForRange(reflectivState.range);
     const scrobbles = getScrobblesForRange(reflectivState.range);
     const lineCanvas = modal.querySelector("#scrobblesOverTime");
+    const hoverIndex = lineCanvas?._lineHoverIndex ?? null;
 
     if (reflectivChartState.lineTween) {
       reflectivChartState.lineTween.kill();
@@ -1752,7 +2339,7 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
     }
 
     if (!lineCanvas || !reflectivChartState.lineSeries.length || !series.length) {
-      drawLineOnCanvas(lineCanvas, series, reflectivState.range);
+      drawLineOnCanvas(lineCanvas, series, reflectivState.range, { hoverIndex });
       reflectivChartState.lineSeries = cloneSeries(series);
     } else {
       const fromSeries = resampleSeriesToTarget(reflectivChartState.lineSeries, series);
@@ -1771,7 +2358,9 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
             };
           });
           reflectivChartState.lineSeries = cloneSeries(blended);
-          drawLineOnCanvas(lineCanvas, blended, reflectivState.range);
+          drawLineOnCanvas(lineCanvas, blended, reflectivState.range, {
+            hoverIndex: lineCanvas?._lineHoverIndex ?? null,
+          });
         },
         onComplete: () => {
           reflectivChartState.lineSeries = cloneSeries(series);
@@ -1779,9 +2368,14 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
         },
       });
     }
+    bindScrobblesLineInteractions(lineCanvas);
 
     drawBarsOnCanvas(modal.querySelector("#tagPie"), reflectivState.topTags, "name", "count");
-    drawPeakHoursOnCanvas(modal.querySelector("#peakHours"), scrobbles);
+    const peakHoursCanvas = modal.querySelector("#peakHours");
+    drawPeakHoursOnCanvas(peakHoursCanvas, scrobbles, {
+      hoverDay: peakHoursCanvas?._peakHoursHoverDay ?? null,
+    });
+    bindPeakHoursInteractions(peakHoursCanvas);
 
     const tagStream = modal.querySelector("#tagStream");
     const ctx = tagStream?.getContext?.("2d");
@@ -2030,17 +2624,22 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
     const umbrellaGenreCounts = new Map();
     const fileTypeCounts = new Map();
     const durationValues = [];
+    const durationYearPoints = [];
+    const songDurationEntries = [];
     let totalDurationSeconds = 0;
     const albumUmbrellasByKey = new Map();
     const artistAlbumSets = new Map();
     const genreAlbumSets = new Map();
     const albumYearByKey = new Map();
+    const albumDurationTotals = new Map();
+    const albumSongCounts = new Map();
     const albumEntryByKey = new Map();
     const albumCountriesByKey = new Map();
 
     rows.forEach((r, index) => {
       const artist = (r.Artist || "").trim();
       const album = (r.Album || "").trim();
+      const song = (r.Song || "").trim();
       const albumKey = artist && album ? `${artist.toLowerCase()}::${album.toLowerCase()}` : "";
       if (albumKey && !albumEntryByKey.has(albumKey)) {
         albumEntryByKey.set(albumKey, {
@@ -2052,6 +2651,7 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
 
       if (artist) artists.add(artist);
       if (albumKey) albums.add(albumKey);
+      if (albumKey) albumSongCounts.set(albumKey, (albumSongCounts.get(albumKey) || 0) + 1);
       const fileType = getFileTypeLabel(r.File);
       fileTypeCounts.set(fileType, (fileTypeCounts.get(fileType) || 0) + 1);
       const rowGenres = [...new Set((r.Genres || "")
@@ -2069,17 +2669,25 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
       }
 
       const duration = parseDurationToSeconds(r.Duration);
+      const year = Number.parseInt((r.Year || "").trim(), 10);
       if (Number.isFinite(duration) && duration > 0) {
         durationValues.push(duration);
+        songDurationEntries.push({
+          duration,
+          label: song && artist ? `${song} - ${artist}` : song || artist || "unknown song",
+        });
+        if (Number.isInteger(year) && year >= 1900 && year <= 2100) {
+          durationYearPoints.push({ year, duration });
+        }
         totalDurationSeconds += duration;
         if (artist) {
           artistDurationTotals.set(artist, (artistDurationTotals.get(artist) || 0) + duration);
         }
+        if (albumKey) albumDurationTotals.set(albumKey, (albumDurationTotals.get(albumKey) || 0) + duration);
         rowGenres.forEach((genre) => {
           genreDurationTotals.set(genre, (genreDurationTotals.get(genre) || 0) + duration);
         });
       }
-      const year = Number.parseInt((r.Year || "").trim(), 10);
       if (albumKey && Number.isInteger(year) && year >= 1900 && year <= 2100 && !albumYearByKey.has(albumKey)) {
         albumYearByKey.set(albumKey, year);
       }
@@ -2198,6 +2806,58 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
     setText("#musiclib-total-songs", rows.length.toLocaleString());
     setText("#musiclib-total-artists", artists.size.toLocaleString());
     setText("#musiclib-total-genres", genres.size.toLocaleString());
+
+    const setStat = (baseId, value, detail) => {
+      setText(`#${baseId}`, value || "-");
+      setText(`#${baseId}-detail`, detail || "no data");
+    };
+    const pickExtreme = (items, compareFn) => {
+      if (!items.length) return null;
+      return [...items].sort(compareFn)[0];
+    };
+
+    const longestSong = pickExtreme(songDurationEntries, (a, b) => (
+      b.duration - a.duration || compareTextValues(a.label, b.label)
+    ));
+    const shortestSong = pickExtreme(songDurationEntries, (a, b) => (
+      a.duration - b.duration || compareTextValues(a.label, b.label)
+    ));
+    const albumDurationEntries = [...albumDurationTotals.entries()].map(([albumKey, duration]) => ({
+      key: albumKey,
+      duration,
+      label: albumEntryByKey.get(albumKey)?.label || albumKey,
+    }));
+    const longestAlbum = pickExtreme(albumDurationEntries, (a, b) => (
+      b.duration - a.duration || compareTextValues(a.label, b.label)
+    ));
+    const mostSongsAlbum = pickExtreme([...albumSongCounts.entries()].map(([albumKey, count]) => ({
+      key: albumKey,
+      count,
+      label: albumEntryByKey.get(albumKey)?.label || albumKey,
+    })), (a, b) => (
+      b.count - a.count || compareTextValues(a.label, b.label)
+    ));
+
+    setStat(
+      "musiclib-longest-song",
+      longestSong ? formatDurationCardLabel(longestSong.duration) : "-",
+      longestSong?.label,
+    );
+    setStat(
+      "musiclib-shortest-song",
+      shortestSong ? formatDurationCardLabel(shortestSong.duration) : "-",
+      shortestSong?.label,
+    );
+    setStat(
+      "musiclib-longest-album",
+      longestAlbum ? formatDurationCardLabel(longestAlbum.duration) : "-",
+      longestAlbum?.label,
+    );
+    setStat(
+      "musiclib-most-songs-album",
+      mostSongsAlbum ? `${mostSongsAlbum.count.toLocaleString()} songs` : "-",
+      mostSongsAlbum?.label,
+    );
 
     reflectivState.libraryArtists = sortAlphaIgnoringArticles(artists);
     reflectivState.libraryGenres = sortAlpha(genres);
@@ -2336,6 +2996,7 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
     }
     drawGenreUmbrellaPie(modal.querySelector("#libraryFileTypePie"), fileTypeCounts);
     drawDurationDistributionLine(modal.querySelector("#libraryDurationScatter"), durationValues);
+    drawSongLengthOverTimeScatter(modal.querySelector("#libraryDurationYearScatter"), durationYearPoints);
   }
 
   function bindReflectivControls(modal) {
