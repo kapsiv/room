@@ -470,9 +470,37 @@
               </div>
             </section>
 
+            <div class="reflectiv-facts reflectiv-facts--library-stats">
+              <div class="fact-card">
+                <span class="fact-label">longest song</span>
+                <span class="fact-value" id="musiclib-longest-song">-</span>
+                <span class="fact-detail" id="musiclib-longest-song-detail">-</span>
+              </div>
+              <div class="fact-card">
+                <span class="fact-label">shortest song</span>
+                <span class="fact-value" id="musiclib-shortest-song">-</span>
+                <span class="fact-detail" id="musiclib-shortest-song-detail">-</span>
+              </div>
+              <div class="fact-card">
+                <span class="fact-label">longest album</span>
+                <span class="fact-value" id="musiclib-longest-album">-</span>
+                <span class="fact-detail" id="musiclib-longest-album-detail">-</span>
+              </div>
+              <div class="fact-card">
+                <span class="fact-label">most songs in an album</span>
+                <span class="fact-value" id="musiclib-most-songs-album">-</span>
+                <span class="fact-detail" id="musiclib-most-songs-album-detail">-</span>
+              </div>
+            </div>
+
             <section class="chart-section">
               <h3 class="chart-title">song length distribution</h3>
               <canvas id="libraryDurationScatter"></canvas>
+            </section>
+
+            <section class="chart-section">
+              <h3 class="chart-title">song length over time</h3>
+              <canvas id="libraryDurationYearScatter"></canvas>
             </section>
           </div>
         </section>
