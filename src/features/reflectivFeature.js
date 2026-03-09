@@ -441,6 +441,37 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
       .trim();
   }
 
+  const libraryArtistSplitMap = new Map(
+    [
+      ["Alva Noto + Ryuichi Sakamoto", ["Alva Noto", "Ryuichi Sakamoto"]],
+      ["Duke Ellington & John Coltrane", ["Duke Ellington", "John Coltrane"]],
+      [
+        "Floating Points, Pharoah Sanders & The London Symphony Orchestra",
+        ["Floating Points", "Pharoah Sanders", "The London Symphony Orchestra"],
+      ],
+      ["Gezan with Million Wish Collective", ["Gezan", "Million Wish Collective"]],
+      ["Itoh Masyitoh & Rineka Swara", ["Itoh Masyitoh", "Rineka Swara"]],
+      ["Joe Henderson featuring Alice Coltrane", ["Joe Henderson", "Alice Coltrane"]],
+      ["Jonsi & Alex Somers", ["Jonsi", "Alex Somers"]],
+      ["Macha & Bedhead", ["Macha", "Bedhead"]],
+      ["Masayoshi Fujita & Jan Jelinek", ["Masayoshi Fujita", "Jan Jelinek"]],
+      ["Matthew Halsall & The Gondwana Orchestra", ["Matthew Halsall", "The Gondwana Orchestra"]],
+      ["Steven Stapleton & David Tibet", ["Steven Stapleton", "David Tibet"]],
+      ["Sun Ra and His Arkestra", ["Sun Ra"]],
+      ["Thom Yorke & Flea / Wynton Marsalis", ["Thom Yorke", "Flea", "Wynton Marsalis"]],
+      ["Toumani Diabate with Ballaké Sissoko", ["Toumani Diabate", "Ballaké Sissoko"]],
+      ["Triosk Meets Jan Jelinek", ["Triosk", "Jan Jelinek"]],
+      ["Whirr & Nothing", ["Whirr", "Nothing"]],
+    ].map(([artist, credits]) => [normalizeKey(artist), credits]),
+  );
+
+  function getLibraryArtistCredits(value) {
+    const artist = String(value || "").trim();
+    if (!artist) return [];
+    const splitArtists = libraryArtistSplitMap.get(normalizeKey(artist));
+    return splitArtists ? [...new Set(splitArtists)] : [artist];
+  }
+
   const IGNORED_ALBUM_KEYS = new Set(
     [
       { album: "(removed)", artist: "Fjarri" },
@@ -1473,66 +1504,47 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
     return parts.join(" ");
   }
 
+  function formatDurationHoursMinutesLabel(seconds) {
+    const totalSeconds = Math.max(0, Math.round(Number(seconds) || 0));
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    if (hours > 0) return `${hours}h ${minutes}m`;
+    return `${minutes}m`;
+  }
+
   function compareTextValues(a, b) {
     return String(a || "").localeCompare(String(b || ""), undefined, {
       sensitivity: "base",
     });
   }
 
-  function drawSongLengthOverTimeScatter(canvas, points) {
+  function drawAverageSongLengthByGenreChart(canvas, entries) {
     const ctx = canvas?.getContext?.("2d");
     if (!ctx) return;
     const width = canvas.clientWidth || 720;
-    const height = canvas.clientHeight || 220;
+    const height = canvas.clientHeight || 320;
     canvas.width = width;
     canvas.height = height;
     ctx.clearRect(0, 0, width, height);
 
-    if (!points.length) {
+    if (!entries.length) {
       ctx.fillStyle = "#4e4738";
       ctx.font = "14px 'Ubuntu Mono', monospace";
-      ctx.fillText("No duration/year data available", 12, 20);
+      ctx.fillText("No genre duration data available", 12, 20);
       return;
     }
 
-    const minVisibleDuration = 2 * 60;
-    const maxVisibleDuration = 15 * 60;
-    const visiblePoints = points.filter(
-      (point) => point.duration >= minVisibleDuration && point.duration <= maxVisibleDuration,
-    );
-    if (!visiblePoints.length) {
-      ctx.fillStyle = "#4e4738";
-      ctx.font = "14px 'Ubuntu Mono', monospace";
-      ctx.fillText("No songs between 2:00 and 15:00", 12, 20);
-      return;
-    }
-
-    const years = visiblePoints.map((point) => point.year);
-    const durationTotalsByYear = new Map();
-    const durationCountsByYear = new Map();
-    visiblePoints.forEach((point) => {
-      durationTotalsByYear.set(point.year, (durationTotalsByYear.get(point.year) || 0) + point.duration);
-      durationCountsByYear.set(point.year, (durationCountsByYear.get(point.year) || 0) + 1);
-    });
-    const averagePoints = [...durationTotalsByYear.entries()]
-      .map(([year, totalDuration]) => ({
-        year,
-        duration: totalDuration / Math.max(durationCountsByYear.get(year) || 1, 1),
-      }))
-      .sort((a, b) => a.year - b.year);
-    const minYear = Math.min(...years);
-    const maxYear = Math.max(...years);
-    const yTicks = [120, 180, 240, 300, 420, 600, 900];
-    const pad = { l: 40, r: 14, t: 14, b: 36 };
+    const sortedEntries = [...entries].sort((a, b) => (
+      b.duration - a.duration || compareTextValues(a.name, b.name)
+    ));
+    const pad = { l: 42, r: 12, t: 16, b: 88 };
     const usableW = width - pad.l - pad.r;
     const usableH = height - pad.t - pad.b;
-    const xForYear = (year) => {
-      const pct = (year - minYear) / Math.max(maxYear - minYear, 1);
-      return pad.l + pct * usableW;
-    };
+    const slotW = usableW / Math.max(sortedEntries.length, 1);
+    const barW = Math.min(34, Math.max(14, slotW - 10));
+    const maxDuration = Math.max(...sortedEntries.map((entry) => entry.duration), 1);
     const yForDuration = (duration) => {
-      const clamped = Math.min(maxVisibleDuration, Math.max(minVisibleDuration, Number(duration) || 0));
-      const pct = (clamped - minVisibleDuration) / Math.max(maxVisibleDuration - minVisibleDuration, 1);
+      const pct = Math.max(0, Number(duration) || 0) / maxDuration;
       return pad.t + usableH - pct * usableH;
     };
 
@@ -1548,83 +1560,43 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
     ctx.stroke();
 
     ctx.font = "10px 'Ubuntu Mono', monospace";
+    ctx.fillStyle = "rgba(78,71,56,0.82)";
+    ctx.strokeStyle = "rgba(78,71,56,0.22)";
     ctx.textBaseline = "middle";
     ctx.textAlign = "right";
-    ctx.fillStyle = "rgba(78,71,56,0.82)";
-    ctx.strokeStyle = "rgba(78,71,56,0.1)";
-    yTicks.forEach((duration) => {
+    const tickCount = 4;
+    for (let i = 0; i <= tickCount; i += 1) {
+      const duration = (maxDuration / tickCount) * i;
       const y = yForDuration(duration);
       ctx.beginPath();
       ctx.moveTo(pad.l, y);
-      ctx.lineTo(width - pad.r, y);
+      ctx.lineTo(pad.l - 4, y);
       ctx.stroke();
       ctx.fillText(formatDurationAxisLabel(duration), pad.l - 6, y);
-    });
-
-    const yearSpan = Math.max(maxYear - minYear, 1);
-    const yearStep = yearSpan <= 12 ? 1 : yearSpan <= 30 ? 5 : 10;
-    ctx.textBaseline = "top";
-    ctx.textAlign = "center";
-    ctx.strokeStyle = "rgba(78,71,56,0.14)";
-    for (let year = Math.ceil(minYear / yearStep) * yearStep; year <= maxYear; year += yearStep) {
-      const x = xForYear(year);
-      ctx.beginPath();
-      ctx.moveTo(x, pad.t + usableH);
-      ctx.lineTo(x, pad.t + usableH + 4);
-      ctx.stroke();
-      ctx.fillText(String(year), x, pad.t + usableH + 8);
-    }
-    if (minYear === maxYear) {
-      ctx.fillText(String(minYear), pad.l + usableW / 2, pad.t + usableH + 8);
     }
 
-    ctx.fillStyle = "rgba(78,71,56,0.12)";
-    visiblePoints.forEach((point) => {
-      ctx.beginPath();
-      ctx.arc(xForYear(point.year), yForDuration(point.duration), 2.2, 0, Math.PI * 2);
-      ctx.fill();
-    });
+    sortedEntries.forEach((entry, index) => {
+      const x = pad.l + slotW * index + (slotW - barW) / 2;
+      const y = yForDuration(entry.duration);
+      const barHeight = Math.max(pad.t + usableH - y, 2);
+      const label = formatUmbrellaCenterLabel(entry.name);
 
-    const trendPoints = averagePoints.map((point) => ({
-      x: xForYear(point.year),
-      y: yForDuration(point.duration),
-      ...point,
-    }));
-
-    if (trendPoints.length === 1) {
-      ctx.beginPath();
-      ctx.arc(trendPoints[0].x, trendPoints[0].y, 3.2, 0, Math.PI * 2);
+      ctx.font = "11px 'Ubuntu Mono', monospace";
       ctx.fillStyle = "#4e4738";
-      ctx.fill();
-    } else if (trendPoints.length > 1) {
-      const tension = 0.82;
-      ctx.save();
-      ctx.strokeStyle = "rgba(78,71,56,0.92)";
-      ctx.lineWidth = 2.4;
-      ctx.lineJoin = "round";
-      ctx.lineCap = "round";
-      ctx.beginPath();
-      ctx.moveTo(trendPoints[0].x, trendPoints[0].y);
-      for (let i = 0; i < trendPoints.length - 1; i += 1) {
-        const p0 = trendPoints[i - 1] || trendPoints[i];
-        const p1 = trendPoints[i];
-        const p2 = trendPoints[i + 1];
-        const p3 = trendPoints[i + 2] || p2;
-        const cp1x = p1.x + ((p2.x - p0.x) / 6) * tension;
-        const cp1y = p1.y + ((p2.y - p0.y) / 6) * tension;
-        const cp2x = p2.x - ((p3.x - p1.x) / 6) * tension;
-        const cp2y = p2.y - ((p3.y - p1.y) / 6) * tension;
-        ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
-      }
-      ctx.stroke();
-      ctx.restore();
-    }
+      ctx.fillRect(x, y, barW, barHeight);
 
-    ctx.fillStyle = "#4e4738";
-    trendPoints.forEach((point) => {
-      ctx.beginPath();
-      ctx.arc(point.x, point.y, 2.8, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.textBaseline = "bottom";
+      ctx.textAlign = "center";
+      ctx.fillStyle = "rgba(78,71,56,0.92)";
+      ctx.fillText(formatDurationAxisLabel(entry.duration), x + barW / 2, Math.max(y - 4, pad.t + 10));
+
+      ctx.save();
+      ctx.translate(x + barW / 2, pad.t + usableH + 10);
+      ctx.rotate(-Math.PI / 4);
+      ctx.textAlign = "right";
+      ctx.textBaseline = "top";
+      ctx.fillText(label, 0, 0);
+      ctx.restore();
     });
   }
 
@@ -2622,9 +2594,10 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
     const genreSongCounts = new Map();
     const genreDurationTotals = new Map();
     const umbrellaGenreCounts = new Map();
+    const umbrellaDurationTotals = new Map();
+    const umbrellaDurationCounts = new Map();
     const fileTypeCounts = new Map();
     const durationValues = [];
-    const durationYearPoints = [];
     const songDurationEntries = [];
     let totalDurationSeconds = 0;
     const albumUmbrellasByKey = new Map();
@@ -2635,9 +2608,12 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
     const albumSongCounts = new Map();
     const albumEntryByKey = new Map();
     const albumCountriesByKey = new Map();
+    let totalArtistSongCredits = 0;
+    let totalArtistDurationSeconds = 0;
 
     rows.forEach((r, index) => {
       const artist = (r.Artist || "").trim();
+      const artistCredits = getLibraryArtistCredits(artist);
       const album = (r.Album || "").trim();
       const song = (r.Song || "").trim();
       const albumKey = artist && album ? `${artist.toLowerCase()}::${album.toLowerCase()}` : "";
@@ -2649,7 +2625,7 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
         });
       }
 
-      if (artist) artists.add(artist);
+      artistCredits.forEach((name) => artists.add(name));
       if (albumKey) albums.add(albumKey);
       if (albumKey) albumSongCounts.set(albumKey, (albumSongCounts.get(albumKey) || 0) + 1);
       const fileType = getFileTypeLabel(r.File);
@@ -2658,14 +2634,20 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
         .split(";")
         .map((g) => g.trim().toLowerCase())
         .filter(Boolean))];
+      const rowUmbrellas = [...new Set(
+        rowGenres.map((g) => normalizedGenreUmbrellaMap[normalizeGenreKey(g)] || "other"),
+      )];
       rowGenres.forEach((g) => {
         genres.add(g);
         genreSongCounts.set(g, (genreSongCounts.get(g) || 0) + 1);
         const umbrella = normalizedGenreUmbrellaMap[normalizeGenreKey(g)] || "other";
         umbrellaGenreCounts.set(umbrella, (umbrellaGenreCounts.get(umbrella) || 0) + 1);
       });
-      if (artist && !artistSongCountExclusions.has(index)) {
-        artistSongCounts.set(artist, (artistSongCounts.get(artist) || 0) + 1);
+      if (artistCredits.length && !artistSongCountExclusions.has(index)) {
+        artistCredits.forEach((name) => {
+          artistSongCounts.set(name, (artistSongCounts.get(name) || 0) + 1);
+        });
+        totalArtistSongCredits += artistCredits.length;
       }
 
       const duration = parseDurationToSeconds(r.Duration);
@@ -2676,16 +2658,18 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
           duration,
           label: song && artist ? `${song} - ${artist}` : song || artist || "unknown song",
         });
-        if (Number.isInteger(year) && year >= 1900 && year <= 2100) {
-          durationYearPoints.push({ year, duration });
-        }
         totalDurationSeconds += duration;
-        if (artist) {
-          artistDurationTotals.set(artist, (artistDurationTotals.get(artist) || 0) + duration);
-        }
+        artistCredits.forEach((name) => {
+          artistDurationTotals.set(name, (artistDurationTotals.get(name) || 0) + duration);
+        });
+        totalArtistDurationSeconds += duration * artistCredits.length;
         if (albumKey) albumDurationTotals.set(albumKey, (albumDurationTotals.get(albumKey) || 0) + duration);
         rowGenres.forEach((genre) => {
           genreDurationTotals.set(genre, (genreDurationTotals.get(genre) || 0) + duration);
+        });
+        rowUmbrellas.forEach((umbrella) => {
+          umbrellaDurationTotals.set(umbrella, (umbrellaDurationTotals.get(umbrella) || 0) + duration);
+          umbrellaDurationCounts.set(umbrella, (umbrellaDurationCounts.get(umbrella) || 0) + 1);
         });
       }
       if (albumKey && Number.isInteger(year) && year >= 1900 && year <= 2100 && !albumYearByKey.has(albumKey)) {
@@ -2693,10 +2677,10 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
       }
 
       if (albumKey) {
-        if (artist) {
-          if (!artistAlbumSets.has(artist)) artistAlbumSets.set(artist, new Set());
-          artistAlbumSets.get(artist).add(albumKey);
-        }
+        artistCredits.forEach((name) => {
+          if (!artistAlbumSets.has(name)) artistAlbumSets.set(name, new Set());
+          artistAlbumSets.get(name).add(albumKey);
+        });
         if (!albumUmbrellasByKey.has(albumKey)) albumUmbrellasByKey.set(albumKey, new Set());
         const umbrellaSet = albumUmbrellasByKey.get(albumKey);
         rowGenres.forEach((genre) => {
@@ -2725,6 +2709,13 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
       if (!genresByUmbrella.has(umbrella)) genresByUmbrella.set(umbrella, new Map());
       genresByUmbrella.get(umbrella).set(genre, count);
     });
+    const averageSongLengthByUmbrella = [...umbrellaDurationTotals.entries()]
+      .map(([name, totalDuration]) => ({
+        name,
+        duration: totalDuration / Math.max(umbrellaDurationCounts.get(name) || 1, 1),
+      }))
+      .filter(({ name }) => name !== "spoken / vocal" && name !== "other")
+      .sort((a, b) => b.duration - a.duration || compareTextValues(a.name, b.name));
 
     const umbrellaOptions = sortAlpha(new Set([...albumUmbrellasByKey.values()].flatMap((set) => [...set])));
     if (!umbrellaOptions.includes(reflectivState.libraryYearGenreFilter)) {
@@ -2874,12 +2865,17 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
           : [...artistSongCounts.entries()])
         .sort((a, b) => b[1] - a[1])
         .slice(0, 100);
-      const totalForPercent = metric === "albums" ? albums.size : metric === "duration" ? totalDurationSeconds : rows.length;
+      const totalArtistAlbumCredits = [...artistAlbumSets.values()].reduce((sum, albumSet) => sum + albumSet.size, 0);
+      const totalForPercent = metric === "albums"
+        ? totalArtistAlbumCredits
+        : metric === "duration"
+          ? totalArtistDurationSeconds
+          : totalArtistSongCredits;
       const percentFormatter = new Intl.NumberFormat("en-GB", { maximumFractionDigits: 1 });
       const valueFormatter = metric === "duration"
-        ? (value) => `${Math.round(value / 60).toLocaleString("en-GB")}`
+        ? (value) => formatDurationHoursMinutesLabel(value)
         : (value) => value.toLocaleString();
-      if (topArtistsCountLabel) topArtistsCountLabel.textContent = metric === "duration" ? "duration (mins)" : metric;
+      if (topArtistsCountLabel) topArtistsCountLabel.textContent = metric === "duration" ? "duration" : metric;
       topArtistsList.innerHTML = topArtists
         .map(([name, count], i) => {
           const share = totalForPercent > 0 ? `${percentFormatter.format((count / totalForPercent) * 100)}%` : "0%";
@@ -2901,9 +2897,9 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
       const totalForPercent = metric === "albums" ? albums.size : metric === "duration" ? totalDurationSeconds : rows.length;
       const percentFormatter = new Intl.NumberFormat("en-GB", { maximumFractionDigits: 1 });
       const valueFormatter = metric === "duration"
-        ? (value) => `${Math.round(value / 60).toLocaleString("en-GB")}`
+        ? (value) => formatDurationHoursMinutesLabel(value)
         : (value) => value.toLocaleString();
-      if (topGenresCountLabel) topGenresCountLabel.textContent = metric === "duration" ? "duration (mins)" : metric;
+      if (topGenresCountLabel) topGenresCountLabel.textContent = metric === "duration" ? "duration" : metric;
       topGenresList.innerHTML = topGenres
         .map(([name, count], i) => {
           const share = totalForPercent > 0 ? `${percentFormatter.format((count / totalForPercent) * 100)}%` : "0%";
@@ -2996,7 +2992,7 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
     }
     drawGenreUmbrellaPie(modal.querySelector("#libraryFileTypePie"), fileTypeCounts);
     drawDurationDistributionLine(modal.querySelector("#libraryDurationScatter"), durationValues);
-    drawSongLengthOverTimeScatter(modal.querySelector("#libraryDurationYearScatter"), durationYearPoints);
+    drawAverageSongLengthByGenreChart(modal.querySelector("#libraryGenreAverageDurationChart"), averageSongLengthByUmbrella);
   }
 
   function bindReflectivControls(modal) {
