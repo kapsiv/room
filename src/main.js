@@ -8,6 +8,7 @@ import { getDocument, GlobalWorkerOptions } from "pdfjs-dist/build/pdf.mjs";
 import pdfWorkerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
 
 import { OrbitControls } from './utils/OrbitControls.js';
+import { createAnnotationFeature } from './features/annotationFeature.js';
 import { createReflectivFeature } from './features/reflectivFeature.js';
 import { createModalManager } from './ui/modalManager.js';
 import { createFabManager } from './ui/fabManager.js';
@@ -100,10 +101,15 @@ const modals = {
   book: document.querySelector(".modal.book"),
 };
 
+function hasVisibleModal() {
+  return Object.values(modals).some((modal) => modal && modal.style.display === "block");
+}
+
 let showModal;
 let hideModal;
 let placeModalAt;
 let controls;
+let annotationFeature = null;
 
 const reflectivFeature = createReflectivFeature({
   gsap,
@@ -902,6 +908,9 @@ const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
 let pointerClientX = null;
 let pointerClientY = null;
+let vinylAnnotationTarget = null;
+let guitarAnnotationTarget = null;
+let rugAnnotationTarget = null;
 
 function isPointerOverModal() {
   if (pointerClientX === null || pointerClientY === null) return false;
@@ -1528,6 +1537,10 @@ loader.load("/models/Room_Portfolio_V4.glb", (glb) => {
         guitarParts.push(child)
       }
 
+      if (child.name.includes("Rug")) {
+        rugAnnotationTarget = rugAnnotationTarget || child;
+      }
+
       const raycasterNameTags = [
         "_Zeroth",
         "_First",
@@ -1662,6 +1675,7 @@ loader.load("/models/Room_Portfolio_V4.glb", (glb) => {
 
             if(child.name.includes("Vinyl")){
               yAxisVinyl.push(child);
+              vinylAnnotationTarget = vinylAnnotationTarget || child;
             }
           }
         });
@@ -1669,6 +1683,14 @@ loader.load("/models/Room_Portfolio_V4.glb", (glb) => {
     }
   });
   scene.add(glb.scene);
+
+  if (vinylAnnotationTarget) {
+    annotationFeature?.registerTarget("vinyl-reflectiv", vinylAnnotationTarget);
+  }
+
+  if (rugAnnotationTarget) {
+    annotationFeature?.registerTarget("rug-about", rugAnnotationTarget);
+  }
 
   if (guitarMesh && guitarParts.length) {
     const guitarGroup = new THREE.Group();
@@ -1691,6 +1713,8 @@ loader.load("/models/Room_Portfolio_V4.glb", (glb) => {
     guitarGroup.userData.hoverTiltY = Math.PI / 24;
     guitarGroup.userData.initialQuaternion = guitarGroup.quaternion.clone();
 
+    guitarAnnotationTarget = guitarGroup;
+    annotationFeature?.registerTarget("guitar-feature", guitarAnnotationTarget);
     createDetachedHitboxForTarget(guitarGroup);
   }
 });
@@ -1831,6 +1855,76 @@ controls.target.set(
   4,
   0
 )
+annotationFeature = createAnnotationFeature({
+  camera,
+  maxVisible: 3,
+  getIsSuppressed: () => isLoading || hasVisibleModal(),
+  annotations: [
+    {
+      id: "vinyl-reflectiv",
+      body: "click the vinyl!",
+      ariaLabel: "Open the music annotation",
+      modal: modals.reflectiv,
+      preferredSide: "left",
+      anchorOffset: new THREE.Vector3(0, 0.48, 0),
+      idleMs: 18000,
+      maxDistance: 60,
+      offsetX: 128,
+      offsetY: -70,
+      onActivate: () => {
+        showModal(modals.reflectiv);
+      },
+    },
+    {
+      id: "guitar-feature",
+      body: "guitar stuff",
+      ariaLabel: "Open the guitar annotation",
+      modal: modals.guitar,
+      preferredSide: "right",
+      anchorOffset: new THREE.Vector3(0, 0.58, 0),
+      idleMs: 18000,
+      maxDistance: 60,
+      offsetX: 136,
+      offsetY: -62,
+      onActivate: () => {
+        showModal(modals.guitar);
+      },
+    },
+    {
+      id: "rug-about",
+      body: "about",
+      ariaLabel: "Open the about annotation",
+      modal: modals.about,
+      preferredSide: "right",
+      anchorOffset: new THREE.Vector3(0, 0.08, 0),
+      idleMs: 18000,
+      maxDistance: 60,
+      offsetX: 120,
+      offsetY: 58,
+      onActivate: () => {
+        showModal(modals.about);
+      },
+    },
+  ],
+});
+
+if (vinylAnnotationTarget) {
+  annotationFeature.registerTarget("vinyl-reflectiv", vinylAnnotationTarget);
+}
+
+if (guitarAnnotationTarget) {
+  annotationFeature.registerTarget("guitar-feature", guitarAnnotationTarget);
+}
+
+if (rugAnnotationTarget) {
+  annotationFeature.registerTarget("rug-about", rugAnnotationTarget);
+}
+
+const baseShowModal = showModal;
+showModal = (modal) => {
+  annotationFeature?.notifyModalShown(modal);
+  baseShowModal(modal);
+};
 
 // Event listeners
 window.addEventListener("resize", ()=>{
@@ -2115,6 +2209,7 @@ const render = (timestamp = 0) => {
         currentHoveredObject = null;
       }
       document.body.style.cursor = "default";
+      annotationFeature?.update(timestamp);
       renderer.render(scene, camera);
       window.requestAnimationFrame(render);
       return;
@@ -2175,6 +2270,7 @@ const render = (timestamp = 0) => {
     }
   }
 
+  annotationFeature?.update(timestamp);
   renderer.render(scene, camera);
   window.requestAnimationFrame(render);
 };
