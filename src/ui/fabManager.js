@@ -80,15 +80,91 @@ export function createFabManager({
   getShowModal,
   getNowPlayingTrack,
   onLoadingComplete,
+  onMobileModeSelect,
 }) {
   let loadingRevealStarted = false;
   let fabOrbitAnimating = false;
   let fabExpanded = false;
   let assetsLoaded = false;
   let loadingLogoDrawDone = true;
+  let selectedMobileMode = isMobileDockLayout() ? null : "full";
+  let modeChooser = null;
 
   function isMobileDockLayout() {
     return window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`).matches;
+  }
+
+  function canPlayLoadingReveal() {
+    return loadingLogoDrawDone && assetsLoaded && selectedMobileMode !== null;
+  }
+
+  function selectMobileMode(mode) {
+    selectedMobileMode = mode;
+    if (loadingScreen) {
+      loadingScreen.dataset.mobileMode = mode;
+      loadingScreen.classList.add("loading-screen--mode-selected");
+    }
+
+    if (modeChooser) {
+      modeChooser.classList.add("is-hidden");
+      modeChooser.setAttribute("aria-hidden", "true");
+    }
+
+    onMobileModeSelect?.(mode);
+
+    if (mode === "lite") {
+      assetsLoaded = true;
+    }
+
+    if (canPlayLoadingReveal()) {
+      playLoadingReveal();
+    }
+  }
+
+  function initMobileModeChooser() {
+    if (!loadingScreen || !isMobileDockLayout() || loadingScreen.dataset.modeChooserBound === "true") return;
+
+    loadingScreen.dataset.modeChooserBound = "true";
+    loadingScreen.dataset.mobileMode = "pending";
+
+    const heading = document.createElement("div");
+    heading.className = "loading-mobile-title";
+    heading.innerHTML = '<span class="loading-mobile-title-text">kapsiv</span>';
+    loadingScreen.appendChild(heading);
+
+    modeChooser = document.createElement("div");
+    modeChooser.className = "loading-mode-chooser";
+    modeChooser.innerHTML = `
+      <button type="button" class="loading-mode-button" data-mobile-mode="full">
+        <span class="loading-mode-button-title">continue to mobile site</span>
+      </button>
+      <button type="button" class="loading-mode-button loading-mode-button--secondary" data-mobile-mode="lite">
+        <span class="loading-mode-button-title">lite version</span>
+        <span class="loading-mode-button-subtitle">FOR SLOWER PHONES</span>
+      </button>
+    `;
+
+    modeChooser.querySelectorAll("[data-mobile-mode]").forEach((button) => {
+      const handleModeSelect = () => {
+        const mode = button.getAttribute("data-mobile-mode");
+        if (!mode || selectedMobileMode) return;
+        selectMobileMode(mode);
+      };
+
+      button.addEventListener("pointerup", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        handleModeSelect();
+      });
+
+      button.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        handleModeSelect();
+      });
+    });
+
+    loadingScreen.appendChild(modeChooser);
   }
 
   function getMobileDockMetrics() {
@@ -131,21 +207,40 @@ export function createFabManager({
       button.type = "button";
       button.className = "fab-dock-button";
       button.setAttribute("aria-label", `Open ${item.name}`);
+      button.dataset.modalKey = item.modalKey;
       button.innerHTML = `
         <span class="fab-dock-button-icon" style="--dock-icon: url('${item.icon}')"></span>
       `;
       const openDockModal = (event) => {
         event.preventDefault();
         event.stopPropagation();
+        if (typeof event.stopImmediatePropagation === "function") {
+          event.stopImmediatePropagation();
+        }
         const showModal = typeof getShowModal === "function" ? getShowModal() : null;
         const modals = typeof getModals === "function" ? getModals() : null;
-        const modal = modals?.[item.modalKey];
+        const modal = item.modalKey === "inventory"
+          ? document.querySelector(".modal.inventory")
+          : modals?.[item.modalKey];
         if (!showModal || !modal) return;
         showModal(modal);
       };
 
+      button.addEventListener("pointerdown", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (typeof event.stopImmediatePropagation === "function") {
+          event.stopImmediatePropagation();
+        }
+      });
       button.addEventListener("pointerup", openDockModal);
+      button.addEventListener("touchend", openDockModal, { passive: false });
       button.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (typeof event.stopImmediatePropagation === "function") {
+          event.stopImmediatePropagation();
+        }
         if (event.detail !== 0) return;
         openDockModal(event);
       });
@@ -741,11 +836,19 @@ export function createFabManager({
     loadingScreen.style.setProperty("--dock-top", `${targetCenterY}px`);
 
     const tl = gsap.timeline();
+    if (modeChooser) {
+      tl.to(modeChooser, {
+        opacity: 0,
+        duration: 0.18,
+        ease: "power2.out",
+      });
+    }
+
     tl.to(loadingScreen, {
       scale: 0.64,
       duration: 1.05,
       ease: "power3.out",
-    });
+    }, modeChooser ? "-=0.04" : 0);
 
     if (logo) {
       tl.to(
@@ -794,6 +897,8 @@ export function createFabManager({
     const logoPath = document.querySelector("#logo");
     if (!logoPath) return;
 
+    initMobileModeChooser();
+
     loadingLogoDrawDone = false;
     const pathLength = logoPath.getTotalLength();
     logoPath.style.strokeDasharray = pathLength;
@@ -805,18 +910,23 @@ export function createFabManager({
       ease: "power2.inOut",
       onComplete: () => {
         loadingLogoDrawDone = true;
-        if (assetsLoaded) playLoadingReveal();
+        if (canPlayLoadingReveal()) playLoadingReveal();
       },
     });
   }
 
   function markAssetsLoaded() {
     assetsLoaded = true;
-    if (loadingLogoDrawDone) playLoadingReveal();
+    if (canPlayLoadingReveal()) playLoadingReveal();
+  }
+
+  function markAssetsPending() {
+    assetsLoaded = false;
   }
 
   return {
     init,
     markAssetsLoaded,
+    markAssetsPending,
   };
 }

@@ -23,9 +23,11 @@ export function createModalManager({
   function clampModalPosition(modal, left, top) {
     if (isMobileModalLayout()) {
       const rect = modal.getBoundingClientRect();
+      const width = modal.offsetWidth || rect.width;
+      const height = modal.offsetHeight || rect.height;
       return {
-        left: Math.max((window.innerWidth - rect.width) / 2, mobileViewportInset),
-        top: Math.max((window.innerHeight - rect.height) / 2, mobileViewportInset),
+        left: Math.max((window.innerWidth - width) / 2, mobileViewportInset),
+        top: Math.max((window.innerHeight - height) / 2, mobileViewportInset),
       };
     }
 
@@ -47,6 +49,7 @@ export function createModalManager({
   function placeModalAt(modal, left, top) {
     syncModalViewportConstraints(modal);
     const clamped = clampModalPosition(modal, left, top);
+    modal.style.right = "auto";
     modal.style.left = `${clamped.left}px`;
     modal.style.top = `${clamped.top}px`;
   }
@@ -280,6 +283,10 @@ export function createModalManager({
 
     if (modal === modals.modelling && typeof onShowModelling === "function") {
       onShowModelling(modal, { showModal, hideModal });
+    }
+
+    if (isMobileModalLayout()) {
+      centerModal(modal);
     }
   }
 
