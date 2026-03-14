@@ -1,5 +1,12 @@
 const CLOSED_FAB_SIZE_FACTOR = 0.82;
 const OPEN_FAB_VISUAL_SCALE = 1.32;
+const MOBILE_BREAKPOINT = 760;
+const MOBILE_DOCK_ITEMS = [
+  { name: "about", modalKey: "about", icon: "/icons/about.svg" },
+  { name: "info", modalKey: "info", icon: "/icons/info.svg" },
+  { name: "inventory", modalKey: "inventory", icon: "/icons/box.svg" },
+  { name: "reflectiv", modalKey: "reflectiv", icon: "/icons/reflectIV.svg" },
+];
 
 const PAGES = [
   { name: "info", url: "/info", icon: "/icons/info.svg" },
@@ -80,8 +87,84 @@ export function createFabManager({
   let assetsLoaded = false;
   let loadingLogoDrawDone = true;
 
+  function isMobileDockLayout() {
+    return window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`).matches;
+  }
+
+  function getMobileDockMetrics() {
+    const dockHeight = Math.max(84, Math.min(96, Math.round(window.innerHeight * 0.102)));
+    const dockWidth = Math.max(264, Math.min(window.innerWidth - 20, 376));
+    const dockMargin = 16;
+    const dockTop = Math.max(12, window.innerHeight - dockMargin - dockHeight);
+    const dockRadius = Math.round(dockHeight / 2);
+
+    return {
+      dockHeight,
+      dockWidth,
+      dockMargin,
+      dockTop,
+      dockRadius,
+    };
+  }
+
+  function updateMobileDockLayout() {
+    if (!loadingScreen || !loadingScreen.classList.contains("loading-screen--dock")) return;
+    const { dockHeight, dockWidth, dockMargin, dockTop } = getMobileDockMetrics();
+    loadingScreen.style.setProperty("--dock-height", `${dockHeight}px`);
+    loadingScreen.style.setProperty("--dock-width", `${dockWidth}px`);
+    loadingScreen.style.setProperty("--dock-margin", `${dockMargin}px`);
+    loadingScreen.style.setProperty("--dock-top", `${dockTop + dockHeight / 2}px`);
+  }
+
+  function initMobileDock() {
+    if (!loadingScreen || loadingScreen.dataset.dockBound === "true") return;
+    loadingScreen.dataset.dockBound = "true";
+    loadingScreen.setAttribute("role", "toolbar");
+    loadingScreen.setAttribute("aria-label", "Quick access");
+    loadingScreen.removeAttribute("tabindex");
+
+    const dock = document.createElement("div");
+    dock.className = "fab-dock-buttons";
+
+    MOBILE_DOCK_ITEMS.forEach((item) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "fab-dock-button";
+      button.setAttribute("aria-label", `Open ${item.name}`);
+      button.innerHTML = `
+        <span class="fab-dock-button-icon" style="--dock-icon: url('${item.icon}')"></span>
+      `;
+      const openDockModal = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const showModal = typeof getShowModal === "function" ? getShowModal() : null;
+        const modals = typeof getModals === "function" ? getModals() : null;
+        const modal = modals?.[item.modalKey];
+        if (!showModal || !modal) return;
+        showModal(modal);
+      };
+
+      button.addEventListener("pointerup", openDockModal);
+      button.addEventListener("click", (event) => {
+        if (event.detail !== 0) return;
+        openDockModal(event);
+      });
+      dock.appendChild(button);
+    });
+
+    loadingScreen.appendChild(dock);
+    updateMobileDockLayout();
+    window.addEventListener("resize", updateMobileDockLayout);
+  }
+
   function initLoadingFab() {
     if (!loadingScreen || loadingScreen.dataset.fabBound === "true") return;
+
+    if (isMobileDockLayout()) {
+      initMobileDock();
+      return;
+    }
+
     loadingScreen.dataset.fabBound = "true";
     loadingScreen.setAttribute("role", "button");
     loadingScreen.setAttribute("aria-label", "Open fab");
@@ -638,12 +721,24 @@ export function createFabManager({
     const fabMargin = 24;
     const fabTop = Math.max(16, window.innerHeight - fabMargin - fabSize);
     const fabCorner = Math.round(fabSize * 0.5);
-    const targetCenterX = fabMargin + fabSize / 2;
-    const targetCenterY = fabTop + fabSize / 2;
+    const isMobile = isMobileDockLayout();
+    const {
+      dockHeight,
+      dockWidth,
+      dockMargin,
+      dockTop,
+      dockRadius,
+    } = getMobileDockMetrics();
+    const targetCenterX = isMobile ? window.innerWidth / 2 : fabMargin + fabSize / 2;
+    const targetCenterY = isMobile ? dockTop + dockHeight / 2 : fabTop + fabSize / 2;
     const deltaX = targetCenterX - window.innerWidth / 2;
     const deltaY = targetCenterY - window.innerHeight / 2;
     loadingScreen.style.setProperty("--fab-size", `${fabSize}px`);
     loadingScreen.style.setProperty("--fab-margin", `${fabMargin}px`);
+    loadingScreen.style.setProperty("--dock-width", `${dockWidth}px`);
+    loadingScreen.style.setProperty("--dock-height", `${dockHeight}px`);
+    loadingScreen.style.setProperty("--dock-margin", `${dockMargin}px`);
+    loadingScreen.style.setProperty("--dock-top", `${targetCenterY}px`);
 
     const tl = gsap.timeline();
     tl.to(loadingScreen, {
@@ -667,18 +762,25 @@ export function createFabManager({
     tl.to(
       loadingScreen,
       {
-        x: deltaX,
+        x: isMobile ? 0 : deltaX,
         y: deltaY,
-        width: fabSize,
-        height: fabSize,
+        width: isMobile ? dockWidth : fabSize,
+        height: isMobile ? dockHeight : fabSize,
         borderWidth: 4,
-        borderRadius: `${fabCorner}px ${fabCorner}px ${fabCorner}px 0px`,
+        borderRadius: isMobile
+          ? `${dockRadius}px`
+          : `${fabCorner}px ${fabCorner}px ${fabCorner}px 0px`,
         scale: 1,
         duration: 1.05,
         ease: "power2.inOut",
         onComplete: () => {
-          gsap.set(loadingScreen, { clearProps: "transform,left,top,x,y,scale" });
-          loadingScreen.classList.add("loading-screen--fab");
+          if (isMobile) {
+            loadingScreen.classList.add("loading-screen--dock");
+            gsap.set(loadingScreen, { clearProps: "x,y,scale" });
+          } else {
+            gsap.set(loadingScreen, { clearProps: "transform,left,top,x,y,scale" });
+            loadingScreen.classList.add("loading-screen--fab");
+          }
           initLoadingFab();
           onLoadingComplete?.();
         },

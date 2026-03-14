@@ -21,6 +21,8 @@ GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
 const LASTFM_USER = "kapsiv";
 const LASTFM_API_KEY = "683650a829cee53959e8d505e8841726";
 const LASTFM_ENDPOINT = "https://ws.audioscrobbler.com/2.0/";
+const MOBILE_BREAKPOINT = 760;
+const MOBILE_VIEWPORT_INSET = 12;
 
 async function fetchNowPlayingTrack() {
   const url = `${LASTFM_ENDPOINT}?method=user.getrecenttracks&user=${encodeURIComponent(LASTFM_USER)}&api_key=${LASTFM_API_KEY}&format=json&limit=1`;
@@ -108,6 +110,89 @@ function hasVisibleModal() {
   return Object.values(modals).some((modal) => modal && modal.style.display === "block");
 }
 
+function isMobileLayout() {
+  return window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`).matches;
+}
+
+function resetTooltipViewportPosition(tooltipContent) {
+  if (!tooltipContent) return;
+  tooltipContent.style.removeProperty("--tooltip-shift-x");
+  tooltipContent.style.removeProperty("--tooltip-shift-y");
+}
+
+function clampTooltipToViewport(tooltip) {
+  const tooltipContent = tooltip?.querySelector(".ui-tooltip-content");
+  if (!tooltipContent) return;
+
+  if (!isMobileLayout()) {
+    resetTooltipViewportPosition(tooltipContent);
+    return;
+  }
+
+  resetTooltipViewportPosition(tooltipContent);
+
+  const rect = tooltipContent.getBoundingClientRect();
+  const minX = MOBILE_VIEWPORT_INSET;
+  const maxX = window.innerWidth - MOBILE_VIEWPORT_INSET;
+  const minY = MOBILE_VIEWPORT_INSET;
+  const maxY = window.innerHeight - MOBILE_VIEWPORT_INSET;
+
+  let shiftX = 0;
+  let shiftY = 0;
+
+  if (rect.left < minX) {
+    shiftX += minX - rect.left;
+  }
+
+  if (rect.right + shiftX > maxX) {
+    shiftX += maxX - (rect.right + shiftX);
+  }
+
+  if (rect.top < minY) {
+    shiftY += minY - rect.top;
+  }
+
+  if (rect.bottom + shiftY > maxY) {
+    shiftY += maxY - (rect.bottom + shiftY);
+  }
+
+  tooltipContent.style.setProperty("--tooltip-shift-x", `${Math.round(shiftX)}px`);
+  tooltipContent.style.setProperty("--tooltip-shift-y", `${Math.round(shiftY)}px`);
+}
+
+function scheduleTooltipClamp(tooltip) {
+  window.requestAnimationFrame(() => {
+    clampTooltipToViewport(tooltip);
+  });
+}
+
+function updateTooltipViewportBounds() {
+  document.querySelectorAll(".ui-tooltip").forEach((tooltip) => {
+    clampTooltipToViewport(tooltip);
+  });
+}
+
+function setupTooltipBounds() {
+  document.querySelectorAll(".ui-tooltip").forEach((tooltip) => {
+    if (tooltip.dataset.viewportBound === "true") return;
+    tooltip.dataset.viewportBound = "true";
+
+    const schedule = () => scheduleTooltipClamp(tooltip);
+    tooltip.addEventListener("focusin", schedule);
+    tooltip.addEventListener("mouseenter", schedule);
+    tooltip.addEventListener("click", schedule);
+    tooltip.addEventListener("touchend", schedule, { passive: true });
+  });
+
+  document.querySelectorAll(".modal-window-content").forEach((container) => {
+    if (container.dataset.tooltipScrollBound === "true") return;
+    container.dataset.tooltipScrollBound = "true";
+    container.addEventListener("scroll", updateTooltipViewportBounds, { passive: true });
+  });
+
+  updateTooltipViewportBounds();
+}
+
 let showModal;
 let hideModal;
 let placeModalAt;
@@ -131,6 +216,8 @@ const logoModalTimelines = new WeakMap();
 const modalManager = createModalManager({
   modals,
   gsap,
+  mobileBreakpoint: MOBILE_BREAKPOINT,
+  mobileViewportInset: MOBILE_VIEWPORT_INSET,
   onBeforeShow: () => {
     if (currentHoveredObject) {
       playHoverAnimation(currentHoveredObject, false);
@@ -166,6 +253,7 @@ const modalManager = createModalManager({
 
 modalManager.init();
 ({ showModal, hideModal, placeModalAt } = modalManager);
+setupTooltipBounds();
 
 document.querySelectorAll("[data-modal-target]").forEach((link) => {
   link.addEventListener("click", (e) => {
@@ -1916,7 +2004,7 @@ controls.target.set(
 annotationFeature = createAnnotationFeature({
   camera,
   maxVisible: 3,
-  getIsSuppressed: () => isLoading || hasVisibleModal(),
+  getIsSuppressed: () => isLoading || hasVisibleModal() || isMobileLayout(),
   getWheelTarget: () => renderer.domElement,
   annotations: [
     {
@@ -1983,6 +2071,9 @@ const baseShowModal = showModal;
 showModal = (modal) => {
   annotationFeature?.notifyModalShown(modal);
   baseShowModal(modal);
+  modal?.querySelectorAll(".ui-tooltip").forEach((tooltip) => {
+    scheduleTooltipClamp(tooltip);
+  });
 };
 
 // Event listeners
@@ -2003,6 +2094,8 @@ window.addEventListener("resize", ()=>{
     const rect = modal.getBoundingClientRect();
     placeModalAt(modal, rect.left, rect.top);
   });
+
+  updateTooltipViewportBounds();
 
   bookViewer?.renderIfOpen();
 })

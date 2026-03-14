@@ -2042,6 +2042,89 @@ b {
 }
 
 @media (max-width: 760px) {
+  .modal {
+    width: calc(100vw - 24px);
+    min-width: 0;
+    max-width: 420px;
+    max-height: calc(100dvh - 24px);
+    border-radius: 18px;
+  }
+
+  .modal-window-bar {
+    min-height: 58px;
+    padding: 12px 16px;
+    gap: 14px;
+    cursor: default;
+    touch-action: manipulation;
+  }
+
+  .modal-window-title {
+    gap: 8px;
+    font-size: 18px;
+  }
+
+  .modal-window-title-icon {
+    width: 34px;
+    height: 34px;
+    flex-basis: 34px;
+  }
+
+  .modal-exit-button {
+    width: 42px;
+    height: 42px;
+    font-size: 24px;
+    border-radius: 10px;
+  }
+
+  .modal-window-content {
+    padding: 18px 16px 20px;
+    max-height: calc(100dvh - 116px);
+  }
+
+  .modal--nowplaying .modal-window-content {
+    background: #f5f0e8;
+    border-radius: 0 0 15px 15px;
+  }
+
+  .modal--nowplaying .nowplaying-body {
+    border-radius: inherit;
+    overflow: hidden;
+  }
+
+  .modal--info {
+    width: calc(100vw - 24px);
+    min-width: 0;
+    max-width: 420px;
+  }
+
+  .modal-window-content--info {
+    width: 100%;
+    max-width: none;
+  }
+
+  .ui-tooltip-content {
+    left: 50%;
+    top: calc(100% + 10px);
+    bottom: auto;
+    transform: translate(
+      calc(-50% + var(--tooltip-shift-x, 0px)),
+      var(--tooltip-shift-y, 0px)
+    );
+    min-width: min(220px, calc(100vw - 24px));
+    max-width: calc(100vw - 24px);
+  }
+
+  .ui-tooltip--ribbon .ui-tooltip-content,
+  .modal--nowplaying .modal-window-title .ui-tooltip-content {
+    left: 50%;
+    top: calc(100% + 10px);
+    bottom: auto;
+    transform: translate(
+      calc(-50% + var(--tooltip-shift-x, 0px)),
+      var(--tooltip-shift-y, 0px)
+    );
+  }
+
   .about-banner {
     flex-direction: column;
   }
@@ -2150,9 +2233,89 @@ b {
   transform-origin: center center;
 }
 
+.loading-screen--dock {
+  --dock-width: min(calc(100vw - 24px), 352px);
+  --dock-height: 90px;
+  --dock-margin: 16px;
+  --dock-top: calc(100vh - var(--dock-margin) - (var(--dock-height) / 2));
+  display: grid;
+  place-items: center;
+  left: 50%;
+  top: var(--dock-top);
+  bottom: auto;
+  width: var(--dock-width);
+  height: var(--dock-height);
+  z-index: 9989;
+  transform: translate(-50%, -50%);
+  border-width: 4px;
+  border-radius: 999px;
+  overflow: hidden;
+  cursor: default;
+  touch-action: manipulation;
+  transform-origin: center center;
+  padding: 0 4px;
+}
+
 .loading-screen--fab .loading-logo {
   opacity: 0;
   pointer-events: none;
+}
+
+.loading-screen--dock .loading-logo {
+  display: none;
+}
+
+.fab-dock-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: calc(100% - 8px);
+  height: 100%;
+  gap: 0;
+  margin: 0 auto;
+  pointer-events: auto;
+}
+
+.fab-dock-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 72px;
+  width: 72px;
+  min-width: 72px;
+  max-width: 72px;
+  height: calc(var(--dock-height) - 12px);
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #4e4738;
+  cursor: pointer;
+  transition: background-color 0.16s ease, transform 0.16s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.fab-dock-button:hover,
+.fab-dock-button:focus-visible {
+  background: rgba(78, 71, 56, 0.08);
+  outline: none;
+}
+
+.fab-dock-button:active {
+  transform: translateY(1px);
+}
+
+.fab-dock-button-icon {
+  width: 60px;
+  height: 60px;
+  background: #4e4738;
+  -webkit-mask-image: var(--dock-icon);
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+  mask-image: var(--dock-icon);
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
 }
 
 .fab-mark {
