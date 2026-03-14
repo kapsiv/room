@@ -9,12 +9,26 @@ export function createModalManager({
   onShowLogo = null,
   onShowModelling = null,
   modalMargin = 16,
+  mobileBreakpoint = 760,
+  mobileViewportInset = 12,
   initialZIndex = 10000,
 }) {
   let modalZIndex = initialZIndex;
   let touchHappened = false;
 
+  function isMobileModalLayout() {
+    return window.matchMedia(`(max-width: ${mobileBreakpoint}px)`).matches;
+  }
+
   function clampModalPosition(modal, left, top) {
+    if (isMobileModalLayout()) {
+      const rect = modal.getBoundingClientRect();
+      return {
+        left: Math.max((window.innerWidth - rect.width) / 2, mobileViewportInset),
+        top: Math.max((window.innerHeight - rect.height) / 2, mobileViewportInset),
+      };
+    }
+
     const rect = modal.getBoundingClientRect();
     const maxLeft = Math.max(modalMargin, window.innerWidth - rect.width - modalMargin);
     const maxTop = Math.max(modalMargin, window.innerHeight - rect.height - modalMargin);
@@ -31,16 +45,50 @@ export function createModalManager({
   }
 
   function placeModalAt(modal, left, top) {
+    syncModalViewportConstraints(modal);
     const clamped = clampModalPosition(modal, left, top);
     modal.style.left = `${clamped.left}px`;
     modal.style.top = `${clamped.top}px`;
   }
 
   function centerModal(modal) {
+    syncModalViewportConstraints(modal);
     const rect = modal.getBoundingClientRect();
     const left = (window.innerWidth - rect.width) / 2;
     const top = (window.innerHeight - rect.height) / 2;
     placeModalAt(modal, left, top);
+  }
+
+  function clearModalViewportConstraints(modal) {
+    if (!modal) return;
+    modal.style.removeProperty("max-height");
+    const content = modal.querySelector(".modal-window-content");
+    content?.style.removeProperty("max-height");
+  }
+
+  function syncModalViewportConstraints(modal) {
+    if (!modal) return;
+
+    if (!isMobileModalLayout()) {
+      clearModalViewportConstraints(modal);
+      return;
+    }
+
+    const availableHeight = Math.max(220, window.innerHeight - mobileViewportInset * 2);
+    modal.style.maxHeight = `${availableHeight}px`;
+
+    const content = modal.querySelector(".modal-window-content");
+    if (!content) return;
+
+    content.style.removeProperty("max-height");
+
+    const chromeHeight = Array.from(modal.children).reduce((total, child) => {
+      if (child === content) return total;
+      return total + child.getBoundingClientRect().height;
+    }, 0);
+    const availableContentHeight = Math.max(120, availableHeight - chromeHeight - 6);
+
+    content.style.maxHeight = `${availableContentHeight}px`;
   }
 
   function setupModalTitleIcon(modal) {
@@ -71,6 +119,7 @@ export function createModalManager({
     };
 
     handle.addEventListener("pointerdown", (e) => {
+      if (isMobileModalLayout()) return;
       const isMouse = e.pointerType === "mouse";
       if (isMouse && e.button !== 0) return;
       if (e.target.closest(".modal-exit-button")) return;
@@ -112,18 +161,51 @@ export function createModalManager({
   function hideModal(modal) {
     if (!modal) return;
 
+    gsap.killTweensOf(modal);
+    if (isMobileModalLayout()) {
+      gsap.to(modal, {
+        opacity: 0,
+        scale: 0.94,
+        y: 18,
+        duration: 0.22,
+        ease: "power2.in",
+        onComplete: () => {
+          gsap.set(modal, { clearProps: "scale,y,transformOrigin" });
+          modal.style.display = "none";
+        },
+      });
+      return;
+    }
+
     gsap.to(modal, {
       opacity: 0,
       duration: 0.5,
       onComplete: () => {
+        gsap.set(modal, { clearProps: "scale,y,transformOrigin" });
         modal.style.display = "none";
       },
     });
   }
 
-  function hideAllModals() {
+  function hideModalImmediately(modal) {
+    if (!modal) return;
+    gsap.killTweensOf(modal);
+    gsap.set(modal, {
+      opacity: 0,
+      scale: 1,
+      y: 0,
+      clearProps: "scale,y,transformOrigin",
+    });
+    modal.style.display = "none";
+  }
+
+  function hideAllModals({ except = null, immediate = false } = {}) {
     Object.values(modals).forEach((modal) => {
-      if (!modal || modal.style.display === "none") return;
+      if (!modal || modal === except || modal.style.display === "none") return;
+      if (immediate) {
+        hideModalImmediately(modal);
+        return;
+      }
       hideModal(modal);
     });
   }
@@ -131,10 +213,17 @@ export function createModalManager({
   function showModal(modal) {
     if (!modal) return;
 
+    if (isMobileModalLayout()) {
+      hideAllModals({ except: modal, immediate: true });
+    }
+
     modal.style.display = "block";
     bringModalToFront(modal);
 
-    if (!modal.dataset.positioned) {
+    if (isMobileModalLayout()) {
+      centerModal(modal);
+      modal.dataset.positioned = "true";
+    } else if (!modal.dataset.positioned) {
       centerModal(modal);
       modal.dataset.positioned = "true";
     } else {
@@ -146,11 +235,28 @@ export function createModalManager({
       onBeforeShow();
     }
 
-    gsap.set(modal, { opacity: 0 });
-    gsap.to(modal, {
-      opacity: 1,
-      duration: 0.5,
-    });
+    gsap.killTweensOf(modal);
+    if (isMobileModalLayout()) {
+      gsap.set(modal, {
+        opacity: 0,
+        scale: 0.94,
+        y: 18,
+        transformOrigin: "50% 50%",
+      });
+      gsap.to(modal, {
+        opacity: 1,
+        scale: 1,
+        y: 0,
+        duration: 0.3,
+        ease: "back.out(1.5)",
+      });
+    } else {
+      gsap.set(modal, { opacity: 0, scale: 1, y: 0 });
+      gsap.to(modal, {
+        opacity: 1,
+        duration: 0.5,
+      });
+    }
 
     if (modal === modals.about && typeof onShowAbout === "function") {
       onShowAbout(modal, { showModal, hideModal });
