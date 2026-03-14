@@ -48,6 +48,7 @@ export function createAnnotationFeature({
   rootParent = document.body,
   maxVisible = 1,
   getIsSuppressed = () => false,
+  getWheelTarget = () => null,
 }) {
   const root = document.createElement("div");
   root.className = "annotation-overlay";
@@ -90,6 +91,35 @@ export function createAnnotationFeature({
     button.addEventListener("pointerdown", (event) => {
       event.stopPropagation();
     });
+
+    button.addEventListener(
+      "wheel",
+      (event) => {
+        const wheelTarget = getWheelTarget();
+        if (!wheelTarget) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        wheelTarget.dispatchEvent(
+          new WheelEvent("wheel", {
+            bubbles: true,
+            cancelable: true,
+            clientX: event.clientX,
+            clientY: event.clientY,
+            deltaMode: event.deltaMode,
+            deltaX: event.deltaX,
+            deltaY: event.deltaY,
+            deltaZ: event.deltaZ,
+            shiftKey: event.shiftKey,
+            ctrlKey: event.ctrlKey,
+            altKey: event.altKey,
+            metaKey: event.metaKey,
+          }),
+        );
+      },
+      { passive: false },
+    );
 
     button.addEventListener("click", (event) => {
       event.preventDefault();
