@@ -259,7 +259,7 @@ const normalizedGenreUmbrellaMap = Object.fromEntries(
 );
 
 export function createReflectivFeature({ gsap, modals, getShowModal }) {
-  const reflectivState = {
+const reflectivState = {
     range: "all",
     libraryMetric: "songs",
     libraryYearGenreFilter: "all",
@@ -274,7 +274,11 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
     daily: [],
     topArtists: [],
     topTags: [],
-  };
+};
+
+function isMobileLayout() {
+  return window.matchMedia("(max-width: 760px)").matches;
+}
 
   const reflectivChartState = {
     lineSeries: [],
@@ -1608,7 +1612,14 @@ export function createReflectivFeature({ gsap, modals, getShowModal }) {
     if (container && container.dataset.pieResetBound !== "true") {
       container.dataset.pieResetBound = "true";
       container.addEventListener("click", (event) => {
-        if (event.target.closest(".chart-open-button, .ui-tooltip")) return;
+        if (event.target.closest(".ui-tooltip")) return;
+        if (event.target.closest(".chart-open-button")) {
+          if (isMobileLayout()) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+          return;
+        }
         if (!reflectivState.libraryGenreFocus) return;
         reflectivState.libraryGenreFocus = null;
         if (cacheState.collection) renderMusicLibraryPanel(modal, cacheState.collection);

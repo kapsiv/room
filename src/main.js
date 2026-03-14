@@ -23,6 +23,7 @@ const LASTFM_API_KEY = "683650a829cee53959e8d505e8841726";
 const LASTFM_ENDPOINT = "https://ws.audioscrobbler.com/2.0/";
 const MOBILE_BREAKPOINT = 760;
 const MOBILE_VIEWPORT_INSET = 12;
+const MOBILE_LITE_LAUNCHER_IDS = ["info", "about", "logo", "faq"];
 
 async function fetchNowPlayingTrack() {
   const url = `${LASTFM_ENDPOINT}?method=user.getrecenttracks&user=${encodeURIComponent(LASTFM_USER)}&api_key=${LASTFM_API_KEY}&format=json&limit=1`;
@@ -51,6 +52,9 @@ if (import.meta.env.PROD) {
 }
 
 let isLoading = true;
+let selectedMobileExperienceMode = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`).matches ? null : "full";
+let mobileLiteModeActive = false;
+let roomModelLoadStarted = false;
 const manager = new THREE.LoadingManager();
 
 const loadingScreen = document.querySelector(".loading-screen");
@@ -60,8 +64,21 @@ const fabManager = createFabManager({
   getModals: () => modals,
   getShowModal: () => showModal,
   getNowPlayingTrack: fetchNowPlayingTrack,
+  onMobileModeSelect: (mode) => {
+    selectedMobileExperienceMode = mode;
+    if (mode === "lite") {
+      activateMobileLiteMode();
+      return;
+    }
+    fabManager.markAssetsPending();
+    loadRoomModel();
+  },
   onLoadingComplete: () => {
     isLoading = false;
+    if (selectedMobileExperienceMode === "lite") {
+      renderMobileLiteShell();
+      return;
+    }
     playIntroAnimation();
   },
 });
@@ -112,6 +129,60 @@ function hasVisibleModal() {
 
 function isMobileLayout() {
   return window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`).matches;
+}
+
+function renderMobileLiteShell() {
+  if (!mobileLiteModeActive) return;
+  const appRoot = document.querySelector("#app");
+  if (!appRoot || appRoot.dataset.mobileLiteShell === "true") return;
+
+  appRoot.dataset.mobileLiteShell = "true";
+  appRoot.innerHTML = `
+    <div class="mobile-lite-shell">
+      <div class="mobile-lite-watermark" aria-hidden="true">
+        <img src="/icons/logo.svg" alt="" />
+      </div>
+      <main class="mobile-lite-main">
+        <section class="mobile-lite-hero">
+          <p class="mobile-lite-eyebrow">mobile lite mode</p>
+          <h1>welcome to kapsiv.</h1>
+          <p class="mobile-lite-copy">use the dock or the cards below to open windows.</p>
+        </section>
+        <section class="mobile-lite-launcher">
+          <div class="mobile-lite-launcher-grid">
+            ${MOBILE_LITE_LAUNCHER_IDS.map((id) => {
+              const modal = modals[id];
+              const title = modal?.querySelector(".modal-window-title")?.textContent?.trim() || id;
+              const icon = modal?.dataset.modalIcon || "";
+              return `
+                <button class="mobile-lite-card" type="button" data-lite-modal="${id}">
+                  <span class="mobile-lite-card-icon" style="--mobile-lite-icon: url('${icon}')"></span>
+                  <span class="mobile-lite-card-title">${title}</span>
+                </button>
+              `;
+            }).join("")}
+          </div>
+        </section>
+      </main>
+    </div>
+  `;
+
+  appRoot.querySelectorAll("[data-lite-modal]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const modalKey = button.getAttribute("data-lite-modal") || "";
+      const modal = modals[modalKey];
+      if (!modal || !showModal) return;
+      showModal(modal);
+    });
+  });
+}
+
+function activateMobileLiteMode() {
+  if (mobileLiteModeActive) return;
+  mobileLiteModeActive = true;
+  document.body.classList.add("mobile-lite-mode");
+  controls && (controls.enabled = false);
+  renderMobileLiteShell();
 }
 
 function resetTooltipViewportPosition(tooltipContent) {
@@ -259,6 +330,7 @@ document.querySelectorAll("[data-modal-target]").forEach((link) => {
   link.addEventListener("click", (e) => {
     e.preventDefault();
     const modalKey = link.getAttribute("data-modal-target") || "";
+    if (isMobileLayout() && modalKey === "genreDistribution") return;
     const modal = modals[modalKey];
     if (!modal) return;
     showModal(modal);
@@ -315,7 +387,11 @@ function initInventoryModal() {
   if (!grid || !toggle) return;
 
   const items = Object.entries(modals)
-    .filter(([key, modal]) => modal && key !== "inventory")
+    .filter(([key, modal]) => {
+      if (!modal || key === "inventory") return false;
+      if (isMobileLayout() && key === "genreDistribution") return false;
+      return true;
+    })
     .map(([key, modal]) => ({
       key,
       modal,
@@ -722,17 +798,26 @@ function initBookViewer(modal) {
     const total = state.pdf?.numPages || null;
     const left = state.leftPage;
     const right = left + 1;
+    const isMobileBook = isMobileLayout();
 
     if (!state.isOpen) {
       statusEl.textContent = total ? `pages ${left}-${Math.min(right, total)} / ${total}` : "pages 1-2";
       openBtn.textContent = "open";
       openBtn.classList.remove("active");
+      openBtn.disabled = isMobileBook;
+      coverBtn.disabled = isMobileBook;
+      openBtn.setAttribute("aria-disabled", String(isMobileBook));
+      coverBtn.setAttribute("aria-disabled", String(isMobileBook));
       return;
     }
 
     statusEl.textContent = total ? `pages ${left}-${Math.min(right, total)} / ${total}` : `pages ${left}-${right}`;
     openBtn.textContent = "close";
     openBtn.classList.add("active");
+    openBtn.disabled = isMobileBook;
+    coverBtn.disabled = isMobileBook;
+    openBtn.setAttribute("aria-disabled", String(isMobileBook));
+    coverBtn.setAttribute("aria-disabled", String(isMobileBook));
   };
 
   const renderPdfPage = async (pdf, pageNum, canvas, emptyLabel) => {
@@ -795,6 +880,14 @@ function initBookViewer(modal) {
   };
 
   const setOpenState = (nextOpen) => {
+    if (isMobileLayout()) {
+      state.isOpen = false;
+      shell.classList.remove("is-open");
+      clearCanvas(leftCanvas);
+      clearCanvas(rightCanvas);
+      updateControls();
+      return;
+    }
     state.isOpen = Boolean(nextOpen);
     shell.classList.toggle("is-open", state.isOpen);
     updateControls();
@@ -842,6 +935,16 @@ function initBookViewer(modal) {
       updateControls();
     },
     renderIfOpen() {
+      if (isMobileLayout()) {
+        if (state.isOpen) {
+          state.isOpen = false;
+          shell.classList.remove("is-open");
+          clearCanvas(leftCanvas);
+          clearCanvas(rightCanvas);
+          updateControls();
+        }
+        return;
+      }
       if (!state.isOpen) return;
       void renderSpread();
     },
@@ -1547,6 +1650,12 @@ window.addEventListener("mousemove", (e) => {
 });
 
 window.addEventListener("touchstart", (e) => {
+  if (
+    e.target instanceof Element &&
+    e.target.closest("button, a, input, textarea, select, .modal, .loading-screen")
+  ) {
+    return;
+  }
   e.preventDefault();
   pointer.x = ( e.touches[0].clientX / window.innerWidth) * 2 - 1;
   pointer.y = -(e.touches[0].clientY / window.innerHeight) * 2 + 1;
@@ -1557,6 +1666,12 @@ window.addEventListener("touchstart", (e) => {
 );
 
 window.addEventListener("touchend", (e) => {
+  if (
+    e.target instanceof Element &&
+    e.target.closest("button, a, input, textarea, select, .modal, .loading-screen")
+  ) {
+    return;
+  }
   e.preventDefault();
   handleRaycasterInteraction();
   },
@@ -1564,7 +1679,7 @@ window.addEventListener("touchend", (e) => {
 );
 
 function handleRaycasterInteraction(e) {
-  if (e?.target?.closest?.(".modal")) return;
+  if (e?.target?.closest?.(".modal, .loading-screen")) return;
   if (currentIntersects.length === 0) return;
 
   const hitObject = currentIntersects[0].object;
@@ -1605,7 +1720,11 @@ function getHoverRoot(obj) {
 window.addEventListener("click", handleRaycasterInteraction);
 
 
-loader.load("/models/Room_Portfolio_V4.glb", (glb) => {
+function loadRoomModel() {
+  if (roomModelLoadStarted) return;
+  roomModelLoadStarted = true;
+
+  loader.load("/models/Room_Portfolio_V4.glb", (glb) => {
   let bluMesh = null;
   let guitarMesh = null;
   const guitarParts = [];
@@ -1861,7 +1980,14 @@ loader.load("/models/Room_Portfolio_V4.glb", (glb) => {
     annotationFeature?.registerTarget("guitar-feature", guitarAnnotationTarget);
     createDetachedHitboxForTarget(guitarGroup);
   }
-});
+
+    fabManager.markAssetsLoaded();
+  });
+}
+
+if (selectedMobileExperienceMode === "full") {
+  loadRoomModel();
+}
 
 function playIntroAnimation() {
   const basePopDuration = 0.6;
@@ -2098,6 +2224,10 @@ window.addEventListener("resize", ()=>{
   updateTooltipViewportBounds();
 
   bookViewer?.renderIfOpen();
+
+  if (mobileLiteModeActive) {
+    render();
+  }
 })
 
 function getHoverScaleMultiplier(name) {
@@ -2327,6 +2457,11 @@ const updateClockHands = () => {
 };
 
 const render = (timestamp = 0) => {
+  if (mobileLiteModeActive) {
+    renderer.render(scene, camera);
+    return;
+  }
+
   const elapsedTime = clock.getElapsedTime();
   steamMaterial.uniforms.uTime.value = elapsedTime;
   bluSleepZs?.update(timestamp);
