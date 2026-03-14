@@ -6,10 +6,13 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { getDocument, GlobalWorkerOptions } from "pdfjs-dist/build/pdf.mjs";
 import pdfWorkerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
+import steamVertexShader from "./shaders/steam/vertex.glsl?raw";
+import steamFragmentShader from "./shaders/steam/fragment.glsl?raw";
 
 import { OrbitControls } from './utils/OrbitControls.js';
 import { createAnnotationFeature } from './features/annotationFeature.js';
 import { createReflectivFeature } from './features/reflectivFeature.js';
+import { createSleepZsFeature } from './features/sleepZsFeature.js';
 import { createModalManager } from './ui/modalManager.js';
 import { createFabManager } from './ui/fabManager.js';
 
@@ -911,6 +914,8 @@ let pointerClientY = null;
 let vinylAnnotationTarget = null;
 let guitarAnnotationTarget = null;
 let rugAnnotationTarget = null;
+const mugSteamAnchor = new THREE.Vector3();
+let bluSleepZs = null;
 
 function isPointerOverModal() {
   if (pointerClientX === null || pointerClientY === null) return false;
@@ -1030,6 +1035,34 @@ Object.entries(textureMap).forEach(([key, paths])=>{
   dayTexture.needsUpdate = true;
   loadedTextures.day[key] = dayTexture;
 });
+
+const steamGeometry = new THREE.PlaneGeometry(1, 1, 16, 64);
+steamGeometry.translate(0, 0.5, 0);
+steamGeometry.scale(0.3, 1.65, 0.28);
+
+const perlinTexture = textureLoader.load("/images/perlin.png");
+perlinTexture.wrapS = THREE.RepeatWrapping;
+perlinTexture.wrapT = THREE.RepeatWrapping;
+perlinTexture.minFilter = THREE.LinearFilter;
+perlinTexture.magFilter = THREE.LinearFilter;
+perlinTexture.generateMipmaps = false;
+perlinTexture.needsUpdate = true;
+
+const steamMaterial = new THREE.ShaderMaterial({
+  vertexShader: steamVertexShader,
+  fragmentShader: steamFragmentShader,
+  uniforms: {
+    uTime: new THREE.Uniform(0),
+    uPerlinTexture: new THREE.Uniform(perlinTexture),
+  },
+  side: THREE.DoubleSide,
+  transparent: true,
+  depthWrite: false,
+});
+
+const steam = new THREE.Mesh(steamGeometry, steamMaterial);
+steam.visible = false;
+steam.renderOrder = 3;
 
 function createWarmTextureMaterial(map) {
   const material = new THREE.MeshBasicMaterial({ map });
@@ -1297,8 +1330,7 @@ function toTerminalLabel(rawName) {
 
 const hoverMessages = {
   guitar: [
-    "classical guitar repertoire",
-    "hover over strings to play",
+    "repertoire",
   ],
   vinyl: [
     "kaps' music data",
@@ -1314,8 +1346,7 @@ const hoverMessages = {
     "archive",
   ],
   marimo: [
-    "bob the marimo",
-    "marimo stil alive",
+    "marimo",
   ],
   otamatone: [
     "the coltrane of otamatone",
@@ -1324,12 +1355,8 @@ const hoverMessages = {
   ],
   amp: [
     "vox av15",
-    "treble at 0",
-    "slight reverb",
   ],
   mug: [
-    "tea, milk no sugar",
-    "caution, contents hot",
     "wide-bottom mug",
   ],
   plant: [
@@ -1491,8 +1518,10 @@ window.addEventListener("click", handleRaycasterInteraction);
 
 
 loader.load("/models/Room_Portfolio_V4.glb", (glb) => {
+  let bluMesh = null;
   let guitarMesh = null;
   const guitarParts = [];
+  let mugMesh = null;
 
   glb.scene.traverse((child) => {
     if (child.isMesh) {
@@ -1539,6 +1568,14 @@ loader.load("/models/Room_Portfolio_V4.glb", (glb) => {
 
       if (child.name.includes("Rug")) {
         rugAnnotationTarget = rugAnnotationTarget || child;
+      }
+
+      if (child.name.includes("Blu_Body_First_Hover")) {
+        bluMesh = child;
+      }
+
+      if (child.name.includes("Mug_First_Hover")) {
+        mugMesh = child;
       }
 
       const raycasterNameTags = [
@@ -1682,7 +1719,26 @@ loader.load("/models/Room_Portfolio_V4.glb", (glb) => {
       }
     }
   });
+
   scene.add(glb.scene);
+  glb.scene.updateWorldMatrix(true, true);
+
+  if (bluMesh) {
+    bluSleepZs = createSleepZsFeature({
+      scene,
+      target: bluMesh,
+    });
+  }
+
+  if (mugMesh) {
+    mugMesh.getWorldPosition(mugSteamAnchor);
+    steam.position.set(
+      mugSteamAnchor.x,
+      mugSteamAnchor.y + 0.5,
+      mugSteamAnchor.z
+    );
+    steam.visible = true;
+  }
 
   if (vinylAnnotationTarget) {
     annotationFeature?.registerTarget("vinyl-reflectiv", vinylAnnotationTarget);
@@ -1822,6 +1878,7 @@ const camera = new THREE.PerspectiveCamera(
   sizes.width / sizes.height,
   0.1, 1000
 );
+const clock = new THREE.Clock();
 
 camera.position.set(
   -38.44019158594338,
@@ -1830,6 +1887,7 @@ camera.position.set(
 );
 
 scene.background = new THREE.Color("#e7ddcd");
+scene.add(steam);
 
 const renderer = new THREE.WebGLRenderer({canvas:canvas, antialias: true });
 renderer.setSize(sizes.width , sizes.height);
@@ -1859,10 +1917,11 @@ annotationFeature = createAnnotationFeature({
   camera,
   maxVisible: 3,
   getIsSuppressed: () => isLoading || hasVisibleModal(),
+  getWheelTarget: () => renderer.domElement,
   annotations: [
     {
       id: "vinyl-reflectiv",
-      body: "click the vinyl!",
+      body: "music habits",
       ariaLabel: "Open the music annotation",
       modal: modals.reflectiv,
       preferredSide: "left",
@@ -1983,9 +2042,14 @@ function playHoverAnimation (object, isHovering) {
 
   const isButton = typeof target.name === "string" && target.name.includes("Button");
   const isLogo = typeof target.name === "string" && target.name.includes("Logo");
+  const isMug = typeof target.name === "string" && target.name.includes("Mug");
 
   const isGuitar = target.name === "Guitar_HoverGroup";
   const canRotate = target.name.includes("Otamatone") || isGuitar;
+
+  if (isMug) {
+    gsap.killTweensOf(steam.scale);
+  }
 
   if (canRotate) {
     if (isGuitar) {
@@ -2028,6 +2092,16 @@ function playHoverAnimation (object, isHovering) {
           y: target.userData.initialPosition.y + 0.32,
           duration: 0.35,
           ease: "power2.out",
+        });
+      }
+
+      if (isMug) {
+        gsap.to(steam.scale, {
+          x: 1.35,
+          y: 1.35,
+          z: 1.35,
+          duration: 0.5,
+          ease: "back.out(2)",
         });
       }
     }
@@ -2076,6 +2150,16 @@ function playHoverAnimation (object, isHovering) {
       duration: 0.22,
       ease: "power2.out",
     });
+
+    if (isMug) {
+      gsap.to(steam.scale, {
+        x: 1,
+        y: 1,
+        z: 1,
+        duration: 0.3,
+        ease: "back.out(2)",
+      });
+    }
 
     if (canRotate) {
       if (isGuitar) {
@@ -2150,6 +2234,10 @@ const updateClockHands = () => {
 };
 
 const render = (timestamp = 0) => {
+  const elapsedTime = clock.getElapsedTime();
+  steamMaterial.uniforms.uTime.value = elapsedTime;
+  bluSleepZs?.update(timestamp);
+
   updateTerminalTyping(timestamp);
   controls.update();
   updateClockHands();
