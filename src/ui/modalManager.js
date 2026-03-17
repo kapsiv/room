@@ -182,7 +182,10 @@ export function createModalManager({
 
     gsap.to(modal, {
       opacity: 0,
-      duration: 0.5,
+      scale: 0.9,
+      y: 22,
+      duration: 0.24,
+      ease: "power2.in",
       onComplete: () => {
         gsap.set(modal, { clearProps: "scale,y,transformOrigin" });
         modal.style.display = "none";
@@ -254,10 +257,18 @@ export function createModalManager({
         ease: "back.out(1.5)",
       });
     } else {
-      gsap.set(modal, { opacity: 0, scale: 1, y: 0 });
+      gsap.set(modal, {
+        opacity: 0,
+        scale: 0.9,
+        y: 22,
+        transformOrigin: "50% 50%",
+      });
       gsap.to(modal, {
         opacity: 1,
-        duration: 0.5,
+        scale: 1,
+        y: 0,
+        duration: 0.3,
+        ease: "back.out(1.45)",
       });
     }
 

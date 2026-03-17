@@ -1427,12 +1427,13 @@ b {
 .rnw-slider-thumb {
   position: absolute;
   top: 50%;
-  left: 6px;
+  left: 10px;
   z-index: 2;
-  max-width: calc(100% - 12px);
+  max-width: calc(100% - 20px);
   border: 2px solid rgba(78, 71, 56, 0.86);
   border-radius: 10px;
   background: vars.$base-beige;
+  box-sizing: border-box;
   padding: 8px 10px;
   display: inline-flex;
   align-items: center;

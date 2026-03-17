@@ -3,7 +3,7 @@ const OPEN_FAB_VISUAL_SCALE = 1.32;
 const MOBILE_BREAKPOINT = 760;
 const MOBILE_DOCK_ITEMS = [
   { name: "about", modalKey: "about", icon: "/icons/about.svg" },
-  { name: "info", modalKey: "info", icon: "/icons/info.svg" },
+  { name: "now playing", modalKey: "nowplaying", icon: "/icons/music.svg" },
   { name: "inventory", modalKey: "inventory", icon: "/icons/box.svg" },
   { name: "reflectiv", modalKey: "reflectiv", icon: "/icons/reflectIV.svg" },
 ];
