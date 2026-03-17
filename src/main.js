@@ -23,7 +23,7 @@ const LASTFM_API_KEY = "683650a829cee53959e8d505e8841726";
 const LASTFM_ENDPOINT = "https://ws.audioscrobbler.com/2.0/";
 const MOBILE_BREAKPOINT = 760;
 const MOBILE_VIEWPORT_INSET = 12;
-const MOBILE_LITE_LAUNCHER_IDS = ["info", "about", "logo", "faq"];
+const MOBILE_LITE_LAUNCHER_IDS = ["reflectiv", "about", "logo", "faq"];
 
 async function fetchNowPlayingTrack() {
   const url = `${LASTFM_ENDPOINT}?method=user.getrecenttracks&user=${encodeURIComponent(LASTFM_USER)}&api_key=${LASTFM_API_KEY}&format=json&limit=1`;
@@ -146,7 +146,8 @@ function renderMobileLiteShell() {
         <section class="mobile-lite-hero">
           <p class="mobile-lite-eyebrow">mobile lite mode</p>
           <h1>welcome to kapsiv.</h1>
-          <p class="mobile-lite-copy">use the dock or the cards below to open windows.</p>
+          <p class="mobile-lite-copy">i originally designed this website for desktop (because phone = bad) so this is my compromise...</p>
+          <p class="mobile-lite-copy">open the inventory for a list of all applications.</p>
         </section>
         <section class="mobile-lite-launcher">
           <div class="mobile-lite-launcher-grid">
@@ -267,6 +268,7 @@ function setupTooltipBounds() {
 let showModal;
 let hideModal;
 let placeModalAt;
+let centerModal;
 let controls;
 let annotationFeature = null;
 
@@ -309,7 +311,17 @@ const modalManager = createModalManager({
     }
   },
   onShowNowPlaying: (modal) => {
-    initNowPlayingModal(modal);
+    Promise.resolve(initNowPlayingModal(modal)).finally(() => {
+      if (!isMobileLayout() || typeof centerModal !== "function" || modal?.style.display !== "block") return;
+      requestAnimationFrame(() => {
+        if (modal?.style.display !== "block") return;
+        centerModal(modal);
+        requestAnimationFrame(() => {
+          if (modal?.style.display !== "block") return;
+          centerModal(modal);
+        });
+      });
+    });
   },
   onShowReflectiv: (modal) => {
     initReflectivModal(modal);
@@ -323,7 +335,7 @@ const modalManager = createModalManager({
 });
 
 modalManager.init();
-({ showModal, hideModal, placeModalAt } = modalManager);
+({ showModal, hideModal, placeModalAt, centerModal } = modalManager);
 setupTooltipBounds();
 
 document.querySelectorAll("[data-modal-target]").forEach((link) => {
@@ -1066,6 +1078,7 @@ let bookBlue,
   bookYellow,
   bookOrange,
   bookPurple,
+  bluRevealMesh,
   bookBrown,
   bookRed,
   logo1,
@@ -1116,7 +1129,10 @@ function isPointerOverModal() {
 
 function createDetachedHitboxForTarget(target, options = {}) {
   if (!target?.isMesh || !target.geometry) return null;
-  const { followTargetTransform = false } = options;
+  const {
+    followTargetTransform = false,
+    worldOffset = null,
+  } = options;
 
   target.updateWorldMatrix(true, false);
   const worldPosition = new THREE.Vector3();
@@ -1137,6 +1153,9 @@ function createDetachedHitboxForTarget(target, options = {}) {
 
   hitbox.name = target.name;
   hitbox.position.copy(worldPosition);
+  if (worldOffset) {
+    hitbox.position.add(worldOffset);
+  }
   hitbox.quaternion.copy(worldQuaternion);
   hitbox.scale.copy(worldScale);
   hitbox.userData.isRaycastHitbox = true;
@@ -1146,7 +1165,7 @@ function createDetachedHitboxForTarget(target, options = {}) {
   raycasterObjects.push(hitbox);
 
   if (followTargetTransform) {
-    raycastHitboxesFollowingTarget.push({ hitbox, target });
+    raycastHitboxesFollowingTarget.push({ hitbox, target, worldOffset });
   }
 
   return hitbox;
@@ -1159,11 +1178,14 @@ function syncFollowingRaycastHitboxes() {
   const worldQuaternion = new THREE.Quaternion();
   const worldScale = new THREE.Vector3();
 
-  raycastHitboxesFollowingTarget.forEach(({ hitbox, target }) => {
+  raycastHitboxesFollowingTarget.forEach(({ hitbox, target, worldOffset }) => {
     if (!hitbox || !target) return;
     target.updateWorldMatrix(true, false);
     target.matrixWorld.decompose(worldPosition, worldQuaternion, worldScale);
     hitbox.position.copy(worldPosition);
+    if (worldOffset) {
+      hitbox.position.add(worldOffset);
+    }
     hitbox.quaternion.copy(worldQuaternion);
     hitbox.scale.copy(worldScale);
     hitbox.updateMatrixWorld(true);
@@ -1779,6 +1801,9 @@ function loadRoomModel() {
 
       if (child.name.includes("Blu_Body_First_Hover")) {
         bluMesh = child;
+        bluRevealMesh = child;
+        child.userData.initialScale = new THREE.Vector3().copy(child.scale);
+        child.scale.set(0, 0, 0);
       }
 
       if (child.name.includes("Mug_First_Hover")) {
@@ -1796,14 +1821,18 @@ function loadRoomModel() {
       ];
       if (raycasterNameTags.some((tag) => child.name.includes(tag)) || child.name.includes("Photo_Frame")) {
         createDetachedHitboxForTarget(child, {
-          followTargetTransform: getGuitarStringIndex(child) !== null,
+          followTargetTransform:
+            getGuitarStringIndex(child) !== null || child.name.includes("Blu_Body_First_Hover"),
+          worldOffset: child.name.includes("Blu_Body_First_Hover")
+            ? new THREE.Vector3(0, 0.22, 0)
+            : null,
         });
       }
 
       if (child.name.includes("Hover")) {
-        child.userData.initialScale = new THREE.Vector3().copy(child.scale);
-        child.userData.initialPosition = new THREE.Vector3().copy(child.position);
-        child.userData.initialRotation = new THREE.Vector3().copy(child.rotation);
+        child.userData.initialScale ||= new THREE.Vector3().copy(child.scale);
+        child.userData.initialPosition ||= new THREE.Vector3().copy(child.position);
+        child.userData.initialRotation ||= new THREE.Vector3().copy(child.rotation);
       }
 
       if (child.name.includes("Book_Blue")) {
@@ -2047,7 +2076,7 @@ function playIntroAnimation() {
   // intro sequences
   master.add(
     addSequence(
-      [bookBlue, bookGreen, bookYellow, bookOrange, bookPurple, bookBrown, bookRed],
+      [bluRevealMesh, bookBlue, bookGreen, bookYellow, bookOrange, bookPurple, bookBrown, bookRed],
       { startOffset: 0.0, speedMultiplier: 1.0 }
     ),
     0

@@ -2380,6 +2380,7 @@ function isMobileLayout() {
     const thumb = modal.querySelector(".rnw-slider-thumb");
     if (!track || !thumb) return;
 
+    const THUMB_EDGE_GUTTER = 10;
     const state = { x: 0 };
     let activePointerId = null;
     let startX = 0;
@@ -2392,7 +2393,7 @@ function isMobileLayout() {
     };
 
     const recalc = () => {
-      maxOffset = Math.max(0, track.clientWidth - thumb.offsetWidth - 12);
+      maxOffset = Math.max(0, track.clientWidth - thumb.offsetWidth - THUMB_EDGE_GUTTER * 2);
       setOffset(state.x);
     };
 
