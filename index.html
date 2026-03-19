@@ -746,13 +746,16 @@
       </div>
     </div>
 
-    <div class="data-pipelines modal" data-modal-icon="/icons/data_pipelines.svg" role="dialog" aria-modal="true" aria-labelledby="window-title-data-pipelines">
+    <div class="data-pipelines modal modal--pipeline" data-modal-icon="/icons/data_pipelines.svg" role="dialog" aria-modal="true" aria-labelledby="window-title-data-pipelines">
       <div class="modal-window-bar">
         <div id="window-title-data-pipelines" class="modal-window-title">data pipelines</div>
         <button class="modal-exit-button" type="button" aria-label="Close window">X</button>
       </div>
-      <div class="modal-window-content modal-window-content--offwhite">
-        <p>data pipelines content coming soon.</p>
+      <div class="modal-window-content modal-window-content--offwhite modal-window-content--pipeline">
+        <p class="data-pipeline-caption">my current data pipeline set up for this website and associated utilities. scheduled batches are run daily at 6am using vercel cron jobs.</p>
+        <div class="data-pipeline-frame">
+          <div class="data-pipeline-diagram" data-inline-svg="data-pipeline"></div>
+        </div>
       </div>
     </div>
 
