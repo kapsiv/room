@@ -8,6 +8,7 @@ import { getDocument, GlobalWorkerOptions } from "pdfjs-dist/build/pdf.mjs";
 import pdfWorkerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
 import steamVertexShader from "./shaders/steam/vertex.glsl?raw";
 import steamFragmentShader from "./shaders/steam/fragment.glsl?raw";
+import dataPipelineDiagramSvg from "./assets/data-pipeline-diagram.svg?raw";
 
 import { OrbitControls } from './utils/OrbitControls.js';
 import { createAnnotationFeature } from './features/annotationFeature.js';
@@ -24,6 +25,18 @@ const LASTFM_ENDPOINT = "https://ws.audioscrobbler.com/2.0/";
 const MOBILE_BREAKPOINT = 760;
 const MOBILE_VIEWPORT_INSET = 12;
 const MOBILE_LITE_LAUNCHER_IDS = ["reflectiv", "about", "logo", "faq"];
+const DATA_PIPELINE_HOVER_TARGET_IDS = [
+  "github_repo",
+  "scrobbler",
+  "music_player",
+  "blob_storage",
+  "health_app",
+  "website",
+  "computer",
+  "phone",
+  "last.fm",
+  "smartwatch",
+];
 
 async function fetchNowPlayingTrack() {
   const url = `${LASTFM_ENDPOINT}?method=user.getrecenttracks&user=${encodeURIComponent(LASTFM_USER)}&api_key=${LASTFM_API_KEY}&format=json&limit=1`;
@@ -122,6 +135,34 @@ const modals = {
   informativ: document.querySelector(".modal.informativ"),
   book: document.querySelector(".modal.book"),
 };
+
+function initDataPipelinesDiagram() {
+  const mount = modals.dataPipelines?.querySelector("[data-inline-svg='data-pipeline']");
+  if (!mount || mount.dataset.svgMounted === "true") return;
+
+  const cleanedSvg = dataPipelineDiagramSvg.replace(/<\?xml[\s\S]*?\?>\s*/u, "").trim();
+  const parsedSvg = new DOMParser().parseFromString(cleanedSvg, "image/svg+xml").documentElement;
+
+  if (!parsedSvg || parsedSvg.nodeName.toLowerCase() !== "svg") return;
+
+  const svg = document.importNode(parsedSvg, true);
+  svg.classList.add("data-pipeline-svg");
+  svg.setAttribute("role", "img");
+  svg.setAttribute(
+    "aria-label",
+    "Animated data pipeline diagram showing data movement between sources, caches, storage, and kapsiv.com.",
+  );
+  svg.setAttribute("focusable", "false");
+
+  DATA_PIPELINE_HOVER_TARGET_IDS.forEach((id) => {
+    const target = svg.querySelector(`#${CSS.escape(id)}`);
+    if (!target) return;
+    target.classList.add("data-pipeline-hover-target");
+  });
+
+  mount.replaceChildren(svg);
+  mount.dataset.svgMounted = "true";
+}
 
 function hasVisibleModal() {
   return Object.values(modals).some((modal) => modal && modal.style.display === "block");
@@ -336,6 +377,7 @@ const modalManager = createModalManager({
 
 modalManager.init();
 ({ showModal, hideModal, placeModalAt, centerModal } = modalManager);
+initDataPipelinesDiagram();
 setupTooltipBounds();
 
 document.querySelectorAll("[data-modal-target]").forEach((link) => {
