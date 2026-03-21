@@ -893,6 +893,94 @@
       </div>
     </div>
 
+    <div class="marimo modal modal--marimo" data-modal-icon="/icons/teardrop.svg" role="dialog" aria-modal="true" aria-labelledby="window-title-marimo">
+      <div class="modal-window-bar">
+        <div id="window-title-marimo" class="modal-window-title">
+          marimo
+          <span class="ui-tooltip">
+            <span class="ui-tooltip-trigger" aria-label="Marimo stats note" tabindex="0">i</span>
+            <span class="ui-tooltip-content" role="tooltip">these are not real stats :(</span>
+          </span>
+        </div>
+        <button class="modal-exit-button" type="button" aria-label="Close window">X</button>
+      </div>
+      <div class="modal-window-content modal-window-content--marimo">
+        <div class="marimo-water-scene" aria-hidden="true">
+          <div class="marimo-tank-water">
+            <div class="marimo-water-surface marimo-water-surface--back"></div>
+            <div class="marimo-water-surface marimo-water-surface--front"></div>
+            <div class="marimo-water-caustics"></div>
+            <span class="marimo-bubble marimo-bubble--1"></span>
+            <span class="marimo-bubble marimo-bubble--2"></span>
+            <span class="marimo-bubble marimo-bubble--3"></span>
+            <span class="marimo-bubble marimo-bubble--4"></span>
+            <div class="marimo-ball">
+              <svg
+                class="marimo-face marimo-face--idle"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 403 130.93"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <circle cx="54.67" cy="54.67" r="54.67" fill="#bde7fb"/>
+                <circle cx="51.24" cy="65.93" r="29.17" fill="#131618"/>
+                <circle cx="348.32" cy="76.26" r="54.67" fill="#bde7fb"/>
+                <circle cx="347.21" cy="93.02" r="29.17" fill="#131618"/>
+              </svg>
+              <svg
+                class="marimo-face marimo-face--drag"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 430.07 194.88"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <circle cx="70.82" cy="105.9" r="54.67" fill="#bde7fb"/>
+                <circle cx="67.39" cy="117.16" r="29.17" fill="#131618"/>
+                <circle cx="364.47" cy="127.48" r="54.67" fill="#bde7fb"/>
+                <circle cx="363.35" cy="144.24" r="29.17" fill="#131618"/>
+                <g>
+                  <path fill="#0f2315" d="M177.49 164.28c3.36-9.59 14.61-13.68 24.03-14.68 12.72-1.47 26.69 1.96 35.95 11.29 6.16 5.84 12.41 17.2 2.95 22.8-6.58 3.7-15 3.71-22.46 3.68-12.17-.36-26.2-1.35-35.98-9.56-3.9-3.44-6.1-8.42-4.53-13.41l.03-.11Z"/>
+                  <path fill="#122417" d="M184.73 166.27c3.58-9.06 18.43-10.05 26.48-9.34 9.83.87 21.64 6.13 25.83 15.77 2.1 4.83-1.96 5.62-6.23 6.47-6.08 1.21-12.65.81-18.8.44s-11.94-1.06-17.53-3.17c-3.82-1.44-11.39-4.92-9.75-10.17 2.87-9.24-11.6-13.19-14.46-3.99-5.04 16.2 12.01 26.93 25.34 30.13 7.04 1.69 14.41 2.25 21.64 2.42 8.08.19 16.53-.08 24.05-3.31 14.57-6.26 13.28-21.65 4.63-32.46-9.05-11.32-23.45-17.01-37.71-17.29-15.35-.3-31.92 5.27-37.95 20.5-1.5 3.79 1.65 8.2 5.24 9.23 4.25 1.22 7.74-1.49 9.23-5.24Z"/>
+                </g>
+                <path fill="#122417" d="M14.07 52.57c6.87-8.93 17.44-14.5 26.91-20.21 10.59-6.39 21.33-12.75 32.78-17.49 3.73-1.54 6.43-4.98 5.24-9.23-.99-3.53-5.45-6.8-9.23-5.24-13.27 5.5-25.64 12.53-37.92 19.95-11.46 6.93-22.47 13.9-30.73 24.65-2.49 3.24-.47 8.37 2.69 10.26 3.84 2.3 7.81.5 10.26-2.69Z"/>
+                <path fill="#122417" d="M426.53 62.27c-25.64-15.93-50.85-32.55-75.61-49.82-7.93-5.54-15.44 7.46-7.57 12.95 24.76 17.28 49.97 33.89 75.61 49.82 8.22 5.11 15.76-7.86 7.57-12.95Z"/>
+              </svg>
+              <span class="marimo-ball-fuzz marimo-ball-fuzz--1"></span>
+              <span class="marimo-ball-fuzz marimo-ball-fuzz--2"></span>
+              <span class="marimo-ball-fuzz marimo-ball-fuzz--3"></span>
+            </div>
+          </div>
+          <div class="marimo-speech" role="status" aria-live="polite">
+            <span class="marimo-speech-text"></span>
+          </div>
+          <div class="marimo-tank-floor"></div>
+          <div class="marimo-tank-gloss"></div>
+        </div>
+        <div class="marimo-stats" aria-label="Marimo habitat stats">
+          <div class="marimo-stat">
+            <span class="marimo-stat-label">O2 level</span>
+            <span class="marimo-stat-value">96%</span>
+            <span class="marimo-stat-meter"><span class="marimo-stat-fill marimo-stat-fill--oxygen"></span></span>
+          </div>
+          <div class="marimo-stat">
+            <span class="marimo-stat-label">pH level</span>
+            <span class="marimo-stat-value">7.4</span>
+            <span class="marimo-stat-meter"><span class="marimo-stat-fill marimo-stat-fill--ph"></span></span>
+          </div>
+          <div class="marimo-stat">
+            <span class="marimo-stat-label">temperature</span>
+            <span class="marimo-stat-value">18.2C</span>
+            <span class="marimo-stat-meter"><span class="marimo-stat-fill marimo-stat-fill--temp"></span></span>
+          </div>
+          <div class="marimo-stat">
+            <span class="marimo-stat-label">solar energy</span>
+            <span class="marimo-stat-value">71%</span>
+            <span class="marimo-stat-meter"><span class="marimo-stat-fill marimo-stat-fill--solar"></span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="inventory modal modal--inventory" data-modal-icon="/icons/box.svg" role="dialog" aria-modal="true" aria-labelledby="window-title-inventory">
       <div class="modal-window-bar">
         <div id="window-title-inventory" class="modal-window-title">inventory</div>
@@ -933,7 +1021,7 @@
           </div>
           <div class="faq-item">
             <p class="faq-question">what's the floating green blob?</p>
-            <p class="faq-answer">marimo!</p>
+            <p class="faq-answer"><a href="#" data-modal-target="marimo">marimo!</a></p>
           </div>
           <div class="faq-item">
             <p class="faq-question">why the name "kapsiv"?</p>

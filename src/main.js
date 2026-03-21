@@ -124,6 +124,7 @@ const modals = {
   vinaflow: document.querySelector(".modal.vinaflow"),
   links: document.querySelector(".modal.links"),
   food: document.querySelector(".modal.food"),
+  marimo: document.querySelector(".modal.marimo"),
   inventory: document.querySelector(".modal.inventory"),
   genreDistribution: document.querySelector(".modal.genre-distribution"),
   albumsByYear: document.querySelector(".modal.albums-by-year"),
@@ -410,7 +411,7 @@ const INVENTORY_CATEGORY_DEFS = [
   { key: "P", label: "profession", items: ["cv", "archive", "dataPipelines", "utilities", "vinaflow"] },
   { key: "S", label: "social", items: ["blu", "calendar", "gallery", "links"] },
   { key: "I", label: "introspection", items: ["about", "nowplaying", "reflectiv"] },
-  { key: "V", label: "vitality", items: ["informativ", "food"] },
+  { key: "V", label: "vitality", items: ["informativ", "food", "marimo"] },
 ];
 
 function escapeHtml(value) {
@@ -514,6 +515,293 @@ function initInventoryModal() {
 }
 
 initInventoryModal();
+
+function initMarimoModal() {
+  const modal = modals.marimo;
+  const water = modal?.querySelector(".marimo-tank-water");
+  const ball = modal?.querySelector(".marimo-ball");
+  const speechBubble = modal?.querySelector(".marimo-speech");
+  const speechBubbleText = speechBubble?.querySelector(".marimo-speech-text");
+
+  if (!modal || !water || !ball || !speechBubble || !speechBubbleText || ball.dataset.interactive === "true") return;
+
+  ball.dataset.interactive = "true";
+
+  const releaseMessages = [
+    "why am i still alive",
+    "i can't swim",
+    "release me",
+    "why does this room only have 2 walls lol",
+    "wish i had ears so i could hear that music behind me",
+    "you'll float too",
+    "don't poke the glass",
+    "...",
+    "help i am under the water",
+    "let me out",
+    "the cats gonna eat me",
+  ];
+
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const state = {
+    initialized: false,
+    x: 0,
+    y: 0,
+    scale: 1,
+    lastMessageIndex: -1,
+    hovering: false,
+    dragging: false,
+    pointerId: null,
+    pointerOffsetX: 0,
+    pointerOffsetY: 0,
+    settleTween: null,
+    bubbleTween: null,
+  };
+
+  const clampValue = (value, min, max) => Math.min(Math.max(value, min), max);
+
+  function getMetrics() {
+    const waterRect = water.getBoundingClientRect();
+    if (!waterRect.width || !waterRect.height) return null;
+
+    const ballSize = ball.offsetWidth || Math.min(waterRect.width, waterRect.height) * 0.24;
+    const radius = ballSize / 2;
+    const groundHeight = waterRect.height * 0.13;
+    const minX = radius + 4;
+    const maxX = Math.max(minX, waterRect.width - radius - 4);
+    const minY = radius + 8;
+    const maxY = Math.max(minY, waterRect.height - groundHeight - radius - 6);
+    const settleY = clampValue(waterRect.height * 0.52, minY, maxY);
+
+    return {
+      waterRect,
+      minX,
+      maxX,
+      minY,
+      maxY,
+      settleY,
+    };
+  }
+
+  function syncBallState() {
+    const metrics = getMetrics();
+    if (!metrics) return null;
+
+    if (!state.initialized) {
+      state.x = metrics.waterRect.width / 2;
+      state.y = metrics.settleY;
+      state.scale = 1;
+      state.initialized = true;
+      return metrics;
+    }
+
+    state.x = clampValue(state.x, metrics.minX, metrics.maxX);
+
+    if (!state.dragging && !state.settleTween) {
+      state.y = metrics.settleY;
+    } else {
+      state.y = clampValue(state.y, metrics.minY, metrics.maxY);
+    }
+
+    return metrics;
+  }
+
+  function applyBallTransform(timestamp) {
+    if (!state.initialized) return;
+
+    const bobOffset =
+      prefersReducedMotion.matches || state.dragging
+        ? 0
+        : Math.sin(timestamp * 0.003) * 7;
+    const targetScale = state.dragging ? 1.14 : state.hovering ? 1.1 : 1;
+    const easeFactor = state.dragging ? 0.28 : 0.16;
+    state.scale += (targetScale - state.scale) * easeFactor;
+
+    ball.style.left = `${state.x}px`;
+    ball.style.top = `${state.y}px`;
+    ball.style.transform = `translate(-50%, -50%) translateY(${bobOffset}px) scale(${state.scale})`;
+  }
+
+  function applySpeechBubblePosition() {
+    if (!state.initialized) return;
+
+    const bubbleWidth = speechBubble.offsetWidth || 160;
+    const bubbleHeight = speechBubble.offsetHeight || 44;
+    const waterWidth = water.offsetWidth || 0;
+    const waterHeight = water.offsetHeight || 0;
+    const ballWidth = ball.offsetWidth || 0;
+
+    const desiredLeft = state.x + ballWidth * 0.46;
+    const minLeft = bubbleWidth / 2 + 8;
+    const maxLeft = Math.max(minLeft, waterWidth - bubbleWidth / 2 - 8);
+    const bubbleLeft = clampValue(desiredLeft, minLeft, maxLeft);
+
+    const desiredTop = state.y - ballWidth * 0.42;
+    const minTop = bubbleHeight + 10;
+    const maxTop = Math.max(minTop, waterHeight - 24);
+    const bubbleTop = clampValue(desiredTop, minTop, maxTop);
+
+    speechBubble.style.left = `${bubbleLeft}px`;
+    speechBubble.style.top = `${bubbleTop}px`;
+  }
+
+  function showReleaseMessage() {
+    let nextIndex = Math.floor(Math.random() * releaseMessages.length);
+    if (releaseMessages.length > 1 && nextIndex === state.lastMessageIndex) {
+      nextIndex = (nextIndex + 1) % releaseMessages.length;
+    }
+
+    state.lastMessageIndex = nextIndex;
+    speechBubbleText.textContent = releaseMessages[nextIndex];
+    applySpeechBubblePosition();
+
+    if (state.bubbleTween) {
+      state.bubbleTween.kill();
+      state.bubbleTween = null;
+    }
+
+    gsap.set(speechBubble, {
+      opacity: 0,
+      y: 8,
+    });
+
+    state.bubbleTween = gsap.timeline({
+      onComplete: () => {
+        state.bubbleTween = null;
+      },
+    });
+
+    state.bubbleTween
+      .to(speechBubble, {
+        opacity: 1,
+        y: 0,
+        duration: 0.18,
+        ease: "power2.out",
+      })
+      .to(
+        speechBubble,
+        {
+          opacity: 0,
+          y: -4,
+          duration: 0.2,
+          ease: "power2.in",
+        },
+        "+=2.35",
+      );
+  }
+
+  function releaseBall() {
+    const metrics = getMetrics();
+    if (!metrics) return;
+
+    state.x = clampValue(state.x, metrics.minX, metrics.maxX);
+
+    if (state.settleTween) {
+      state.settleTween.kill();
+    }
+
+    state.settleTween = gsap.to(state, {
+      y: metrics.settleY,
+      duration: 0.55,
+      ease: "sine.out",
+      overwrite: true,
+      onComplete: () => {
+        state.settleTween = null;
+      },
+    });
+  }
+
+  function endDrag(pointerId) {
+    if (state.pointerId !== pointerId) return;
+
+    if (ball.hasPointerCapture(pointerId)) {
+      ball.releasePointerCapture(pointerId);
+    }
+
+    state.pointerId = null;
+    state.dragging = false;
+    ball.classList.remove("is-dragging");
+    state.hovering = ball.matches(":hover");
+    showReleaseMessage();
+    releaseBall();
+  }
+
+  ball.addEventListener("pointerenter", () => {
+    state.hovering = true;
+  });
+
+  ball.addEventListener("pointerleave", () => {
+    if (state.dragging) return;
+    state.hovering = false;
+  });
+
+  ball.addEventListener("pointerdown", (e) => {
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+
+    const metrics = syncBallState();
+    if (!metrics) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (state.settleTween) {
+      state.settleTween.kill();
+      state.settleTween = null;
+    }
+
+    state.dragging = true;
+    state.hovering = true;
+    state.pointerId = e.pointerId;
+    ball.classList.add("is-dragging");
+
+    const localX = e.clientX - metrics.waterRect.left;
+    const localY = e.clientY - metrics.waterRect.top;
+    state.pointerOffsetX = state.x - localX;
+    state.pointerOffsetY = state.y - localY;
+
+    ball.setPointerCapture(e.pointerId);
+  });
+
+  ball.addEventListener("pointermove", (e) => {
+    if (state.pointerId !== e.pointerId || !state.dragging) return;
+
+    const metrics = getMetrics();
+    if (!metrics) return;
+
+    e.preventDefault();
+
+    const localX = e.clientX - metrics.waterRect.left;
+    const localY = e.clientY - metrics.waterRect.top;
+
+    state.x = clampValue(localX + state.pointerOffsetX, metrics.minX, metrics.maxX);
+    state.y = clampValue(localY + state.pointerOffsetY, metrics.minY, metrics.maxY);
+  });
+
+  ball.addEventListener("pointerup", (e) => {
+    endDrag(e.pointerId);
+  });
+
+  ball.addEventListener("pointercancel", (e) => {
+    endDrag(e.pointerId);
+  });
+
+  window.addEventListener("resize", () => {
+    syncBallState();
+  });
+
+  const animateMarimoBall = (timestamp) => {
+    if (modal.style.display === "block") {
+      syncBallState();
+    }
+
+    applyBallTransform(timestamp);
+    applySpeechBubblePosition();
+    requestAnimationFrame(animateMarimoBall);
+  };
+
+  requestAnimationFrame(animateMarimoBall);
+}
+
+initMarimoModal();
 
 function playLogoModalAnimation(modal) {
   if (!modal) return;
@@ -1763,6 +2051,8 @@ function handleRaycasterInteraction(e) {
   } else if (visualObject.name.includes("Bin")) {
     showModal(modals.reflectiv);
     setReflectivTab(modals.reflectiv, "library");
+  } else if (visualObject.name.includes("Marimo")) {
+    showModal(modals.marimo);
   } else if (visualObject.name.includes("Box")) {
     showModal(modals.inventory);
   } else if (visualObject.name.includes("Calendar")) {
