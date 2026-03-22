@@ -100,13 +100,13 @@
             <li>typography</li>
           </ul><br>
 
-          <p>any questions? send a message to <a href="me@kapsiv.com">me@kapsiv.com</a> :D</p><br>
+          <p>any questions? send a message to <a href="info@kapsiv.com">info@kapsiv.com</a> :D</p><br>
 
           <h3>education</h3>
-          <p>master's in biology, university of oxford<br><small>2021-2025</small></p>
+          <p>master's in biology, university of oxford<br><small>Oct 2021 - Aug 2025</small></p>
 
           <h3>work</h3>
-          <p>data engineering, city of london<br><small>2025-present</small></p>
+          <p>data engineering, city of london<br><small>Aug 2025 - present</small></p>
 
           <h3>other interests</h3>
           <ul>
@@ -209,6 +209,17 @@
           id="library-tab-button"
         >
           music library
+        </button>
+        <button
+          type="button"
+          class="modal-tab"
+          data-reflectiv-tab="other"
+          role="tab"
+          aria-selected="false"
+          aria-controls="reflectiv-other-tab-panel"
+          id="reflectiv-other-tab-button"
+        >
+          other
         </button>
       </div>
       <div class="modal-window-content">
@@ -502,6 +513,33 @@
               <h3 class="chart-title">song length by genre</h3>
               <canvas id="libraryGenreAverageDurationChart"></canvas>
             </section>
+          </div>
+        </section>
+        <section
+          id="reflectiv-other-tab-panel"
+          class="reflectiv-panel"
+          data-reflectiv-panel="other"
+          role="tabpanel"
+          aria-labelledby="reflectiv-other-tab-button"
+        >
+          <div class="reflectiv-other-body">
+            <p class="reflectiv-other-copy">more music stuff:</p>
+            <div class="reflectiv-other-links">
+              <a
+                class="profile-link-card reflectiv-other-link"
+                href="https://www.youtube.com/@kapilansivanesan/playlists"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <span class="profile-link-badge" aria-hidden="true">
+                  <img src="/images/youtube.png" alt="youtube">
+                </span>
+                <span class="profile-link-copy">
+                  <span class="profile-link-site">discoveries</span>
+                  <span class="profile-link-handle">curated youtube playlists of albums by genre</span>
+                </span>
+              </a>
+            </div>
           </div>
         </section>
       </div>

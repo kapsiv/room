@@ -352,6 +352,26 @@ b {
   display: block;
 }
 
+.reflectiv-other-body {
+  display: grid;
+  gap: 16px;
+}
+
+.reflectiv-other-copy {
+  margin: 0;
+  color: rgba(78, 71, 56, 0.82);
+}
+
+.reflectiv-other-links {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.reflectiv-other-link {
+  min-height: 80px;
+}
+
 .guitar-panel {
   display: none;
 }
@@ -1619,27 +1639,21 @@ b {
   align-items: center;
   min-height: 68px;
   padding: 12px 14px;
-  border: 2px solid rgba(78, 71, 56, 0.22);
-  border-radius: 14px;
-  background:
-    linear-gradient(180deg, rgba(255, 253, 248, 0.92), rgba(238, 231, 218, 0.96));
-  color: #4e4738;
+  border: 2px solid rgba(78, 71, 56, 0.24);
+  border-radius: 10px;
+  background: #ece5da;
+  color: vars.$base-brown;
   text-decoration: none;
-  box-shadow: 0 8px 18px rgba(78, 71, 56, 0.08);
-  transition:
-    transform 140ms ease,
-    box-shadow 140ms ease,
-    border-color 140ms ease,
-    background 140ms ease;
+  box-shadow: none;
+  transition: transform 120ms ease, box-shadow 120ms ease, background-color 120ms ease;
 }
 
 .profile-link-card:hover,
 .profile-link-card:focus-visible {
-  transform: translateY(-2px);
-  border-color: rgba(78, 71, 56, 0.42);
-  box-shadow: 0 12px 24px rgba(78, 71, 56, 0.14);
-  background:
-    linear-gradient(180deg, rgba(255, 251, 244, 0.98), rgba(236, 226, 210, 0.98));
+  transform: translateY(-1px);
+  border-color: rgba(78, 71, 56, 0.36);
+  box-shadow: 0 3px 8px rgba(78, 71, 56, 0.16);
+  background: #e5dccf;
   outline: none;
 }
 
@@ -1648,7 +1662,7 @@ b {
   place-items: center;
   width: 48px;
   height: 48px;
-  border-radius: 12px;
+  border-radius: 10px;
   background: transparent;
   color: #f6efe1;
   font-size: 15px;
@@ -1659,8 +1673,8 @@ b {
 }
 
 .profile-link-badge img {
-  width: 72%;
-  height: 72%;
+  width: 74%;
+  height: 74%;
   object-fit: contain;
   border-radius: 8px;
 }
