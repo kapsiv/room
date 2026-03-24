@@ -1323,17 +1323,51 @@ b {
 
 .faq-body {
   display: grid;
-  gap: 18px;
+  gap: 12px;
 }
 
 .faq-item {
-  display: grid;
-  gap: 4px;
+  border: 2px solid rgba(78, 71, 56, 0.18);
+  border-radius: 12px;
+  background: #ece5da;
+  overflow: hidden;
+}
+
+.faq-item[open] {
+  border-color: rgba(78, 71, 56, 0.3);
+  background: #e7decf;
 }
 
 .faq-question {
   margin: 0;
   font-weight: 700;
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 14px;
+}
+
+.faq-question::-webkit-details-marker {
+  display: none;
+}
+
+.faq-question::after {
+  content: "+";
+  flex: 0 0 auto;
+  font-size: 20px;
+  line-height: 1;
+  font-weight: 400;
+}
+
+.faq-item[open] .faq-question::after {
+  content: "−";
+}
+
+.faq-panel {
+  padding: 0 14px 14px;
 }
 
 .faq-answer {
@@ -1342,12 +1376,13 @@ b {
 
 .faq-body .faq-reason-list {
   margin: 0;
-  padding-left: 22px;
+  padding-left: 28px;
+  list-style: decimal;
 }
 
 .faq-body .faq-reason-list > li {
   margin: 0 0 4px;
-  display: block;
+  display: list-item;
 }
 
 .faq-reason-title,
@@ -1395,7 +1430,7 @@ b {
 }
 
 .faq-footnote {
-  margin: 0;
+  margin: 10px 0 0;
   font-size: 12px;
   line-height: 1.35;
   color: rgba(78, 71, 56, 0.62);
@@ -1624,6 +1659,49 @@ b {
 .links-modal-intro {
   margin: 0;
   color: rgba(78, 71, 56, 0.8);
+}
+
+.utilities-modal {
+  display: grid;
+  gap: 18px;
+}
+
+.utilities-modal-intro {
+  margin: 0;
+  color: vars.$base-brown;
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+.utilities-modal-subcopy {
+  margin: -10px 0 0;
+  color: rgba(78, 71, 56, 0.72);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.utilities-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+.utilities-banner-button {
+  display: block;
+  line-height: 0;
+  transition: transform 140ms ease;
+}
+
+.utilities-banner-button:hover,
+.utilities-banner-button:focus-visible {
+  transform: translateY(-2px) scale(1.01);
+  outline: none;
+}
+
+.utilities-banner-button img {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 .links-grid {

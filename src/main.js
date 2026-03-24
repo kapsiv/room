@@ -37,6 +37,14 @@ const DATA_PIPELINE_HOVER_TARGET_IDS = [
   "last.fm",
   "smartwatch",
 ];
+const DATA_PIPELINE_LINKS = {
+  blob_storage: "https://vercel.com/docs/vercel-blob",
+  scrobbler: "https://kawaiidango.github.io/pano-scrobbler/",
+  health_app: "https://consumer.huawei.com/uk/mobileservices/health/",
+  music_player: "https://getmusicbee.com",
+  "last.fm": "https://www.last.fm/user/kapsiv",
+  github_repo: "https://github.com/kapsiv/room",
+};
 
 async function fetchNowPlayingTrack() {
   const url = `${LASTFM_ENDPOINT}?method=user.getrecenttracks&user=${encodeURIComponent(LASTFM_USER)}&api_key=${LASTFM_API_KEY}&format=json&limit=1`;
@@ -159,6 +167,28 @@ function initDataPipelinesDiagram() {
     const target = svg.querySelector(`#${CSS.escape(id)}`);
     if (!target) return;
     target.classList.add("data-pipeline-hover-target");
+
+    const url = DATA_PIPELINE_LINKS[id];
+    if (!url) return;
+
+    target.setAttribute("role", "link");
+    target.setAttribute("tabindex", "0");
+    target.setAttribute("aria-label", `Open ${id.replaceAll("_", " ")} in a new tab`);
+
+    const openLink = () => {
+      window.open(url, "_blank", "noopener,noreferrer");
+    };
+
+    target.addEventListener("click", (e) => {
+      e.stopPropagation();
+      openLink();
+    });
+    target.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      e.preventDefault();
+      e.stopPropagation();
+      openLink();
+    });
   });
 
   mount.replaceChildren(svg);

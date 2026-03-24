@@ -803,7 +803,18 @@
         <button class="modal-exit-button" type="button" aria-label="Close window">X</button>
       </div>
       <div class="modal-window-content modal-window-content--offwhite">
-        <p>utilities content coming soon.</p>
+        <div class="utilities-modal">
+          <p class="utilities-modal-intro">Introspective Visualisations (IV)</p>
+          <p class="utilities-modal-subcopy">some systems i made to track and visualise personal data</p>
+          <div class="utilities-grid">
+            <a class="utilities-banner-button" href="#" data-modal-target="reflectiv" aria-label="Open reflectIV modal">
+              <img src="/images/reflectiv-banner.png" alt="reflectIV">
+            </a>
+            <a class="utilities-banner-button" href="#" data-modal-target="informativ" aria-label="Open informatIV modal">
+              <img src="/images/informativ-banner-1.png" alt="informatIV">
+            </a>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1049,50 +1060,62 @@
       </div>
       <div class="modal-window-content modal-window-content--offwhite">
         <div class="faq-body">
-          <div class="faq-item">
-            <p class="faq-question">what's this font?</p>
-            <p class="faq-answer"><a href="https://design.ubuntu.com/font" target="_blank" rel="noopener noreferrer">ubuntu mono</a> by dalton maag studio</p>
-          </div>
-          <div class="faq-item">
-            <p class="faq-question">how was the room made?</p>
-            <p class="faq-answer">in <a href="#" data-modal-target="modelling">blender</a></p>
-          </div>
-          <div class="faq-item">
-            <p class="faq-question">what's the floating green blob?</p>
-            <p class="faq-answer"><a href="#" data-modal-target="marimo">marimo!</a></p>
-          </div>
-          <div class="faq-item">
-            <p class="faq-question">why the name "kapsiv"?</p>
-            <ul class="faq-answer faq-reason-list">
-              <li>
-                <span class="faq-reason-title">
-                  <span class="faq-name-bold">KAP</span>ilan <span class="faq-name-bold">SIV</span>anesan
-                </span>
-                <span class="faq-first-subreason">(my name)</span>
-              </li>
-              <li>
-                <span class="faq-reason-title"><span class="faq-name-bold">KAPS IV</span></span>
-                <span class="faq-first-subreason">(KAPS + 4 in roman numerals)</span>
-                <ul class="faq-subreasons">
-                  <li>born on 4/4</li>
-                  <li>this is the 4th iteration of this website</li>
-                </ul>
-              </li>
-              <li>
-                <span class="faq-reason-title"><span class="faq-name-bold">KA PSI V</span></span>
-                <span class="faq-first-subreason">(<span class="faq-symbol-strong">𓂓</span> Ψ V)</span>
-                <ul class="faq-subreasons">
-                  <li>KA (Egyptian hieroglyph "<span class="faq-symbol-strong">𓂓</span>") symbolising life</li>
-                  <li>PSI (Greek letter "Ψ") symbolising mind</li>
-                  <li>V (Roman numeral "V") symbolising strength</li>
-                </ul>
-              </li>
-            </ul>
-          </div>
-          <div class="faq-item">
-            <p class="faq-question">what does the logo mean?</p>
-            <p class="faq-answer"><a href="#" data-modal-target="logo"><span lang="ta" class="tamil-text tamil-text-sample">க</span></a></p>
-          </div>
+          <details class="faq-item">
+            <summary class="faq-question">what's this font?</summary>
+            <div class="faq-panel">
+              <p class="faq-answer"><a href="https://design.ubuntu.com/font" target="_blank" rel="noopener noreferrer">ubuntu mono</a> by dalton maag studio</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary class="faq-question">how was the room made?</summary>
+            <div class="faq-panel">
+              <p class="faq-answer">in <a href="#" data-modal-target="modelling">blender</a></p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary class="faq-question">what's the floating green blob?</summary>
+            <div class="faq-panel">
+              <p class="faq-answer"><a href="#" data-modal-target="marimo">marimo!</a></p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary class="faq-question">why the name "kapsiv"?</summary>
+            <div class="faq-panel">
+              <ol class="faq-answer faq-reason-list">
+                <li>
+                  <span class="faq-reason-title">
+                    <span class="faq-name-bold">KAP</span>ilan <span class="faq-name-bold">SIV</span>anesan
+                  </span>
+                  <span class="faq-first-subreason">(my government name)</span>
+                </li>
+                <li>
+                  <span class="faq-reason-title"><span class="faq-name-bold">KAPS IV</span></span>
+                  <span class="faq-first-subreason">(KAPS + 4 in roman numerals)</span>
+                  <ul class="faq-subreasons">
+                    <li>am kaps</li>
+                    <li>born on 4/4</li>
+                    <li>this is also now the 4th (and hopefully final!) iteration of this site</li>
+                  </ul>
+                </li>
+                <li>
+                  <span class="faq-reason-title"><span class="faq-name-bold">KA PSI V</span></span>
+                  <span class="faq-first-subreason">(<span class="faq-symbol-strong">𓂓</span> Ψ V)</span>
+                  <ul class="faq-subreasons">
+                    <li>KA (Egyptian hieroglyph "<span class="faq-symbol-strong">𓂓</span>") symbolising life</li>
+                    <li>PSI (Greek letter "Ψ") symbolising mind</li>
+                    <li>V (Roman numeral "V") symbolising strength</li>
+                  </ul>
+                  <p class="faq-footnote">(ok that last one was a joke i just made that up)</p>
+                </li>
+              </ol>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary class="faq-question">what does the logo mean?</summary>
+            <div class="faq-panel">
+              <p class="faq-answer"><a href="#" data-modal-target="logo"><span lang="ta" class="tamil-text tamil-text-sample">க</span>(click for more info)</a></p>
+            </div>
+          </details>
         </div>
       </div>
     </div>
@@ -1211,7 +1234,7 @@
             as i thought it made a good mark,
             then designed the rest of the letters in my name in the same style to make tamil and english wordmarks.
             all the characters are based on circles and use fixed line widths.
-            i'm procrastinating on finishing it because 247 characters is a lot to design.
+            i'm procrastinating on finishing it because 247 characters is too many.
           </p>
           <div class="logo-typeface-layout">
             <div class="logo-typeface-copy logo-typeface-copy--secondary">
