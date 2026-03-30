@@ -1492,6 +1492,10 @@ function createDetachedHitboxForTarget(target, options = {}) {
   const {
     followTargetTransform = false,
     worldOffset = null,
+    worldPositionOverride = null,
+    worldQuaternionOverride = null,
+    useInitialScale = false,
+    worldScaleOverride = null,
   } = options;
 
   target.updateWorldMatrix(true, false);
@@ -1499,6 +1503,26 @@ function createDetachedHitboxForTarget(target, options = {}) {
   const worldQuaternion = new THREE.Quaternion();
   const worldScale = new THREE.Vector3();
   target.matrixWorld.decompose(worldPosition, worldQuaternion, worldScale);
+
+  if (worldPositionOverride?.isVector3) {
+    worldPosition.copy(worldPositionOverride);
+  }
+
+  if (worldQuaternionOverride?.isQuaternion) {
+    worldQuaternion.copy(worldQuaternionOverride);
+  }
+
+  if (worldScaleOverride?.isVector3) {
+    worldScale.copy(worldScaleOverride);
+  } else if (useInitialScale && target.userData.initialScale) {
+    const parentWorldScale = new THREE.Vector3(1, 1, 1);
+    target.parent?.getWorldScale(parentWorldScale);
+    worldScale.set(
+      parentWorldScale.x * target.userData.initialScale.x,
+      parentWorldScale.y * target.userData.initialScale.y,
+      parentWorldScale.z * target.userData.initialScale.z,
+    );
+  }
 
   const hitbox = new THREE.Mesh(
     target.geometry.clone(),
@@ -2162,6 +2186,10 @@ function loadRoomModel() {
       }
 
       if (child.name.includes("Blu_Body_First_Hover")) {
+        child.updateWorldMatrix(true, false);
+        child.userData.initialWorldPosition = child.getWorldPosition(new THREE.Vector3());
+        child.userData.initialWorldQuaternion = child.getWorldQuaternion(new THREE.Quaternion());
+        child.userData.initialWorldScale = child.getWorldScale(new THREE.Vector3());
         bluMesh = child;
         bluRevealMesh = child;
         child.userData.initialScale = new THREE.Vector3().copy(child.scale);
@@ -2183,11 +2211,11 @@ function loadRoomModel() {
       ];
       if (raycasterNameTags.some((tag) => child.name.includes(tag)) || child.name.includes("Photo_Frame")) {
         createDetachedHitboxForTarget(child, {
-          followTargetTransform:
-            getGuitarStringIndex(child) !== null || child.name.includes("Blu_Body_First_Hover"),
-          worldOffset: child.name.includes("Blu_Body_First_Hover")
-            ? new THREE.Vector3(0, 0.22, 0)
-            : null,
+          followTargetTransform: getGuitarStringIndex(child) !== null,
+          worldPositionOverride: child.userData.initialWorldPosition || null,
+          worldQuaternionOverride: child.userData.initialWorldQuaternion || null,
+          useInitialScale: child.name.includes("Blu_Body_First_Hover"),
+          worldScaleOverride: child.userData.initialWorldScale || null,
         });
       }
 
