@@ -808,11 +808,26 @@
           <p class="utilities-modal-intro">Introspective Visualisations (IV)</p>
           <p class="utilities-modal-subcopy">some systems i made to track and visualise personal data</p>
           <div class="utilities-grid">
-            <a class="utilities-banner-button" href="#" data-modal-target="reflectiv" aria-label="Open reflectIV modal">
-              <img src="/images/reflectiv-banner.png" alt="reflectIV">
+            <a class="utilities-app-card utilities-app-card--featured" href="#" data-modal-target="reflectiv" aria-label="Open reflectIV modal">
+              <span class="utilities-app-card-icon" style="--utilities-icon: url('/icons/reflectIV.svg')"></span>
+              <span class="utilities-app-card-copy">
+                <span class="utilities-app-card-title">reflectIV</span>
+                <span class="utilities-app-card-text">music listening, collection metadata, now playing, and geographic listening patterns.</span>
+              </span>
             </a>
-            <a class="utilities-banner-button" href="#" data-modal-target="informativ" aria-label="Open informatIV modal">
-              <img src="/images/informativ-banner-1.png" alt="informatIV">
+            <a class="utilities-app-card" href="#" data-modal-target="activ" aria-label="Open actIV modal">
+              <span class="utilities-app-card-icon" style="--utilities-icon: url('/icons/actIV.svg')"></span>
+              <span class="utilities-app-card-copy">
+                <span class="utilities-app-card-title">actIV</span>
+                <span class="utilities-app-card-text">attendance heatmaps and workout rhythm visualisations pulled from my PureGym visit history.</span>
+              </span>
+            </a>
+            <a class="utilities-app-card" href="#" data-modal-target="inactiv" aria-label="Open inactIV modal">
+              <span class="utilities-app-card-icon" style="--utilities-icon: url('/icons/inactIV.svg')"></span>
+              <span class="utilities-app-card-copy">
+                <span class="utilities-app-card-title">inactIV</span>
+                <span class="utilities-app-card-text">rest, energy, and wellbeing experiments. still under construction.</span>
+              </span>
             </a>
           </div>
         </div>
@@ -1301,13 +1316,122 @@
       </div>
     </div>
 
-    <div class="informativ modal" data-modal-icon="/icons/informatIV.svg" role="dialog" aria-modal="true" aria-labelledby="window-title-informativ">
+    <div class="activ modal modal--wide" data-modal-icon="/icons/actIV.svg" role="dialog" aria-modal="true" aria-labelledby="window-title-activ">
       <div class="modal-window-bar">
-        <div id="window-title-informativ" class="modal-window-title">informatIV</div>
+        <div id="window-title-activ" class="modal-window-title">actIV</div>
         <button class="modal-exit-button" type="button" aria-label="Close window">X</button>
       </div>
       <div class="modal-window-content modal-window-content--offwhite">
-        <p>informatIV content coming soon.</p>
+        <div id="activRoot" class="activ-body">
+          <div id="activLoadingOverlay" class="reflectiv-loading-overlay visible">
+            <div class="reflectiv-loading-box">
+              <div class="loading-spinner" aria-hidden="true"></div>
+              <p class="loading-main">loading actIV data...</p>
+            </div>
+          </div>
+          <section class="activ-hero">
+            <div>
+              <p class="activ-kicker">gym attendance</p>
+              <h2 class="activ-title">actIV</h2>
+              <p class="activ-copy">visualising my PureGym attendance history in UK local time, with data loaded from Vercel Blob and a local csv fallback.</p>
+            </div>
+            <div class="activ-status">
+              <span id="activDataSource" class="activ-status-pill">source: loading...</span>
+              <span id="activDataFreshness" class="activ-status-pill activ-status-pill--muted">latest visit: --</span>
+            </div>
+          </section>
+          <div class="reflectiv-facts activ-facts">
+            <div id="activFactVisits" class="fact-card">
+              <span class="fact-label">total visits</span>
+              <span class="fact-value">--</span>
+              <span class="fact-detail">--</span>
+            </div>
+            <div id="activFactHours" class="fact-card">
+              <span class="fact-label">time in gym</span>
+              <span class="fact-value">--</span>
+              <span class="fact-detail">--</span>
+            </div>
+            <div id="activFactDuration" class="fact-card">
+              <span class="fact-label">average session</span>
+              <span class="fact-value">--</span>
+              <span class="fact-detail">--</span>
+            </div>
+            <div id="activFactPattern" class="fact-card">
+              <span class="fact-label">dominant pattern</span>
+              <span class="fact-value">--</span>
+              <span class="fact-detail">--</span>
+            </div>
+          </div>
+          <section class="chart-section activ-section">
+            <div class="chart-title-row chart-title-row--split">
+              <div class="chart-title-row-left">
+                <h3 class="chart-title">attendance history</h3>
+              </div>
+              <span id="activBestDayNote" class="chart-note">peak attendance day unavailable</span>
+            </div>
+            <div id="activHeatmapMonths" class="activ-heatmap-months" aria-hidden="true"></div>
+            <div id="activHeatmap" class="activ-heatmap-shell"></div>
+            <div class="activ-heatmap-legend" aria-hidden="true">
+              <span>less</span>
+              <span class="activ-heatmap-legend-swatch is-level-0"></span>
+              <span class="activ-heatmap-legend-swatch is-level-1"></span>
+              <span class="activ-heatmap-legend-swatch is-level-2"></span>
+              <span class="activ-heatmap-legend-swatch is-level-3"></span>
+              <span class="activ-heatmap-legend-swatch is-level-4"></span>
+              <span>more</span>
+            </div>
+          </section>
+          <div class="chart-row">
+            <section class="chart-section activ-section">
+              <h3 class="chart-title">weekday rhythm</h3>
+              <div id="activWeekdayChart" class="activ-bar-chart"></div>
+            </section>
+            <section class="chart-section activ-section">
+              <h3 class="chart-title">entry hours</h3>
+              <div id="activHourChart" class="activ-hour-chart"></div>
+            </section>
+          </div>
+          <div class="chart-row">
+            <section class="chart-section activ-section">
+              <div class="chart-title-row chart-title-row--split">
+                <h3 class="chart-title">monthly visits</h3>
+                <span id="activBestMonthNote" class="chart-note">monthly view unavailable</span>
+              </div>
+              <div id="activMonthlyChart" class="activ-bar-chart"></div>
+            </section>
+            <section class="chart-section activ-section">
+              <h3 class="chart-title">session lengths</h3>
+              <div id="activDurationChart" class="activ-bar-chart"></div>
+            </section>
+          </div>
+          <section class="chart-section activ-section">
+            <h3 class="chart-title">recent visits</h3>
+            <div class="activ-table-shell">
+              <table class="activ-table">
+                <thead>
+                  <tr>
+                    <th>date</th>
+                    <th>entered</th>
+                    <th>left</th>
+                    <th>duration</th>
+                    <th>gym</th>
+                  </tr>
+                </thead>
+                <tbody id="activRecentTableBody"></tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <div class="inactiv modal" data-modal-icon="/icons/inactIV.svg" role="dialog" aria-modal="true" aria-labelledby="window-title-inactiv">
+      <div class="modal-window-bar">
+        <div id="window-title-inactiv" class="modal-window-title">inactIV</div>
+        <button class="modal-exit-button" type="button" aria-label="Close window">X</button>
+      </div>
+      <div class="modal-window-content modal-window-content--offwhite">
+        <p>inactIV content coming soon.</p>
       </div>
     </div>
 

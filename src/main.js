@@ -13,6 +13,7 @@ import dataPipelineDiagramSvg from "./assets/data-pipeline-diagram.svg?raw";
 import { OrbitControls } from './utils/OrbitControls.js';
 import { createAnnotationFeature } from './features/annotationFeature.js';
 import { createReflectivFeature } from './features/reflectivFeature.js';
+import { createActivFeature } from './features/activFeature.js';
 import { createSleepZsFeature } from './features/sleepZsFeature.js';
 import { createModalManager } from './ui/modalManager.js';
 import { createFabManager } from './ui/fabManager.js';
@@ -141,7 +142,8 @@ const modals = {
   logo: document.querySelector(".modal.logo"),
   calendar: document.querySelector(".modal.calendar"),
   modelling: document.querySelector(".modal.modelling"),
-  informativ: document.querySelector(".modal.informativ"),
+  activ: document.querySelector(".modal.activ"),
+  inactiv: document.querySelector(".modal.inactiv"),
   book: document.querySelector(".modal.book"),
 };
 
@@ -349,6 +351,7 @@ const reflectivFeature = createReflectivFeature({
   modals,
   getShowModal: () => showModal,
 });
+const activFeature = createActivFeature();
 
 const {
   initAboutModal,
@@ -356,6 +359,7 @@ const {
   initReflectivModal,
   setReflectivTab,
 } = reflectivFeature;
+const { initActivModal } = activFeature;
 const logoModalTimelines = new WeakMap();
 
 const modalManager = createModalManager({
@@ -397,6 +401,9 @@ const modalManager = createModalManager({
   },
   onShowReflectiv: (modal) => {
     initReflectivModal(modal);
+  },
+  onShowActIV: (modal) => {
+    initActivModal(modal);
   },
   onShowLogo: (modal) => {
     playLogoModalAnimation(modal);
@@ -441,7 +448,7 @@ const INVENTORY_CATEGORY_DEFS = [
   { key: "P", label: "profession", items: ["cv", "archive", "dataPipelines", "utilities", "vinaflow"] },
   { key: "S", label: "social", items: ["blu", "calendar", "gallery", "links"] },
   { key: "I", label: "introspection", items: ["about", "nowplaying", "reflectiv"] },
-  { key: "V", label: "vitality", items: ["informativ", "food", "marimo"] },
+  { key: "V", label: "vitality", items: ["activ", "inactiv", "food", "marimo"] },
 ];
 
 function escapeHtml(value) {

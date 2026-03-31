@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="projects" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
+  <defs>
+    <style>
+      .cls-1 {
+        stroke-width: 50px;
+      }
+
+      .cls-1, .cls-2 {
+        fill: none;
+        stroke: #4e4738;
+        stroke-miterlimit: 10;
+      }
+
+      .cls-2 {
+        stroke-width: 25px;
+      }
+    </style>
+  </defs>
+  <circle class="cls-1" cx="255.31" cy="256.45" r="130.28"/>
+  <polyline class="cls-2" points="199.48 283.42 255.31 256.45 256.02 161.81"/>
+</svg>
