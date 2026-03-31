@@ -2087,13 +2087,18 @@ b {
 }
 
 .activ-heatmap-months {
+  --activ-heatmap-cell-size: 10px;
+  --activ-heatmap-gap: 4px;
   --activ-heatmap-weeks: 1;
   display: grid;
-  grid-template-columns: repeat(var(--activ-heatmap-weeks), minmax(0, 1fr));
-  gap: 4px;
+  grid-template-columns: repeat(var(--activ-heatmap-weeks), var(--activ-heatmap-cell-size));
+  gap: var(--activ-heatmap-gap);
   margin-left: 44px;
   margin-bottom: 8px;
-  min-width: 720px;
+  min-width: calc(
+    var(--activ-heatmap-weeks) * var(--activ-heatmap-cell-size) +
+      (var(--activ-heatmap-weeks) - 1) * var(--activ-heatmap-gap)
+  );
   font-size: 11px;
   color: rgba(78, 71, 56, 0.72);
 }
@@ -2107,7 +2112,11 @@ b {
   grid-template-columns: 34px 1fr;
   gap: 10px;
   align-items: start;
-  min-width: 720px;
+  min-width: calc(
+    34px + 10px +
+      var(--activ-heatmap-weeks) * var(--activ-heatmap-cell-size) +
+      (var(--activ-heatmap-weeks) - 1) * var(--activ-heatmap-gap)
+  );
 }
 
 .activ-heatmap-days {
@@ -2121,19 +2130,18 @@ b {
 }
 
 .activ-heatmap-grid {
-  --activ-heatmap-weeks: 1;
   display: grid;
-  grid-template-columns: repeat(var(--activ-heatmap-weeks), minmax(0, 1fr));
-  grid-template-rows: repeat(7, 13px);
-  gap: 5px;
+  grid-template-columns: repeat(var(--activ-heatmap-weeks), var(--activ-heatmap-cell-size));
+  grid-template-rows: repeat(7, var(--activ-heatmap-cell-size));
+  gap: var(--activ-heatmap-gap);
 }
 
 .activ-heatmap-cell {
-  width: 100%;
-  min-width: 0;
-  border-radius: 4px;
-  background: rgba(78, 71, 56, 0.08);
-  border: 1px solid rgba(78, 71, 56, 0.04);
+  width: var(--activ-heatmap-cell-size);
+  height: var(--activ-heatmap-cell-size);
+  border-radius: 2px;
+  background: rgba(78, 71, 56, 0.1);
+  border: 1px solid rgba(78, 71, 56, 0.06);
 }
 
 .activ-heatmap-cell.is-active {
@@ -2147,42 +2155,10 @@ b {
   visibility: hidden;
 }
 
-.activ-bar-chart {
-  display: grid;
-  gap: 10px;
-}
-
-.activ-bar-row {
-  display: grid;
-  grid-template-columns: 44px 1fr 52px;
-  gap: 10px;
-  align-items: center;
-}
-
-.activ-bar-label,
-.activ-bar-value {
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: lowercase;
-}
-
-.activ-bar-track {
-  position: relative;
-  height: 18px;
-  border-radius: 999px;
-  overflow: hidden;
-  border: 1px solid rgba(78, 71, 56, 0.14);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0)),
-    rgba(78, 71, 56, 0.08);
-}
-
-.activ-bar-fill {
+.activ-weekday-canvas {
+  width: 100%;
+  height: 260px;
   display: block;
-  height: 100%;
-  border-radius: inherit;
-  background: linear-gradient(90deg, #a2ba6d 0%, #6f9259 35%, #3f6a49 100%);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
 
 .activ-empty-state {
@@ -3099,10 +3075,6 @@ b {
 
   .activ-heatmap-months {
     margin-left: 0;
-  }
-
-  .activ-bar-row {
-    grid-template-columns: 44px 1fr 52px;
   }
 
   .book-shell {
