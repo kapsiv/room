@@ -4,6 +4,10 @@
     {
       "path": "/api/lastfm-ingest",
       "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/puregym-ingest",
+      "schedule": "0 1 * * *"
     }
   ]
 }

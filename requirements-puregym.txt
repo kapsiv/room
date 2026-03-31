@@ -1,0 +1,1 @@
+puregym_attendance>=2.0
