@@ -11,6 +11,13 @@ node_modules
 dist
 dist-ssr
 *.local
+.venv/
+__pycache__/
+*.py[cod]
+.env
+.env.*
+!.env.example
+data/puregym/
 
 # Editor directories and files
 .vscode/*
