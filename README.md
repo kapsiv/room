@@ -51,7 +51,7 @@ Example cron entry:
 
 ### Vercel Blob ingest
 
-There is also a server-side ingest route at `/api/puregym-ingest` that appends new visits into a Blob CSV at `scrobbles/activ/visit_history.csv` by default.
+There is also a server-side ingest route at `/api/puregym-ingest` that appends new visits into a Blob CSV at `activ/visit_history.csv` by default.
 
 Set these Vercel environment variables:
 
@@ -59,7 +59,7 @@ Set these Vercel environment variables:
 PUREGYM_EMAIL=...
 PUREGYM_PIN=...
 CRON_SECRET=...
-PUREGYM_VISITS_BLOB_PATH=scrobbles/activ/visit_history.csv
+PUREGYM_VISITS_BLOB_PATH=activ/visit_history.csv
 PUREGYM_VISITS_BLOB_ACCESS=private
 ```
 

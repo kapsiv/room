@@ -2,7 +2,7 @@ import { get, put } from "@vercel/blob";
 
 const CSV_HEADER =
   "date,entered_at,left_at,duration_minutes,is_duration_estimated,gym_id,gym_name";
-const CSV_PATH = process.env.PUREGYM_VISITS_BLOB_PATH || "scrobbles/activ/visit_history.csv";
+const CSV_PATH = process.env.PUREGYM_VISITS_BLOB_PATH || "activ/visit_history.csv";
 const BLOB_ACCESS = process.env.PUREGYM_VISITS_BLOB_ACCESS || "private";
 const PUREGYM_EMAIL = process.env.PUREGYM_EMAIL;
 const PUREGYM_PIN = process.env.PUREGYM_PIN;
