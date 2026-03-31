@@ -1329,97 +1329,40 @@
               <p class="loading-main">loading actIV data...</p>
             </div>
           </div>
-          <section class="activ-hero">
-            <div>
-              <p class="activ-kicker">gym attendance</p>
-              <h2 class="activ-title">actIV</h2>
-              <p class="activ-copy">visualising my PureGym attendance history in UK local time, with data loaded from Vercel Blob and a local csv fallback.</p>
-            </div>
-            <div class="activ-status">
-              <span id="activDataSource" class="activ-status-pill">source: loading...</span>
-              <span id="activDataFreshness" class="activ-status-pill activ-status-pill--muted">latest visit: --</span>
-            </div>
-          </section>
-          <div class="reflectiv-facts activ-facts">
-            <div id="activFactVisits" class="fact-card">
-              <span class="fact-label">total visits</span>
-              <span class="fact-value">--</span>
-              <span class="fact-detail">--</span>
-            </div>
-            <div id="activFactHours" class="fact-card">
-              <span class="fact-label">time in gym</span>
-              <span class="fact-value">--</span>
-              <span class="fact-detail">--</span>
-            </div>
-            <div id="activFactDuration" class="fact-card">
-              <span class="fact-label">average session</span>
-              <span class="fact-value">--</span>
-              <span class="fact-detail">--</span>
-            </div>
-            <div id="activFactPattern" class="fact-card">
-              <span class="fact-label">dominant pattern</span>
-              <span class="fact-value">--</span>
-              <span class="fact-detail">--</span>
-            </div>
-          </div>
+          <details class="activ-info">
+            <summary class="activ-info-toggle">info</summary>
+            <p class="activ-info-copy">i'm using a puregym api to get data from the mobile site to track my gym attendance. a vercel cron job scheduled daily at 1am saves this data to a csv in my blob storage.</p>
+          </details>
           <section class="chart-section activ-section">
-            <div class="chart-title-row chart-title-row--split">
-              <div class="chart-title-row-left">
-                <h3 class="chart-title">attendance history</h3>
-              </div>
-              <span id="activBestDayNote" class="chart-note">peak attendance day unavailable</span>
-            </div>
+            <h3 class="chart-title">attendance history</h3>
             <div id="activHeatmapMonths" class="activ-heatmap-months" aria-hidden="true"></div>
             <div id="activHeatmap" class="activ-heatmap-shell"></div>
-            <div class="activ-heatmap-legend" aria-hidden="true">
-              <span>less</span>
-              <span class="activ-heatmap-legend-swatch is-level-0"></span>
-              <span class="activ-heatmap-legend-swatch is-level-1"></span>
-              <span class="activ-heatmap-legend-swatch is-level-2"></span>
-              <span class="activ-heatmap-legend-swatch is-level-3"></span>
-              <span class="activ-heatmap-legend-swatch is-level-4"></span>
-              <span>more</span>
-            </div>
           </section>
-          <div class="chart-row">
-            <section class="chart-section activ-section">
-              <h3 class="chart-title">weekday rhythm</h3>
-              <div id="activWeekdayChart" class="activ-bar-chart"></div>
-            </section>
-            <section class="chart-section activ-section">
-              <h3 class="chart-title">entry hours</h3>
-              <div id="activHourChart" class="activ-hour-chart"></div>
-            </section>
-          </div>
-          <div class="chart-row">
-            <section class="chart-section activ-section">
-              <div class="chart-title-row chart-title-row--split">
-                <h3 class="chart-title">monthly visits</h3>
-                <span id="activBestMonthNote" class="chart-note">monthly view unavailable</span>
-              </div>
-              <div id="activMonthlyChart" class="activ-bar-chart"></div>
-            </section>
-            <section class="chart-section activ-section">
-              <h3 class="chart-title">session lengths</h3>
-              <div id="activDurationChart" class="activ-bar-chart"></div>
-            </section>
+          <div class="reflectiv-facts activ-facts">
+            <div id="activFactWeeklyRate" class="fact-card">
+              <span class="fact-label">average days / week</span>
+              <span class="fact-value">--</span>
+              <span class="fact-detail">--</span>
+            </div>
+            <div id="activFactEntryTime" class="fact-card">
+              <span class="fact-label">average entry time</span>
+              <span class="fact-value">--</span>
+              <span class="fact-detail">--</span>
+            </div>
+            <div id="activFactLastVisit" class="fact-card">
+              <span class="fact-label">last recorded visit</span>
+              <span class="fact-value">--</span>
+              <span class="fact-detail">--</span>
+            </div>
+            <div id="activFactAttendanceRate" class="fact-card">
+              <span class="fact-label">attendance since jan 1</span>
+              <span class="fact-value">--</span>
+              <span class="fact-detail">--</span>
+            </div>
           </div>
           <section class="chart-section activ-section">
-            <h3 class="chart-title">recent visits</h3>
-            <div class="activ-table-shell">
-              <table class="activ-table">
-                <thead>
-                  <tr>
-                    <th>date</th>
-                    <th>entered</th>
-                    <th>left</th>
-                    <th>duration</th>
-                    <th>gym</th>
-                  </tr>
-                </thead>
-                <tbody id="activRecentTableBody"></tbody>
-              </table>
-            </div>
+            <h3 class="chart-title">share of visits by day</h3>
+            <div id="activWeekdayChart" class="activ-bar-chart"></div>
           </section>
         </div>
       </div>
