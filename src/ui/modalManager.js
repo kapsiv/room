@@ -6,6 +6,7 @@ export function createModalManager({
   onShowBlu = null,
   onShowNowPlaying = null,
   onShowReflectiv = null,
+  onShowActIV = null,
   onShowLogo = null,
   onShowModelling = null,
   modalMargin = 16,
@@ -286,6 +287,10 @@ export function createModalManager({
 
     if (modal === modals.reflectiv && typeof onShowReflectiv === "function") {
       onShowReflectiv(modal, { showModal, hideModal });
+    }
+
+    if (modal === modals.activ && typeof onShowActIV === "function") {
+      onShowActIV(modal, { showModal, hideModal });
     }
 
     if (modal === modals.logo && typeof onShowLogo === "function") {

@@ -6,6 +6,7 @@ const MOBILE_DOCK_ITEMS = [
   { name: "now playing", modalKey: "nowplaying", icon: "/icons/music.svg" },
   { name: "inventory", modalKey: "inventory", icon: "/icons/box.svg" },
   { name: "reflectiv", modalKey: "reflectiv", icon: "/icons/reflectIV.svg" },
+  { name: "actIV", modalKey: "activ", icon: "/icons/actIV.svg" },
 ];
 
 const PAGES = [
@@ -28,8 +29,9 @@ const PAGES = [
   { name: "bloomba", url: "/bloomba", icon: "/icons/bloomba.svg" },
   { name: "blog", url: "/blog", icon: "/icons/blog.svg" },
   { name: "reflectIV", url: "/reflectIV", icon: "/icons/reflectIV.svg" },
+  { name: "actIV", url: "/actIV", icon: "/icons/actIV.svg" },
   { name: "vinaflow", url: "/vinaflow", icon: "/icons/vinaflow.svg" },
-  { name: "informatIV", url: "/informatIV", icon: "/icons/informatIV.svg" },
+  { name: "inactIV", url: "/inactIV", icon: "/icons/inactIV.svg" },
   { name: "404", url: "/404", icon: "/icons/404.svg" },
   { name: "design philosophy", url: "/blog", icon: "/icons/design_philosophy.svg" },
   { name: "logo", url: "/logo", icon: "/icons/logo.svg" },
@@ -417,7 +419,8 @@ export function createFabManager({
       "data pipelines": "dataPipelines",
       utilities: "utilities",
       vinaflow: "vinaflow",
-      informativ: "informativ",
+      activ: "activ",
+      inactiv: "inactiv",
       reflectiv: "reflectiv",
       "2026": "calendar",
       logo: "logo",

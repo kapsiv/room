@@ -1686,22 +1686,72 @@ b {
   gap: 14px;
 }
 
-.utilities-banner-button {
-  display: block;
-  line-height: 0;
-  transition: transform 140ms ease;
+.utilities-app-card {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 14px;
+  align-items: center;
+  min-height: 118px;
+  padding: 16px;
+  border: 2px solid rgba(78, 71, 56, 0.24);
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.45), transparent 48%),
+    linear-gradient(160deg, #f1ebe1 0%, #e3d7c7 100%);
+  color: vars.$base-brown;
+  text-decoration: none;
+  transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
 }
 
-.utilities-banner-button:hover,
-.utilities-banner-button:focus-visible {
+.utilities-app-card:hover,
+.utilities-app-card:focus-visible {
   transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 10px 22px rgba(78, 71, 56, 0.12);
+  border-color: rgba(78, 71, 56, 0.42);
   outline: none;
 }
 
-.utilities-banner-button img {
-  display: block;
-  width: 100%;
-  height: auto;
+.utilities-app-card--featured {
+  grid-column: span 2;
+}
+
+.utilities-app-card-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 22px;
+  background: rgba(78, 71, 56, 0.08);
+  position: relative;
+}
+
+.utilities-app-card-icon::before {
+  content: "";
+  position: absolute;
+  inset: 14px;
+  background: currentColor;
+  -webkit-mask-image: var(--utilities-icon);
+  -webkit-mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-image: var(--utilities-icon);
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: contain;
+}
+
+.utilities-app-card-copy {
+  display: grid;
+  gap: 6px;
+}
+
+.utilities-app-card-title {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.utilities-app-card-text {
+  font-size: 14px;
+  line-height: 1.45;
+  color: rgba(78, 71, 56, 0.78);
 }
 
 .links-grid {
@@ -1972,6 +2022,248 @@ b {
 
 .reflectiv-body {
   position: relative;
+}
+
+.activ-body {
+  position: relative;
+}
+
+.activ-hero {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.activ-kicker {
+  margin: 0 0 4px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(78, 71, 56, 0.72);
+}
+
+.activ-title {
+  margin: 0 0 8px;
+  font-size: clamp(28px, 3vw, 40px);
+  line-height: 1;
+}
+
+.activ-copy {
+  margin: 0;
+  max-width: 620px;
+  color: rgba(78, 71, 56, 0.8);
+  line-height: 1.45;
+}
+
+.activ-status {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.activ-status-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 6px 12px;
+  border: 1px solid rgba(78, 71, 56, 0.24);
+  border-radius: 999px;
+  background: rgba(236, 229, 218, 0.78);
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(78, 71, 56, 0.86);
+}
+
+.activ-status-pill.is-fallback {
+  background: rgba(195, 174, 135, 0.16);
+}
+
+.activ-status-pill--muted {
+  font-weight: 500;
+}
+
+.activ-facts {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.activ-section {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0) 38%),
+    #ece5da;
+}
+
+.activ-heatmap-months {
+  --activ-heatmap-weeks: 1;
+  display: grid;
+  grid-template-columns: repeat(var(--activ-heatmap-weeks), minmax(0, 1fr));
+  gap: 4px;
+  margin-left: 44px;
+  margin-bottom: 8px;
+  font-size: 11px;
+  color: rgba(78, 71, 56, 0.72);
+}
+
+.activ-heatmap-month {
+  white-space: nowrap;
+}
+
+.activ-heatmap-shell {
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  gap: 10px;
+  align-items: start;
+}
+
+.activ-heatmap-days {
+  display: grid;
+  grid-template-rows: repeat(7, 14px);
+  gap: 5px;
+  padding-top: 2px;
+  font-size: 10px;
+  text-transform: lowercase;
+  color: rgba(78, 71, 56, 0.72);
+}
+
+.activ-heatmap-grid {
+  --activ-heatmap-weeks: 1;
+  display: grid;
+  grid-template-columns: repeat(var(--activ-heatmap-weeks), minmax(0, 1fr));
+  grid-template-rows: repeat(7, 14px);
+  grid-auto-flow: column;
+  gap: 5px;
+}
+
+.activ-heatmap-cell {
+  border-radius: 4px;
+  background: rgba(78, 71, 56, 0.08);
+}
+
+.activ-heatmap-cell.is-level-1,
+.activ-heatmap-legend-swatch.is-level-1 {
+  background: #d9d7bd;
+}
+
+.activ-heatmap-cell.is-level-2,
+.activ-heatmap-legend-swatch.is-level-2 {
+  background: #b9c995;
+}
+
+.activ-heatmap-cell.is-level-3,
+.activ-heatmap-legend-swatch.is-level-3 {
+  background: #8fb072;
+}
+
+.activ-heatmap-cell.is-level-4,
+.activ-heatmap-legend-swatch.is-level-4 {
+  background: #4f7d4b;
+}
+
+.activ-heatmap-legend {
+  margin-top: 10px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: rgba(78, 71, 56, 0.72);
+}
+
+.activ-heatmap-legend-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  background: rgba(78, 71, 56, 0.08);
+}
+
+.activ-bar-chart {
+  display: grid;
+  gap: 8px;
+}
+
+.activ-bar-row {
+  display: grid;
+  grid-template-columns: 70px 1fr 30px;
+  gap: 10px;
+  align-items: center;
+}
+
+.activ-bar-label,
+.activ-bar-value {
+  font-size: 12px;
+}
+
+.activ-bar-track {
+  height: 12px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(78, 71, 56, 0.1);
+}
+
+.activ-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #7c9b5c, #3d6741);
+}
+
+.activ-hour-chart {
+  height: 210px;
+  display: grid;
+  grid-template-columns: repeat(24, minmax(0, 1fr));
+  gap: 6px;
+  align-items: end;
+}
+
+.activ-hour-col {
+  display: grid;
+  gap: 8px;
+  align-items: end;
+  height: 100%;
+}
+
+.activ-hour-bar {
+  display: block;
+  min-height: 4px;
+  border-radius: 8px 8px 2px 2px;
+  background: linear-gradient(180deg, #8fb072 0%, #45684a 100%);
+}
+
+.activ-hour-tick {
+  font-size: 10px;
+  text-align: center;
+  color: rgba(78, 71, 56, 0.7);
+}
+
+.activ-table-shell {
+  overflow-x: auto;
+}
+
+.activ-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.activ-table th,
+.activ-table td {
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(78, 71, 56, 0.15);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.activ-table th {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(78, 71, 56, 0.7);
+}
+
+.activ-empty-state {
+  margin: 0;
 }
 
 .reflectiv-loading-overlay {
@@ -2850,8 +3142,56 @@ b {
     grid-template-columns: 1fr;
   }
 
+  .activ-facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .reflectiv-facts--library-stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .activ-hero {
+    flex-direction: column;
+  }
+
+  .activ-status {
+    align-items: flex-start;
+  }
+
+  .utilities-app-card--featured {
+    grid-column: span 1;
+  }
+
+  .utilities-app-card {
+    grid-template-columns: 56px 1fr;
+    min-height: 0;
+    padding: 14px;
+  }
+
+  .utilities-app-card-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 18px;
+  }
+
+  .activ-heatmap-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .activ-heatmap-days {
+    display: none;
+  }
+
+  .activ-heatmap-months {
+    margin-left: 0;
+  }
+
+  .activ-bar-row {
+    grid-template-columns: 56px 1fr 26px;
+  }
+
+  .activ-hour-chart {
+    gap: 4px;
   }
 
   .book-shell {
