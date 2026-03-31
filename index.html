@@ -1333,11 +1333,6 @@
             <summary class="activ-info-toggle">info</summary>
             <p class="activ-info-copy">i'm using a puregym api to get data from the mobile site to track my gym attendance. a vercel cron job scheduled daily at 1am saves this data to a csv in my blob storage.</p>
           </details>
-          <section class="chart-section activ-section">
-            <h3 class="chart-title">attendance history</h3>
-            <div id="activHeatmapMonths" class="activ-heatmap-months" aria-hidden="true"></div>
-            <div id="activHeatmap" class="activ-heatmap-shell"></div>
-          </section>
           <div class="reflectiv-facts activ-facts">
             <div id="activFactWeeklyRate" class="fact-card">
               <span class="fact-label">average days / week</span>
@@ -1361,8 +1356,13 @@
             </div>
           </div>
           <section class="chart-section activ-section">
-            <h3 class="chart-title">share of visits by day</h3>
-            <div id="activWeekdayChart" class="activ-bar-chart"></div>
+            <h3 class="chart-title">attendance history</h3>
+            <div id="activHeatmapMonths" class="activ-heatmap-months" aria-hidden="true"></div>
+            <div id="activHeatmap" class="activ-heatmap-shell"></div>
+          </section>
+          <section class="chart-section activ-section">
+            <h3 class="chart-title">attendance by weekday</h3>
+            <canvas id="activWeekdayChart" class="activ-weekday-canvas"></canvas>
           </section>
         </div>
       </div>

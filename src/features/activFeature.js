@@ -168,6 +168,20 @@ function formatMonthLabel(date) {
   });
 }
 
+function drawCanvasText(ctx, text, x, y, options = {}) {
+  const {
+    align = "left",
+    baseline = "alphabetic",
+    fillStyle = "#4e4738",
+    font = "11px 'Ubuntu Mono', monospace",
+  } = options;
+  ctx.textAlign = align;
+  ctx.textBaseline = baseline;
+  ctx.fillStyle = fillStyle;
+  ctx.font = font;
+  ctx.fillText(text, x, y);
+}
+
 function formatMinutesAsTime(totalMinutes) {
   if (!Number.isFinite(totalMinutes)) return "--";
   const normalized = ((Math.round(totalMinutes) % 1440) + 1440) % 1440;
@@ -345,29 +359,80 @@ function renderAttendanceHeatmap(modal, stats) {
 }
 
 function renderWeekdayChart(modal, stats) {
-  const mount = modal.querySelector("#activWeekdayChart");
-  if (!mount) return;
+  const canvas = modal.querySelector("#activWeekdayChart");
+  const ctx = canvas?.getContext?.("2d");
+  if (!ctx || !canvas) return;
 
-  const rows = WEEKDAY_LABELS.map((label, index) => {
-    const visits = stats.weekdayCounts.get(index) || 0;
-    const share = stats.yearVisits.length ? (visits / stats.yearVisits.length) * 100 : 0;
-    return { label, visits, share };
+  const width = canvas.clientWidth || 720;
+  const height = canvas.clientHeight || 260;
+  canvas.width = width;
+  canvas.height = height;
+  ctx.clearRect(0, 0, width, height);
+
+  const rows = WEEKDAY_LABELS.map((label, index) => ({
+    label,
+    value: stats.weekdayCounts.get(index) || 0,
+  }));
+  const maxValue = Math.max(...rows.map((row) => row.value), 1);
+  const pad = { l: 42, r: 12, t: 16, b: 48 };
+  const usableW = width - pad.l - pad.r;
+  const usableH = height - pad.t - pad.b;
+  const slotW = usableW / rows.length;
+  const barW = Math.min(42, Math.max(22, slotW - 12));
+  const yForValue = (value) => pad.t + usableH - (value / maxValue) * usableH;
+
+  ctx.strokeStyle = "rgba(78,71,56,0.18)";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(pad.l, pad.t + usableH);
+  ctx.lineTo(width - pad.r, pad.t + usableH);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(pad.l, pad.t);
+  ctx.lineTo(pad.l, pad.t + usableH);
+  ctx.stroke();
+
+  const tickCount = Math.min(4, maxValue);
+  for (let i = 0; i <= tickCount; i += 1) {
+    const value = tickCount === 0 ? 0 : Math.round((maxValue / tickCount) * i);
+    const y = yForValue(value);
+
+    ctx.strokeStyle = i === 0 ? "rgba(78,71,56,0.22)" : "rgba(78,71,56,0.12)";
+    ctx.beginPath();
+    ctx.moveTo(pad.l, y);
+    ctx.lineTo(width - pad.r, y);
+    ctx.stroke();
+
+    drawCanvasText(ctx, String(value), pad.l - 8, y, {
+      align: "right",
+      baseline: "middle",
+      fillStyle: "rgba(78,71,56,0.8)",
+      font: "10px 'Ubuntu Mono', monospace",
+    });
+  }
+
+  rows.forEach((row, index) => {
+    const x = pad.l + slotW * index + (slotW - barW) / 2;
+    const y = yForValue(row.value);
+    const barHeight = Math.max(pad.t + usableH - y, 2);
+
+    ctx.fillStyle = "#4e4738";
+    ctx.fillRect(x, y, barW, barHeight);
+
+    drawCanvasText(ctx, row.label, x + barW / 2, pad.t + usableH + 14, {
+      align: "center",
+      baseline: "top",
+      fillStyle: "rgba(78,71,56,0.9)",
+      font: "11px 'Ubuntu Mono', monospace",
+    });
+
+    drawCanvasText(ctx, String(row.value), x + barW / 2, Math.max(y - 6, pad.t + 10), {
+      align: "center",
+      baseline: "bottom",
+      fillStyle: "rgba(78,71,56,0.86)",
+      font: "11px 'Ubuntu Mono', monospace",
+    });
   });
-
-  mount.innerHTML = rows
-    .map((row) => {
-      const title = `${row.label}: ${row.visits} visit${row.visits === 1 ? "" : "s"} (${formatPercent(row.share)})`;
-      return `
-        <div class="activ-bar-row" title="${title}">
-          <span class="activ-bar-label">${row.label}</span>
-          <span class="activ-bar-track">
-            <span class="activ-bar-fill" style="width:${row.share}%"></span>
-          </span>
-          <span class="activ-bar-value">${formatPercent(row.share)}</span>
-        </div>
-      `;
-    })
-    .join("");
 }
 
 function renderModal(modal, visits) {
