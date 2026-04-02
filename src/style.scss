@@ -2086,73 +2086,32 @@ b {
   overflow-x: auto;
 }
 
-.activ-heatmap-months {
-  --activ-heatmap-cell-size: 10px;
-  --activ-heatmap-gap: 4px;
-  --activ-heatmap-weeks: 1;
-  display: grid;
-  grid-template-columns: repeat(var(--activ-heatmap-weeks), var(--activ-heatmap-cell-size));
-  gap: var(--activ-heatmap-gap);
-  margin-left: 44px;
-  margin-bottom: 8px;
-  min-width: calc(
-    var(--activ-heatmap-weeks) * var(--activ-heatmap-cell-size) +
-      (var(--activ-heatmap-weeks) - 1) * var(--activ-heatmap-gap)
-  );
-  font-size: 11px;
-  color: rgba(78, 71, 56, 0.72);
-}
-
-.activ-heatmap-month {
-  white-space: nowrap;
-}
-
 .activ-heatmap-shell {
-  display: grid;
-  grid-template-columns: 34px 1fr;
-  gap: 10px;
-  align-items: start;
-  min-width: calc(
-    34px + 10px +
-      var(--activ-heatmap-weeks) * var(--activ-heatmap-cell-size) +
-      (var(--activ-heatmap-weeks) - 1) * var(--activ-heatmap-gap)
-  );
+  overflow-x: auto;
+  overflow-y: hidden;
+  color: rgba(78, 71, 56, 0.8);
 }
 
-.activ-heatmap-days {
-  display: grid;
-  grid-template-rows: repeat(7, 13px);
-  gap: 5px;
-  padding-top: 2px;
+.activ-heatmap-shell svg {
+  display: block;
+  min-width: 760px;
+}
+
+.activ-heatmap-shell .ch-domain-text,
+.activ-heatmap-shell .ch-plugin-calendar-label-text {
+  fill: rgba(78, 71, 56, 0.74);
+  font-family: "Ubuntu Mono", monospace;
   font-size: 10px;
   text-transform: lowercase;
-  color: rgba(78, 71, 56, 0.72);
 }
 
-.activ-heatmap-grid {
-  display: grid;
-  grid-template-columns: repeat(var(--activ-heatmap-weeks), var(--activ-heatmap-cell-size));
-  grid-template-rows: repeat(7, var(--activ-heatmap-cell-size));
-  gap: var(--activ-heatmap-gap);
+.activ-heatmap-shell .ch-subdomain-bg {
+  stroke: rgba(78, 71, 56, 0.08);
+  stroke-width: 1px;
 }
 
-.activ-heatmap-cell {
-  width: var(--activ-heatmap-cell-size);
-  height: var(--activ-heatmap-cell-size);
-  border-radius: 2px;
-  background: rgba(78, 71, 56, 0.1);
-  border: 1px solid rgba(78, 71, 56, 0.06);
-}
-
-.activ-heatmap-cell.is-active {
-  background:
-    linear-gradient(180deg, rgba(154, 185, 114, 0.92), rgba(64, 99, 64, 0.94)),
-    #6c8b58;
-  border-color: rgba(54, 76, 52, 0.2);
-}
-
-.activ-heatmap-cell--pad {
-  visibility: hidden;
+.activ-heatmap-shell .ch-subdomain-bg:hover {
+  stroke: rgba(78, 71, 56, 0.5);
 }
 
 .activ-weekday-canvas {
@@ -3066,15 +3025,7 @@ b {
   }
 
   .activ-heatmap-shell {
-    grid-template-columns: 1fr;
-  }
-
-  .activ-heatmap-days {
-    display: none;
-  }
-
-  .activ-heatmap-months {
-    margin-left: 0;
+    overflow-x: auto;
   }
 
   .book-shell {

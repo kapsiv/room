@@ -1,3 +1,7 @@
+import CalHeatmap from "cal-heatmap";
+import CalendarLabel from "cal-heatmap/plugins/CalendarLabel";
+import "cal-heatmap/cal-heatmap.css";
+
 const WEEKDAY_LABELS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
 
 function parseCsv(text) {
@@ -161,13 +165,6 @@ function formatAveragePerWeek(value) {
   return value >= 10 ? value.toFixed(1) : value.toFixed(2).replace(/0$/, "");
 }
 
-function formatMonthLabel(date) {
-  return date.toLocaleDateString("en-GB", {
-    month: "short",
-    timeZone: "UTC",
-  });
-}
-
 function drawCanvasText(ctx, text, x, y, options = {}) {
   const {
     align = "left",
@@ -285,77 +282,97 @@ function renderFactCard(modal, selector, value, detail = "") {
   if (detailEl) detailEl.textContent = detail;
 }
 
-function renderAttendanceHeatmap(modal, stats) {
+function buildAttendanceData(stats) {
+  return [...stats.attendanceDays]
+    .sort()
+    .map((dateKey) => ({
+      date: new Date(`${dateKey}T00:00:00Z`).getTime(),
+      value: 1,
+    }));
+}
+
+async function renderAttendanceHeatmap(modal, stats, heatmapState) {
   const mount = modal.querySelector("#activHeatmap");
-  const labelsMount = modal.querySelector("#activHeatmapMonths");
-  if (!mount || !labelsMount) return;
+  if (!mount) return;
 
-  const yearStart = getYearStart(stats.focusYear);
-  const yearEnd = getYearEnd(stats.focusYear);
-  const totalDays = getDayDifferenceInclusive(yearStart, yearEnd);
-  const leadingOffset = (yearStart.getUTCDay() + 6) % 7;
-  const totalWeeks = Math.ceil((leadingOffset + totalDays) / 7);
-
-  mount.style.setProperty("--activ-heatmap-weeks", String(totalWeeks));
-  labelsMount.style.setProperty("--activ-heatmap-weeks", String(totalWeeks));
-
-  const monthLabels = Array.from({ length: 12 }, (_, monthIndex) => {
-    const monthStart = new Date(Date.UTC(stats.focusYear, monthIndex, 1));
-    const dayOffset = getDayDifferenceInclusive(yearStart, monthStart) - 1;
-    const gridColumn = Math.floor((leadingOffset + dayOffset) / 7) + 1;
-    return `
-      <span class="activ-heatmap-month" style="grid-column:${gridColumn};">
-        ${formatMonthLabel(monthStart)}
-      </span>
-    `;
-  });
-
-  labelsMount.innerHTML = monthLabels.join("");
-
-  const cells = [];
-  for (let weekIndex = 0; weekIndex < totalWeeks; weekIndex += 1) {
-    for (let weekdayIndex = 0; weekdayIndex < 7; weekdayIndex += 1) {
-      const dayOffset = weekIndex * 7 + weekdayIndex - leadingOffset;
-
-      if (dayOffset < 0 || dayOffset >= totalDays) {
-        cells.push(`
-          <span
-            class="activ-heatmap-cell activ-heatmap-cell--pad"
-            style="grid-column:${weekIndex + 1};grid-row:${weekdayIndex + 1};"
-            aria-hidden="true"
-          ></span>
-        `);
-        continue;
-      }
-
-      const date = addUtcDays(yearStart, dayOffset);
-      const dateKey = date.toISOString().slice(0, 10);
-      const isActive = stats.attendanceDays.has(dateKey);
-      const label = `${formatDateLabel(date)}: ${isActive ? "gym visit recorded" : "no visit recorded"}`;
-
-      cells.push(`
-        <span
-          class="activ-heatmap-cell${isActive ? " is-active" : ""}"
-          style="grid-column:${weekIndex + 1};grid-row:${weekdayIndex + 1};"
-          title="${label}"
-          aria-label="${label}"
-        ></span>
-      `);
-    }
+  if (heatmapState.instance) {
+    await heatmapState.instance.destroy();
+    heatmapState.instance = null;
   }
 
-  mount.innerHTML = `
-    <div class="activ-heatmap-days" aria-hidden="true">
-      ${WEEKDAY_LABELS.map((label) => `<span>${label}</span>`).join("")}
-    </div>
-    <div
-      class="activ-heatmap-grid"
-      role="img"
-      aria-label="GitHub-style attendance grid for ${stats.focusYear}"
-    >
-      ${cells.join("")}
-    </div>
-  `;
+  mount.innerHTML = "";
+
+  const heatmap = new CalHeatmap();
+  await heatmap.paint(
+    {
+      itemSelector: "#activHeatmap",
+      range: 12,
+      domain: {
+        type: "month",
+        gutter: 8,
+        label: {
+          text: "MMM",
+          position: "top",
+          textAlign: "start",
+          offset: { x: 2, y: 2 },
+        },
+      },
+      subDomain: {
+        type: "ghDay",
+        width: 11,
+        height: 11,
+        gutter: 4,
+        radius: 2,
+      },
+      date: {
+        start: new Date(Date.UTC(stats.focusYear, 0, 1)),
+        locale: {
+          weekStart: 1,
+        },
+        timezone: "Europe/London",
+      },
+      data: {
+        source: buildAttendanceData(stats),
+        x: "date",
+        y: "value",
+        defaultValue: 0,
+      },
+      scale: {
+        color: {
+          type: "threshold",
+          range: ["#e5ddd0", "#4e4738"],
+          domain: [1],
+        },
+      },
+      animationDuration: 0,
+    },
+    [[
+      CalendarLabel,
+      {
+        position: "left",
+        text: () => WEEKDAY_LABELS,
+        width: 26,
+        height: 11,
+        gutter: 4,
+        textAlign: "start",
+        padding: [24, 0, 0, 0],
+      },
+    ]],
+  );
+
+  heatmapState.instance = heatmap;
+}
+
+async function fetchCsvRows(url) {
+  try {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) return [];
+    const text = await response.text();
+    return parseCsv(text);
+  } catch (error) {
+    console.warn(`actIV csv fetch failed for ${url}:`, error);
+    return [];
+  }
 }
 
 function renderWeekdayChart(modal, stats) {
@@ -435,11 +452,11 @@ function renderWeekdayChart(modal, stats) {
   });
 }
 
-function renderModal(modal, visits) {
+async function renderModal(modal, visits, heatmapState) {
   const stats = buildYearStats(visits);
   const lastVisit = stats.lastVisit;
 
-  renderAttendanceHeatmap(modal, stats);
+  await renderAttendanceHeatmap(modal, stats, heatmapState);
   renderWeekdayChart(modal, stats);
 
   renderFactCard(
@@ -477,26 +494,19 @@ export function createActivFeature() {
   const cacheState = {
     visits: null,
   };
+  const heatmapState = {
+    instance: null,
+  };
 
   async function loadVisitsCsv() {
     if (cacheState.visits) return cacheState.visits;
 
-    let response = await fetch("/api/puregym-visits");
-    let text = "";
-
-    if (response.ok) {
-      text = await response.text();
+    let parsed = await fetchCsvRows("/api/puregym-visits");
+    if (!parsed.length) {
+      parsed = await fetchCsvRows("/data/visit_history.csv");
     }
-
-    let parsed = text ? parseCsv(text) : [];
-
-    if (!response.ok || parsed.length === 0) {
-      response = await fetch("/data/visit_history.csv");
-      if (!response.ok) {
-        throw new Error(`visit_history.csv fetch failed: ${response.status}`);
-      }
-      text = await response.text();
-      parsed = parseCsv(text);
+    if (!parsed.length) {
+      throw new Error("No actIV CSV data was available from Blob or the local fallback");
     }
 
     cacheState.visits = buildVisitRecords(parsed);
@@ -511,15 +521,16 @@ export function createActivFeature() {
 
     try {
       const visits = await loadVisitsCsv();
-      renderModal(modal, visits);
+      await renderModal(modal, visits, heatmapState);
     } catch (error) {
       console.warn("actIV load failed:", error);
       const root = modal.querySelector("#activRoot");
+      const message = error instanceof Error ? error.message : "unknown error";
       if (root) {
         root.innerHTML = `
           <div class="chart-section activ-empty-state">
             <h3 class="chart-title">couldn't load actIV data</h3>
-            <p>blob fetch failed and the local backup csv was not available.</p>
+            <p>${message}</p>
           </div>
         `;
       }
