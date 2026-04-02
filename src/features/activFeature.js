@@ -255,9 +255,16 @@ function buildYearStats(visits) {
     coverageEnd = lastVisit ? startOfUtcDay(lastVisit.enteredAt) : yearStart;
   }
 
-  const totalDaysTracked = getDayDifferenceInclusive(yearStart, coverageEnd);
-  const attendanceDayCount = attendanceDays.size;
-  const averageDaysPerWeek = attendanceDayCount / (totalDaysTracked / 7);
+  const calculationStart = addUtcDays(yearStart, 7);
+  const attendanceDaysAfterOpeningWeek = new Set(
+    [...attendanceDays].filter((dateKey) => new Date(`${dateKey}T00:00:00Z`).getTime() >= calculationStart.getTime()),
+  );
+  const totalDaysTracked =
+    coverageEnd.getTime() >= calculationStart.getTime()
+      ? getDayDifferenceInclusive(calculationStart, coverageEnd)
+      : 0;
+  const attendanceDayCount = attendanceDaysAfterOpeningWeek.size;
+  const averageDaysPerWeek = totalDaysTracked ? attendanceDayCount / (totalDaysTracked / 7) : 0;
   const averageEntryMinutes = yearVisits.length ? totalEntryMinutes / yearVisits.length : NaN;
   const attendanceRate = totalDaysTracked ? (attendanceDayCount / totalDaysTracked) * 100 : 0;
 
@@ -269,6 +276,7 @@ function buildYearStats(visits) {
     weekdayCounts,
     totalDaysTracked,
     attendanceDayCount,
+    calculationStart,
     averageDaysPerWeek,
     averageEntryMinutes,
     attendanceRate,
@@ -463,7 +471,7 @@ async function renderModal(modal, visits, heatmapState) {
     modal,
     "#activFactWeeklyRate",
     formatAveragePerWeek(stats.averageDaysPerWeek),
-    `${stats.attendanceDayCount} gym day${stats.attendanceDayCount === 1 ? "" : "s"} tracked in ${stats.focusYear}`,
+    `${stats.attendanceDayCount} gym day${stats.attendanceDayCount === 1 ? "" : "s"} after the first week`,
   );
 
   renderFactCard(
@@ -486,7 +494,7 @@ async function renderModal(modal, visits, heatmapState) {
     modal,
     "#activFactAttendanceRate",
     formatPercent(stats.attendanceRate),
-    `${stats.attendanceDayCount} of ${stats.totalDaysTracked} days since jan 1`,
+    `${stats.attendanceDayCount} of ${stats.totalDaysTracked} days after the first week`,
   );
 }
 
