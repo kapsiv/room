@@ -59,6 +59,16 @@ function parseCsv(text) {
   });
 }
 
+function countBy(items, keyFn) {
+  const counts = new Map();
+  items.forEach((item) => {
+    const key = keyFn(item);
+    if (!key && key !== 0) return;
+    counts.set(key, (counts.get(key) || 0) + 1);
+  });
+  return counts;
+}
+
 function parseDateParts(value) {
   const match = String(value || "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
   if (!match) return null;
@@ -225,6 +235,25 @@ function buildVisitRecords(rows) {
     .sort((a, b) => a.enteredAt.getTime() - b.enteredAt.getTime());
 }
 
+function buildScrobbleRecords(rows) {
+  return rows
+    .map((row) => {
+      const uts = Number.parseInt(row.uts, 10);
+      if (!Number.isFinite(uts)) return null;
+      const playedAt = new Date(uts * 1000);
+      if (Number.isNaN(playedAt.getTime())) return null;
+      return {
+        uts,
+        playedAt,
+        artist: String(row.artist || "").trim(),
+        album: String(row.album || "").trim(),
+        track: String(row.track || "").trim(),
+      };
+    })
+    .filter((row) => row && row.artist && row.track)
+    .sort((a, b) => a.playedAt.getTime() - b.playedAt.getTime());
+}
+
 function getFocusYear(visits) {
   const lastVisit = visits[visits.length - 1];
   if (lastVisit) return lastVisit.enteredAt.getUTCFullYear();
@@ -280,6 +309,32 @@ function buildYearStats(visits) {
     averageDaysPerWeek,
     averageEntryMinutes,
     attendanceRate,
+  };
+}
+
+function buildGymListeningStats(visits, scrobbles, focusYear) {
+  const sessions = visits.filter(
+    (visit) => visit.enteredAt.getUTCFullYear() === focusYear && visit.leftAt instanceof Date,
+  );
+  const gymScrobbles = scrobbles.filter((scrobble) =>
+    sessions.some(
+      (visit) =>
+        scrobble.playedAt.getTime() >= visit.enteredAt.getTime() &&
+        scrobble.playedAt.getTime() <= visit.leftAt.getTime(),
+    ),
+  );
+
+  const artistCounts = [...countBy(gymScrobbles, (row) => row.artist).entries()]
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .slice(0, 20);
+  const albumCounts = [...countBy(gymScrobbles, (row) => `${row.album || "(unknown album)"} — ${row.artist}`).entries()]
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .slice(0, 20);
+
+  return {
+    totalGymScrobbles: gymScrobbles.length,
+    artistCounts,
+    albumCounts,
   };
 }
 
@@ -383,6 +438,21 @@ async function fetchCsvRows(url) {
   }
 }
 
+function drawSmoothLine(ctx, points) {
+  if (!points.length) return;
+  ctx.beginPath();
+  ctx.moveTo(points[0].x, points[0].y);
+
+  for (let i = 0; i < points.length - 1; i += 1) {
+    const current = points[i];
+    const next = points[i + 1];
+    const midX = (current.x + next.x) / 2;
+    ctx.bezierCurveTo(midX, current.y, midX, next.y, next.x, next.y);
+  }
+
+  ctx.stroke();
+}
+
 function renderWeekdayChart(modal, stats) {
   const canvas = modal.querySelector("#activWeekdayChart");
   const ctx = canvas?.getContext?.("2d");
@@ -403,7 +473,6 @@ function renderWeekdayChart(modal, stats) {
   const usableW = width - pad.l - pad.r;
   const usableH = height - pad.t - pad.b;
   const slotW = usableW / rows.length;
-  const barW = Math.min(42, Math.max(22, slotW - 12));
   const yForValue = (value) => pad.t + usableH - (value / maxValue) * usableH;
 
   ctx.strokeStyle = "rgba(78,71,56,0.18)";
@@ -436,42 +505,78 @@ function renderWeekdayChart(modal, stats) {
     });
   }
 
-  rows.forEach((row, index) => {
-    const x = pad.l + slotW * index + (slotW - barW) / 2;
-    const y = yForValue(row.value);
-    const barHeight = Math.max(pad.t + usableH - y, 2);
+  const points = rows.map((row, index) => ({
+    x: pad.l + slotW * index + slotW / 2,
+    y: yForValue(row.value),
+    label: row.label,
+    value: row.value,
+  }));
 
-    ctx.fillStyle = "#4e4738";
-    ctx.fillRect(x, y, barW, barHeight);
+  ctx.strokeStyle = "#4e4738";
+  ctx.lineWidth = 2;
+  drawSmoothLine(ctx, points);
 
-    drawCanvasText(ctx, row.label, x + barW / 2, pad.t + usableH + 14, {
-      align: "center",
-      baseline: "top",
-      fillStyle: "rgba(78,71,56,0.9)",
-      font: "11px 'Ubuntu Mono', monospace",
-    });
-
-    drawCanvasText(ctx, String(row.value), x + barW / 2, Math.max(y - 6, pad.t + 10), {
+  ctx.fillStyle = "#4e4738";
+  points.forEach((point) => {
+    ctx.beginPath();
+    ctx.arc(point.x, point.y, 4, 0, Math.PI * 2);
+    ctx.fill();
+    drawCanvasText(ctx, String(point.value), point.x, Math.max(point.y - 8, pad.t + 10), {
       align: "center",
       baseline: "bottom",
       fillStyle: "rgba(78,71,56,0.86)",
       font: "11px 'Ubuntu Mono', monospace",
     });
   });
+
+  rows.forEach((row, index) => {
+    const x = pad.l + slotW * index + slotW / 2;
+    drawCanvasText(ctx, row.label, x, pad.t + usableH + 14, {
+      align: "center",
+      baseline: "top",
+      fillStyle: "rgba(78,71,56,0.9)",
+      font: "11px 'Ubuntu Mono', monospace",
+    });
+  });
 }
 
-async function renderModal(modal, visits, heatmapState) {
+function renderRankedList(modal, listSelector, items, totalCount) {
+  const list = modal.querySelector(listSelector);
+  if (!list) return;
+
+  if (!items.length) {
+    list.innerHTML = '<li><span class="artist-name">no gym scrobbles matched</span><span class="artist-count">0</span><span class="artist-share">0%</span></li>';
+    return;
+  }
+
+  const percentFormatter = new Intl.NumberFormat("en-GB", { maximumFractionDigits: 1 });
+  list.innerHTML = items
+    .map(([name, count], index) => {
+      const share = totalCount > 0 ? `${percentFormatter.format((count / totalCount) * 100)}%` : "0%";
+      return `<li><span class="artist-name">${index + 1}. ${name}</span><span class="artist-count">${count.toLocaleString()}</span><span class="artist-share">${share}</span></li>`;
+    })
+    .join("");
+}
+
+async function renderModal(modal, visits, scrobbles, heatmapState) {
   const stats = buildYearStats(visits);
   const lastVisit = stats.lastVisit;
+  const listeningStats = buildGymListeningStats(visits, scrobbles, stats.focusYear);
 
   await renderAttendanceHeatmap(modal, stats, heatmapState);
   renderWeekdayChart(modal, stats);
+  renderRankedList(modal, "#activTopArtistsList", listeningStats.artistCounts, listeningStats.totalGymScrobbles);
+  renderRankedList(modal, "#activTopAlbumsList", listeningStats.albumCounts, listeningStats.totalGymScrobbles);
+  const topArtistsCountLabel = modal.querySelector("#activTopArtistsCountLabel");
+  const topAlbumsCountLabel = modal.querySelector("#activTopAlbumsCountLabel");
+  if (topArtistsCountLabel) topArtistsCountLabel.textContent = `${listeningStats.totalGymScrobbles.toLocaleString()} scrobbles`;
+  if (topAlbumsCountLabel) topAlbumsCountLabel.textContent = `${listeningStats.totalGymScrobbles.toLocaleString()} scrobbles`;
 
   renderFactCard(
     modal,
     "#activFactWeeklyRate",
     formatAveragePerWeek(stats.averageDaysPerWeek),
-    `${stats.attendanceDayCount} gym day${stats.attendanceDayCount === 1 ? "" : "s"} after the first week`,
+    `${stats.attendanceDayCount} gym day${stats.attendanceDayCount === 1 ? "" : "s"}`,
   );
 
   renderFactCard(
@@ -494,13 +599,14 @@ async function renderModal(modal, visits, heatmapState) {
     modal,
     "#activFactAttendanceRate",
     formatPercent(stats.attendanceRate),
-    `${stats.attendanceDayCount} of ${stats.totalDaysTracked} days after the first week`,
+    `${stats.attendanceDayCount} of ${stats.totalDaysTracked}`,
   );
 }
 
 export function createActivFeature() {
   const cacheState = {
     visits: null,
+    scrobbles: null,
   };
   const heatmapState = {
     instance: null,
@@ -521,6 +627,18 @@ export function createActivFeature() {
     return cacheState.visits;
   }
 
+  async function loadScrobblesCsv() {
+    if (cacheState.scrobbles) return cacheState.scrobbles;
+
+    let parsed = await fetchCsvRows("/api/scrobbles");
+    if (!parsed.length) {
+      parsed = await fetchCsvRows("/data/scrobbles.csv");
+    }
+
+    cacheState.scrobbles = buildScrobbleRecords(parsed);
+    return cacheState.scrobbles;
+  }
+
   async function initActivModal(modal) {
     if (!modal) return;
 
@@ -528,8 +646,8 @@ export function createActivFeature() {
     overlay?.classList.add("visible");
 
     try {
-      const visits = await loadVisitsCsv();
-      await renderModal(modal, visits, heatmapState);
+      const [visits, scrobbles] = await Promise.all([loadVisitsCsv(), loadScrobblesCsv()]);
+      await renderModal(modal, visits, scrobbles, heatmapState);
     } catch (error) {
       console.warn("actIV load failed:", error);
       const root = modal.querySelector("#activRoot");
