@@ -1363,6 +1363,40 @@
             <h3 class="chart-title">attendance by weekday</h3>
             <canvas id="activWeekdayChart" class="activ-weekday-canvas"></canvas>
           </section>
+          <div class="chart-row">
+            <section class="chart-section activ-section">
+              <div class="chart-title-row chart-title-row--split">
+                <h3 class="chart-title">top gym artists</h3>
+                <span id="activTopArtistsCountLabel" class="fact-detail">scrobbles</span>
+              </div>
+              <div class="top-artists-columns library-ranking-columns">
+                <span>artist</span>
+                <span id="activTopArtistsValueLabel">count</span>
+                <span>share</span>
+              </div>
+              <div class="top-artists-scroll">
+                <ul id="activTopArtistsList" class="top-artists-list top-artists-list--three-cols">
+                  <li><span class="artist-name">loading...</span><span class="artist-count">--</span><span class="artist-share">--</span></li>
+                </ul>
+              </div>
+            </section>
+            <section class="chart-section activ-section">
+              <div class="chart-title-row chart-title-row--split">
+                <h3 class="chart-title">top gym albums</h3>
+                <span id="activTopAlbumsCountLabel" class="fact-detail">scrobbles</span>
+              </div>
+              <div class="top-artists-columns library-ranking-columns">
+                <span>album</span>
+                <span id="activTopAlbumsValueLabel">count</span>
+                <span>share</span>
+              </div>
+              <div class="top-artists-scroll">
+                <ul id="activTopAlbumsList" class="top-artists-list top-artists-list--three-cols">
+                  <li><span class="artist-name">loading...</span><span class="artist-count">--</span><span class="artist-share">--</span></li>
+                </ul>
+              </div>
+            </section>
+          </div>
         </div>
       </div>
     </div>
