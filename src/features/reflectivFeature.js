@@ -2075,6 +2075,22 @@ function isMobileLayout() {
     ];
   }
 
+  function getWorldMapCountryFillData(key, countryAlbumCounts) {
+    if (key === "greenland" && !countryAlbumCounts.has("greenland")) {
+      const denmarkCount = countryAlbumCounts.get("denmark") || 0;
+      return {
+        count: denmarkCount,
+        matchedKey: denmarkCount > 0 ? "denmark" : null,
+      };
+    }
+
+    const count = countryAlbumCounts.get(key) || 0;
+    return {
+      count,
+      matchedKey: count > 0 ? key : null,
+    };
+  }
+
   function drawWorldAlbumsMap(canvas, geojson, countryAlbumCounts) {
     const ctx = canvas?.getContext?.("2d");
     if (!ctx) return { matched: 0, totalCountries: 0 };
@@ -2108,15 +2124,15 @@ function isMobileLayout() {
     const low = [236, 229, 218];
     const high = [78, 71, 56];
 
-    let matched = 0;
+    const matchedKeys = new Set();
     features.forEach((feature) => {
       const props = feature.properties || {};
       const rawName = props.name || props.ADMIN || props.admin || "";
       const key = normalizeCountryKey(rawName);
       if (key === "antarctica") return;
 
-      const count = countryAlbumCounts.get(key) || 0;
-      if (count > 0) matched += 1;
+      const { count, matchedKey } = getWorldMapCountryFillData(key, countryAlbumCounts);
+      if (matchedKey) matchedKeys.add(matchedKey);
 
       const t = count > 0 ? Math.min(1, 1 - Math.exp(-0.55 * count)) : 0;
       const rgb = mixRgb(low, high, t);
@@ -2130,7 +2146,7 @@ function isMobileLayout() {
       ctx.stroke();
     });
 
-    return { matched, totalCountries: countryAlbumCounts.size };
+    return { matched: matchedKeys.size, totalCountries: countryAlbumCounts.size };
   }
 
   async function renderMusicLibraryWorldMap(modal, countryAlbumCounts) {
