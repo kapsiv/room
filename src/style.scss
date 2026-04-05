@@ -2629,6 +2629,10 @@ b {
   gap: 10px;
 }
 
+.musiclib-pie-row + .musiclib-pie-row {
+  margin-top: -14px;
+}
+
 .top-artists-scroll {
   max-height: 180px;
   overflow-y: auto;
@@ -2797,6 +2801,8 @@ b {
 #libraryWorldMap,
 #libraryGenreUmbrellaPie,
 #libraryFileTypePie,
+#libraryRecordingTypePie,
+#libraryFormatPie,
 #libraryDurationScatter {
   width: 100%;
   height: 220px;

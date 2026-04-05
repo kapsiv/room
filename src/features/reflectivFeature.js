@@ -254,6 +254,18 @@ function parseDurationToSeconds(value) {
   return null;
 }
 
+function parseLibraryFacetValues(value) {
+  const raw = String(value || "").trim().toLowerCase();
+  if (!raw) return ["unknown"];
+  const values = [...new Set(
+    raw
+      .split(";")
+      .map((part) => part.trim())
+      .filter(Boolean),
+  )];
+  return values.length ? values : ["unknown"];
+}
+
 const normalizedGenreUmbrellaMap = Object.fromEntries(
   Object.entries(genreUmbrellaMap).map(([key, umbrella]) => [normalizeGenreKey(key), umbrella]),
 );
@@ -2609,6 +2621,8 @@ function isMobileLayout() {
     const umbrellaDurationTotals = new Map();
     const umbrellaDurationCounts = new Map();
     const fileTypeCounts = new Map();
+    const recordingTypesByAlbum = new Map();
+    const formatsByAlbum = new Map();
     const durationValues = [];
     const songDurationEntries = [];
     let totalDurationSeconds = 0;
@@ -2642,6 +2656,14 @@ function isMobileLayout() {
       if (albumKey) albumSongCounts.set(albumKey, (albumSongCounts.get(albumKey) || 0) + 1);
       const fileType = getFileTypeLabel(r.File);
       fileTypeCounts.set(fileType, (fileTypeCounts.get(fileType) || 0) + 1);
+      if (albumKey) {
+        const recordingTypes = parseLibraryFacetValues(r["Recording Type"]);
+        const formats = parseLibraryFacetValues(r.Format);
+        if (!recordingTypesByAlbum.has(albumKey)) recordingTypesByAlbum.set(albumKey, new Set());
+        if (!formatsByAlbum.has(albumKey)) formatsByAlbum.set(albumKey, new Set());
+        recordingTypes.forEach((recordingType) => recordingTypesByAlbum.get(albumKey).add(recordingType));
+        formats.forEach((format) => formatsByAlbum.get(albumKey).add(format));
+      }
       const rowGenres = [...new Set((r.Genres || "")
         .split(";")
         .map((g) => g.trim().toLowerCase())
@@ -2797,6 +2819,18 @@ function isMobileLayout() {
       if (reflectivState.libraryCountryGenreFilter !== "all" && !umbrellas?.has(reflectivState.libraryCountryGenreFilter)) return;
       countrySet.forEach((country) => {
         countryAlbumCounts.set(country, (countryAlbumCounts.get(country) || 0) + 1);
+      });
+    });
+    const recordingTypeCounts = new Map();
+    recordingTypesByAlbum.forEach((recordingTypes) => {
+      recordingTypes.forEach((recordingType) => {
+        recordingTypeCounts.set(recordingType, (recordingTypeCounts.get(recordingType) || 0) + 1);
+      });
+    });
+    const formatCounts = new Map();
+    formatsByAlbum.forEach((formats) => {
+      formats.forEach((format) => {
+        formatCounts.set(format, (formatCounts.get(format) || 0) + 1);
       });
     });
 
@@ -3003,6 +3037,8 @@ function isMobileLayout() {
       bindGenreUmbrellaPieInteractions(modal, umbrellaModalCanvas);
     }
     drawGenreUmbrellaPie(modal.querySelector("#libraryFileTypePie"), fileTypeCounts);
+    drawGenreUmbrellaPie(modal.querySelector("#libraryRecordingTypePie"), recordingTypeCounts);
+    drawGenreUmbrellaPie(modal.querySelector("#libraryFormatPie"), formatCounts);
     drawDurationDistributionLine(modal.querySelector("#libraryDurationScatter"), durationValues);
     drawAverageSongLengthByGenreChart(modal.querySelector("#libraryGenreAverageDurationChart"), averageSongLengthByUmbrella);
   }
