@@ -511,6 +511,13 @@ b {
   letter-spacing: 0.02em;
 }
 
+.data-pipeline-body {
+  margin: 0 0 16px;
+  color: rgba(78, 71, 56, 0.76);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
 .data-pipeline-frame {
   overflow: visible;
   padding: clamp(24px, 2.4vw, 34px);
@@ -953,26 +960,51 @@ b {
   transform: scale(1.035);
 }
 
-.data-pipeline-svg :is(.cls-2, .cls-3, .cls-4, .cls-6, .cls-8, .cls-10, .cls-11, .cls-12, .cls-13, .cls-14, .cls-15, .cls-16, .cls-17, .cls-18, .cls-19, .cls-21, .cls-22) {
+.data-pipeline-key-target {
+  cursor: pointer;
+  outline: none;
+}
+
+.data-pipeline-highlightable {
+  transition:
+    opacity 180ms ease,
+    filter 180ms ease;
+}
+
+.data-pipeline-has-highlight .data-pipeline-dimmed {
+  opacity: 0.18 !important;
+  filter: saturate(0.72);
+}
+
+.data-pipeline-highlighted {
+  opacity: 1 !important;
+  filter: drop-shadow(0 0 10px rgba(78, 71, 56, 0.18));
+}
+
+.data-pipeline-key-active {
+  opacity: 1 !important;
+}
+
+.data-pipeline-svg :is(.cls-2, .cls-3, .cls-4, .cls-6, .cls-8, .cls-10, .cls-11, .cls-12, .cls-13, .cls-14, .cls-15, .cls-16, .cls-17, .cls-18, .cls-19, .cls-20, .cls-21) {
   animation-name: data-pipeline-dash-flow;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
   will-change: stroke-dashoffset;
 }
 
-.data-pipeline-svg .cls-18 {
+.data-pipeline-svg .cls-20 {
   stroke-dasharray: 128 128 !important;
   stroke-dashoffset: 256;
   animation-duration: 750ms;
 }
 
-.data-pipeline-svg :is(.cls-2, .cls-8, .cls-10, .cls-11, .cls-13, .cls-14, .cls-15, .cls-17, .cls-21, .cls-22) {
+.data-pipeline-svg :is(.cls-2, .cls-8, .cls-13, .cls-14, .cls-16, .cls-17, .cls-18, .cls-19) {
   stroke-dasharray: 64 64 !important;
   stroke-dashoffset: 128;
   animation-duration: 500ms;
 }
 
-.data-pipeline-svg :is(.cls-3, .cls-4, .cls-6, .cls-12, .cls-16, .cls-19) {
+.data-pipeline-svg :is(.cls-3, .cls-4, .cls-6, .cls-10, .cls-11, .cls-12, .cls-15, .cls-21) {
   stroke-dasharray: 24 24 !important;
   stroke-dashoffset: 48;
   animation-duration: 188ms;
@@ -985,7 +1017,7 @@ b {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .data-pipeline-svg :is(.cls-2, .cls-3, .cls-4, .cls-6, .cls-8, .cls-10, .cls-11, .cls-12, .cls-13, .cls-14, .cls-15, .cls-16, .cls-17, .cls-18, .cls-19, .cls-21, .cls-22) {
+  .data-pipeline-svg :is(.cls-2, .cls-3, .cls-4, .cls-6, .cls-8, .cls-10, .cls-11, .cls-12, .cls-13, .cls-14, .cls-15, .cls-16, .cls-17, .cls-18, .cls-19, .cls-20, .cls-21) {
     animation: none;
   }
 }

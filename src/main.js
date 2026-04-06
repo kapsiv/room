@@ -27,7 +27,9 @@ const MOBILE_BREAKPOINT = 760;
 const MOBILE_VIEWPORT_INSET = 12;
 const MOBILE_LITE_LAUNCHER_IDS = ["reflectiv", "about", "logo", "faq"];
 const DATA_PIPELINE_HOVER_TARGET_IDS = [
+  "actIV",
   "github_repo",
+  "puregym",
   "scrobbler",
   "music_player",
   "blob_storage",
@@ -40,12 +42,89 @@ const DATA_PIPELINE_HOVER_TARGET_IDS = [
 ];
 const DATA_PIPELINE_LINKS = {
   blob_storage: "https://vercel.com/docs/vercel-blob",
+  puregym: "https://github.com/2t6h/puregym-attendance",
   scrobbler: "https://kawaiidango.github.io/pano-scrobbler/",
   health_app: "https://consumer.huawei.com/uk/mobileservices/health/",
   music_player: "https://getmusicbee.com",
   "last.fm": "https://www.last.fm/user/kapsiv",
   github_repo: "https://github.com/kapsiv/room",
 };
+function parseDataPipelineTags(value) {
+  return (value || "")
+    .trim()
+    .split(/\s+/u)
+    .filter(Boolean);
+}
+
+function initDataPipelineKeyHighlights(svg) {
+  const highlightableElements = [...svg.querySelectorAll("[data-key-tags]")];
+  const triggerElements = [...svg.querySelectorAll("[data-key-trigger]")];
+
+  if (!highlightableElements.length || !triggerElements.length) return;
+
+  highlightableElements.forEach((element) => {
+    element.classList.add("data-pipeline-highlightable");
+  });
+
+  const clearHighlight = () => {
+    svg.classList.remove("data-pipeline-has-highlight");
+    highlightableElements.forEach((element) => {
+      element.classList.remove("data-pipeline-highlighted", "data-pipeline-dimmed", "data-pipeline-key-active");
+    });
+  };
+
+  const applyHighlight = (triggerId) => {
+    const activeTriggerElements = triggerElements.filter(
+      (element) => element.getAttribute("data-key-trigger") === triggerId,
+    );
+    const activeTags = new Set(
+      activeTriggerElements.flatMap((element) =>
+        parseDataPipelineTags(element.getAttribute("data-key-tags")),
+      ),
+    );
+
+    if (!activeTags.size) {
+      clearHighlight();
+      return;
+    }
+
+    svg.classList.add("data-pipeline-has-highlight");
+
+    highlightableElements.forEach((element) => {
+      const tags = parseDataPipelineTags(element.getAttribute("data-key-tags"));
+      const isPersistent = tags.includes("all");
+      const isHighlighted = !isPersistent && tags.some((tag) => activeTags.has(tag));
+
+      element.classList.toggle("data-pipeline-highlighted", isHighlighted);
+      element.classList.toggle("data-pipeline-dimmed", !isPersistent && !isHighlighted);
+      element.classList.toggle("data-pipeline-key-active", activeTriggerElements.includes(element));
+    });
+  };
+
+  const maybeClearHighlight = (event, triggerId) => {
+    const nextTriggerId =
+      event.relatedTarget?.closest?.("[data-key-trigger]")?.getAttribute("data-key-trigger") ??
+      event.relatedTarget?.getAttribute?.("data-key-trigger");
+
+    if (nextTriggerId === triggerId) return;
+    clearHighlight();
+  };
+
+  triggerElements.forEach((triggerElement) => {
+    const triggerId = triggerElement.getAttribute("data-key-trigger");
+    if (!triggerId) return;
+
+    triggerElement.classList.add("data-pipeline-key-target");
+    if (triggerElement.matches("text")) {
+      triggerElement.setAttribute("tabindex", "0");
+    }
+
+    triggerElement.addEventListener("mouseenter", () => applyHighlight(triggerId));
+    triggerElement.addEventListener("focus", () => applyHighlight(triggerId));
+    triggerElement.addEventListener("mouseleave", (event) => maybeClearHighlight(event, triggerId));
+    triggerElement.addEventListener("blur", (event) => maybeClearHighlight(event, triggerId));
+  });
+}
 
 async function fetchNowPlayingTrack() {
   const url = `${LASTFM_ENDPOINT}?method=user.getrecenttracks&user=${encodeURIComponent(LASTFM_USER)}&api_key=${LASTFM_API_KEY}&format=json&limit=1`;
@@ -192,6 +271,8 @@ function initDataPipelinesDiagram() {
       openLink();
     });
   });
+
+  initDataPipelineKeyHighlights(svg);
 
   mount.replaceChildren(svg);
   mount.dataset.svgMounted = "true";
