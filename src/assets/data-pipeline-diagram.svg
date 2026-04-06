@@ -18,7 +18,7 @@
         stroke: #4e4738;
       }
 
-      .data-pipeline-svg .cls-2, .data-pipeline-svg .cls-3, .data-pipeline-svg .cls-4, .data-pipeline-svg .cls-6, .data-pipeline-svg .cls-24, .data-pipeline-svg .cls-8, .data-pipeline-svg .cls-9, .data-pipeline-svg .cls-10, .data-pipeline-svg .cls-11, .data-pipeline-svg .cls-12, .data-pipeline-svg .cls-13, .data-pipeline-svg .cls-14, .data-pipeline-svg .cls-15, .data-pipeline-svg .cls-16, .data-pipeline-svg .cls-17, .data-pipeline-svg .cls-18, .data-pipeline-svg .cls-19, .data-pipeline-svg .cls-21, .data-pipeline-svg .cls-22 {
+      .data-pipeline-svg .cls-2, .data-pipeline-svg .cls-3, .data-pipeline-svg .cls-4, .data-pipeline-svg .cls-6, .data-pipeline-svg .cls-24, .data-pipeline-svg .cls-8, .data-pipeline-svg .cls-9, .data-pipeline-svg .cls-10, .data-pipeline-svg .cls-11, .data-pipeline-svg .cls-12, .data-pipeline-svg .cls-13, .data-pipeline-svg .cls-14, .data-pipeline-svg .cls-15, .data-pipeline-svg .cls-16, .data-pipeline-svg .cls-17, .data-pipeline-svg .cls-18, .data-pipeline-svg .cls-19, .data-pipeline-svg .cls-20, .data-pipeline-svg .cls-21 {
         stroke-linejoin: round;
       }
 
@@ -27,14 +27,14 @@
       }
 
       .data-pipeline-svg .cls-3 {
-        stroke-dasharray: 51.18 51.18;
+        stroke-dasharray: 52.75 52.75;
       }
 
       .data-pipeline-svg .cls-4 {
         stroke-dasharray: 48.66 48.66;
       }
 
-      .data-pipeline-svg .cls-5, .data-pipeline-svg .cls-7, .data-pipeline-svg .cls-20, .data-pipeline-svg .cls-25, .data-pipeline-svg .cls-26, .data-pipeline-svg .cls-27 {
+      .data-pipeline-svg .cls-5, .data-pipeline-svg .cls-7, .data-pipeline-svg .cls-22, .data-pipeline-svg .cls-25, .data-pipeline-svg .cls-26, .data-pipeline-svg .cls-27 {
         stroke-miterlimit: 10;
       }
 
@@ -80,15 +80,15 @@
       }
 
       .data-pipeline-svg .cls-10 {
-        stroke-dasharray: 77.78 77.78;
+        stroke-dasharray: 48.58 48.58;
       }
 
       .data-pipeline-svg .cls-11 {
-        stroke-dasharray: 100.46 100.46;
+        stroke-dasharray: 49.54 49.54;
       }
 
       .data-pipeline-svg .cls-12 {
-        stroke-dasharray: 50;
+        stroke-dasharray: 48.86 48.86;
       }
 
       .data-pipeline-svg .cls-30 {
@@ -97,11 +97,11 @@
       }
 
       .data-pipeline-svg .cls-13 {
-        stroke-dasharray: 100 100;
+        stroke-dasharray: 77.78 77.78;
       }
 
       .data-pipeline-svg .cls-14 {
-        stroke-dasharray: 104.26 104.26;
+        stroke-dasharray: 100.46 100.46;
       }
 
       .data-pipeline-svg .cls-34 {
@@ -113,27 +113,27 @@
       }
 
       .data-pipeline-svg .cls-15 {
-        stroke-dasharray: 86.4 86.4;
+        stroke-dasharray: 50;
       }
 
       .data-pipeline-svg .cls-16 {
-        stroke-dasharray: 48.73 48.73;
+        stroke-dasharray: 100 100;
       }
 
       .data-pipeline-svg .cls-17 {
-        stroke-dasharray: 98.66 98.66;
+        stroke-dasharray: 104.26 104.26;
       }
 
       .data-pipeline-svg .cls-18 {
-        stroke-dasharray: 200 200;
+        stroke-dasharray: 86.4 86.4;
       }
 
       .data-pipeline-svg .cls-19 {
-        stroke-dasharray: 50 50;
+        stroke-dasharray: 98.66 98.66;
       }
 
       .data-pipeline-svg .cls-20 {
-        stroke-linecap: round;
+        stroke-dasharray: 200 200;
       }
 
       .data-pipeline-svg .cls-31 {
@@ -141,11 +141,11 @@
       }
 
       .data-pipeline-svg .cls-21 {
-        stroke-dasharray: 106.51 106.51;
+        stroke-dasharray: 50 50;
       }
 
       .data-pipeline-svg .cls-22 {
-        stroke-dasharray: 96.7 96.7;
+        stroke-linecap: round;
       }
     </style>
     <filter id="luminosity-invert-noclip" x="1485.17" y="2756.59" width="402.71" height="348.01" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
@@ -160,77 +160,77 @@
     </mask>
   </defs>
   <g id="Arrows">
-    <g class="cls-34">
+    <g id="scheduled" class="cls-35" data-key-tags="str">
       <g>
-        <path class="cls-21" d="M1909.22,1663.94H3180.81"/>
+        <path class="cls-12" d="M1909.22,1663.94H3180.81"/>
         <polygon class="cls-29" points="3166.56 1557.64 3166.56 1770.25 3272.83 1663.95 3166.56 1557.64"/>
       </g>
     </g>
-    <g class="cls-34">
+    <g id="scheduled-2" data-name="scheduled" class="cls-34" data-key-tags="sch">
       <g>
-        <path class="cls-17" d="M3789.7,1663.94H4344.23V2801.42L4833.13,2799.72"/>
+        <path class="cls-19" d="M3789.7,1663.94H4344.23V2801.42L4833.13,2799.72"/>
         <polygon class="cls-29" points="4818.5 2693.46 4819.24 2906.08 4925.14 2799.41 4818.5 2693.46"/>
       </g>
     </g>
-    <g>
+    <g id="scheduled_and_on_demand" data-name="scheduled and on demand" data-key-tags="sch ond">
       <path class="cls-8" d="M6636.36,1663.94H7227.91"/>
     </g>
-    <g>
-      <path class="cls-6" d="M1799.7,1457.38H2678.14V286.64H3192"/>
+    <g id="streaming" data-name="streaming" data-key-tags="str">
+      <path class="cls-3" d="M1942.38,1457.38H2678.14V286.64H3192"/>
       <polygon class="cls-29" points="3177.75 392.94 3177.75 180.33 3284.01 286.63 3177.75 392.94"/>
     </g>
-    <g>
-      <path class="cls-14" d="M5597.14,3020.04H7886.58V2660.83"/>
+    <g id="scheduled-3" data-name="scheduled" data-key-tags="sch">
+      <path class="cls-17" d="M5597.14,3020.04H7886.58V2660.83"/>
       <polygon class="cls-29" points="7759.01 2677.93 8014.15 2677.93 7886.59 2550.42 7759.01 2677.93"/>
     </g>
-    <g>
-      <path class="cls-3" d="M3521.9,313.35H4748.94"/>
+    <g id="streaming-2" data-name="streaming" data-key-tags="str">
+      <path class="cls-11" d="M3757.71,313.35H4748.94"/>
       <polygon class="cls-29" points="4734.69 207.04 4734.69 419.66 4840.95 313.36 4734.69 207.04"/>
     </g>
-    <g>
-      <path class="cls-11" d="M5271.77,775.59V2583.32"/>
+    <g id="scheduled-4" data-name="scheduled" data-key-tags="sch">
+      <path class="cls-14" d="M5271.77,775.59V2583.32"/>
       <polygon class="cls-29" points="5165.46 2569.07 5378.07 2569.07 5271.77 2675.34 5165.46 2569.07"/>
     </g>
-    <g class="cls-34">
+    <g id="scheduled-5" data-name="scheduled" class="cls-35" data-key-tags="str">
       <g>
-        <path class="cls-22" d="M1650.67,571.59V961.68"/>
+        <path class="cls-10" d="M1650.67,571.59V961.68"/>
         <polygon class="cls-29" points="1756.97 947.43 1544.36 947.43 1650.66 1053.69 1756.97 947.43"/>
       </g>
     </g>
-    <polyline class="cls-12" points="5756.4 313.35 7868.67 313.35 7880.91 1007.09"/>
-    <g>
-      <line class="cls-13" x1="3753.12" y1="3020.04" x2="4833.13" y2="3020.04"/>
+    <polyline id="on_demand" data-name="on demand" data-key-tags="ond" class="cls-15" points="5756.4 313.35 7868.67 313.35 7880.91 1007.09"/>
+    <g id="ad_hoc" data-name="ad hoc" data-key-tags="adh">
+      <line class="cls-20" x1="3753.12" y1="3020.04" x2="4833.13" y2="3020.04"/>
       <polygon class="cls-29" points="4818.87 3126.34 4818.87 2913.73 4925.14 3020.03 4818.87 3126.34"/>
     </g>
-    <g>
-      <line class="cls-13" x1="2135.96" y1="3020.04" x2="3180.82" y2="3020.04"/>
+    <g id="ad_hoc-2" data-name="ad hoc" data-key-tags="adh">
+      <line class="cls-20" x1="2135.96" y1="3020.04" x2="3180.82" y2="3020.04"/>
       <polygon class="cls-29" points="3166.56 3126.34 3166.56 2913.73 3272.83 3020.03 3166.56 3126.34"/>
     </g>
-    <g>
-      <polyline class="cls-18" points="5560.81 2827.59 6187.21 2827.59 6187.21 2300.15"/>
+    <g id="ad_hoc-3" data-name="ad hoc" data-key-tags="adh">
+      <polyline class="cls-20" points="5560.81 2827.59 6187.21 2827.59 6187.21 2300.15"/>
       <polygon class="cls-29" points="6080.9 2314.4 6293.52 2314.4 6187.22 2208.13 6080.9 2314.4"/>
     </g>
-    <polygon class="cls-20" points="7226.25 1554.17 7226.25 1766.79 7332.51 1660.49 7226.25 1554.17"/>
-    <polygon class="cls-29" points="7226.25 1660.58 7226.25 1766.79 7332.51 1660.49 7226.25 1660.58"/>
-    <polygon class="cls-20" points="7986.13 1012.79 7773.52 1012.79 7879.81 1119.05 7986.13 1012.79"/>
+    <polygon id="_ond_" data-name="[ond]" data-key-tags="sch ond" class="cls-22" points="7226.25 1554.17 7226.25 1766.79 7332.51 1660.49 7226.25 1554.17"/>
+    <polygon data-key-tags="sch ond" class="cls-29" points="7226.25 1660.58 7226.25 1766.79 7332.51 1660.49 7226.25 1660.58"/>
+    <polygon data-key-tags="ond" class="cls-22" points="7986.13 1012.79 7773.52 1012.79 7879.81 1119.05 7986.13 1012.79"/>
   </g>
   <g id="Nodes">
-    <g id="smartwatch" class="cls-34">
+    <g id="smartwatch" class="cls-34" data-key-tags="str">
       <g>
         <rect class="cls-25" x="1406.03" y="80.3" width="489.54" height="466.09" rx="102.03" ry="102.03"/>
         <path class="cls-25" d="M1895.56,182.22h215.78c25.87,0,46.87,21,46.87,46.87v168.52c0,25.87-21,46.87-46.87,46.87h-215.78V182.22h0Z"/>
         <path class="cls-25" d="M1144.9,182.22h215.39c25.87,0,46.87,21,46.87,46.87v168.52c0,25.87-21,46.87-46.87,46.87h-215.39V182.22h0Z" transform="translate(2552.04 626.7) rotate(180)"/>
       </g>
       <g>
-        <path class="cls-5" d="M1651.94,271.31c0-43.15,34.98-78.12,78.12-78.12h0c43.15,0,78.12,34.98,78.12,78.12,0,16.5-5.12,31.81-13.85,44.42-2.67,3.86-5.69,7.47-9,10.79l-19.91,20.08-113.87,116.33-113.87-116.33-19.91-20.08c-3.31-3.31-6.32-6.92-9-10.79-8.73-12.61-13.85-27.92-13.85-44.42,0-43.15,34.98-78.12,78.12-78.12h0c43.15,0,78.12,34.98,78.12,78.12"/>
-        <polyline class="cls-7" points="1513.65 331.95 1608.51 331.95 1637.49 254.39 1659.89 403.36 1707.32 331.95 1787.68 331.95"/>
+        <circle class="cls-5" cx="1651.61" cy="315.91" r="130.28"/>
+        <polyline class="cls-7" points="1595.78 365.8 1651.61 338.84 1652.32 244.2"/>
       </g>
     </g>
-    <g id="last.fm">
+    <g id="last.fm" data-key-tags="str sch ond">
       <path class="cls-24" d="M4966.54,548.27h731.59s50.55-289.73-188.88-291.18c0,0,1.1-227.75-222.37-232.01s-237.34,178.24-237.34,178.24c0,0-153.26-12.19-189.41,178.3-19.17,101.03-19.17,166.65-19.17,166.65h125.58Z"/>
       <path class="cls-29" d="M5415.16,362.46c-8.88-5.56-18.34-9.37-28.96-11.73l-32.07-7.14c-4.45-.99-8.7-2.65-12.56-4.72-6.73-3.6-9.79-9.92-10.37-17.24-.83-10.58,4.67-19.6,15.1-23.06,9.99-3.31,21.21-3.24,31.45-.2,11.49,3.41,16.18,12.68,17.59,23.83l42.84-5.13c-1.75-19.52-9.49-34.99-26.51-44.56-19.65-10.89-50.46-11.52-71.98-7.54-23.7,4.39-44.3,17.42-50.06,42.05-2.51,10.74-2.62,21.61-.29,32.4,2.7,12.52,10.07,22.77,20.87,29.55,7.39,4.64,15.18,7.93,23.76,9.99l36.34,8.7c5.78,1.38,11.13,3.71,15.96,6.88,6.35,4.17,9.63,10.69,9.76,18.17.23,12.65-10.02,18.69-21.08,20.69-14.46,2.61-29.09,2.9-43.5.14-27.33-5.23-42.65-24.51-51.11-49.79l-17.16-51.28c-3.95-11.81-9.22-22.54-16.14-32.74-18.79-27.72-46.82-35.78-78.86-36.87-13.97-.48-27.42.57-40.78,4.46-34.31,10-53.82,37.32-60.04,71.62-3.31,18.27-3.67,36.63-1.03,55.01,6.96,48.53,38.85,74.8,87.42,76.09,26.05.89,56.08-5.36,76.42-22.56l-13.76-37.17c-8.4,8.17-17.62,14.57-28.35,19.04-8.75,3.59-17.59,5.59-27.1,5.64-28.1.18-44.86-21.72-49.45-47.57-2.76-15.55-2.2-31.32,1.31-46.7,5.32-23.28,21.04-41.86,45.87-43.53,20.27-1.37,38.22,5.23,49.55,22.66,5.47,8.42,9.42,17.28,12.57,26.97l16.52,50.73c3.1,9.54,7.08,18.15,12.2,26.66,16.18,26.87,42.55,40.15,73.17,44.09,20.82,2.68,41.69,2.56,62.34-1.06,25.46-4.47,49.44-17.27,53.92-44.89,1.5-9.25,1.21-18.28-.78-27.48-2.98-13.75-11.15-24.97-23.05-32.42Z"/>
     </g>
-    <g id="phone">
+    <g id="phone" data-key-tags="str">
       <g>
         <g>
           <rect class="cls-25" x="1393.89" y="1078.55" width="515.33" height="918.36" rx="118.22" ry="118.22"/>
@@ -249,7 +249,7 @@
       </g>
       <circle class="cls-29" cx="1654.48" cy="1350.72" r="22.12"/>
     </g>
-    <g id="computer">
+    <g id="computer" data-key-tags="adh">
       <g>
         <g>
           <rect class="cls-25" x="1373.07" y="2466.69" width="597.94" height="927.82" rx="118.22" ry="118.22" transform="translate(4602.64 1258.55) rotate(90)"/>
@@ -262,7 +262,7 @@
       </g>
       <path class="cls-29" d="M1789.5,2801.42h-25.9v131.62c-.42-.04-.84-.09-1.26-.12-15.89-1.19-31.72,4.33-43.4,15.16-11.68,10.84-18.39,26.18-18.39,42.09,0,31.66,25.76,57.42,57.42,57.42,15.91,0,31.25-6.7,42.09-18.39,9.84-10.61,15.28-24.63,15.31-39.04h.02v-126.03c6.38,6.53,10.32,15.46,10.32,25.29h51.8c0-48.53-39.49-88.02-88.02-88.02Z"/>
     </g>
-    <g id="website">
+    <g id="website" data-key-tags="sch ond">
       <circle class="cls-24" cx="7886.37" cy="1667.12" r="496.5"/>
       <g>
         <path class="cls-1" d="M7979.52,1683.93l11.48-.02c-3.62-1.58-7.47-2.74-11.48-3.4v3.42Z"/>
@@ -286,18 +286,18 @@
         <path class="cls-29" d="M8028.96,1864.37c4.79-2.03,9.43-4.31,13.95-6.81,4.2-2.32,8.27-4.84,12.21-7.56,7.36-5.07,14.27-10.8,20.67-17.2,10.77-10.78,19.67-22.99,26.61-36.38,1.77-3.41,3.45-6.88,4.95-10.45,6.86-16.22,10.7-33.33,11.45-50.95.09-2.13.14-4.27.14-6.42,0-15.32-2.33-30.29-6.91-44.68-1.36-4.28-2.92-8.52-4.68-12.69h0c-7.42-17.55-18.04-33.3-31.56-46.82-1.08-1.08-2.2-2.11-3.31-3.16-12.77-12.01-27.37-21.58-43.51-28.41-18.19-7.69-37.49-11.59-57.37-11.59h-26.61c-1.88-7.95-4.43-15.76-7.65-23.36-7.42-17.55-18.04-33.31-31.56-46.83-.37-.38-.77-.72-1.15-1.1-13.27-12.99-28.61-23.25-45.68-30.47-18.19-7.69-37.49-11.59-57.37-11.59v68.01c27.02,0,50.92,13.58,65.26,34.28,2.42,3.5,4.58,7.19,6.42,11.06h-71.68c-19.88,0-39.18,3.9-57.37,11.59-16.96,7.17-32.22,17.35-45.42,30.23-.46.45-.94.88-1.4,1.34-13.52,13.52-24.14,29.28-31.56,46.83-2.42,5.71-4.46,11.54-6.12,17.46-3.63,12.92-5.47,26.28-5.47,39.91,0,2.15.05,4.28.14,6.42.75,17.62,4.59,34.73,11.45,50.95.76,1.81,1.58,3.58,2.41,5.35,7.25,15.41,17.02,29.35,29.15,41.48,5.79,5.79,12.02,11.02,18.6,15.72,4.51,3.23,9.2,6.2,14.05,8.9,4.59,2.55,9.3,4.88,14.18,6.94,18.19,7.69,37.49,11.59,57.37,11.59.62,0,1.23,0,1.85-.01.22,0,.44,0,.65-.01.4,0,.8-.01,1.19-.02.28,0,.56-.02.84-.03.33,0,.66-.02,1-.03.31-.01.62-.03.94-.04.3-.01.6-.03.9-.04.34-.02.68-.04,1.02-.06.27-.02.54-.03.81-.05.36-.02.73-.05,1.09-.07.25-.02.49-.03.74-.05.38-.03.76-.06,1.14-.09.23-.02.46-.04.68-.05.4-.03.79-.07,1.19-.11.21-.02.42-.04.63-.06.41-.04.83-.09,1.24-.13.19-.02.38-.04.57-.06.43-.05.85-.1,1.28-.15.18-.02.35-.04.53-.06.44-.05.88-.11,1.32-.17.16-.02.32-.04.48-.06.45-.06.91-.13,1.36-.19.14-.02.29-.04.44-.06.46-.07.93-.14,1.39-.22.13-.02.27-.04.4-.06.48-.08.95-.16,1.43-.24.12-.02.24-.04.36-.06.49-.08.97-.17,1.46-.26.11-.02.22-.04.32-.06.5-.09,1-.19,1.49-.29.09-.02.19-.04.28-.05.51-.1,1.02-.21,1.52-.31.08-.02.16-.03.25-.05.52-.11,1.03-.22,1.55-.34.07-.02.15-.03.22-.05.52-.12,1.05-.24,1.57-.37.06-.01.12-.03.19-.04.53-.13,1.07-.26,1.6-.39.05-.01.1-.03.15-.04.54-.14,1.08-.28,1.62-.42.04-.01.09-.02.13-.03.55-.14,1.09-.29,1.64-.44.03,0,.07-.02.1-.03.55-.15,1.1-.31,1.66-.47.03,0,.06-.02.08-.03.56-.16,1.11-.33,1.67-.5.02,0,.04-.01.06-.02.56-.17,1.12-.35,1.68-.52.02,0,.03,0,.04-.01.56-.18,1.13-.36,1.69-.55.01,0,.02,0,.03,0,.57-.19,1.13-.38,1.7-.58,0,0,.01,0,.02,0,.57-.2,1.14-.4,1.7-.6h0c2.28-.82,4.55-1.7,6.79-2.64.23-.1.46-.19.69-.29,17.09-7.23,32.45-17.51,45.73-30.52.36-.35.74-.69,1.1-1.05,7.6-7.6,14.29-15.91,20-24.85.03-.05.06-.1.09-.15.27-.42.53-.84.8-1.26.1-.17.21-.34.31-.51.19-.31.38-.61.56-.92.12-.19.23-.39.35-.58.17-.29.35-.57.51-.86.12-.2.24-.4.35-.6.17-.28.33-.57.5-.85.12-.2.23-.4.35-.6.17-.29.33-.59.5-.88.11-.19.22-.39.32-.58.18-.32.36-.64.53-.97.09-.17.18-.33.27-.5.26-.48.52-.96.77-1.45.02-.04.04-.08.06-.11.24-.46.48-.92.72-1.39.09-.17.17-.34.26-.51.17-.33.33-.66.5-.99.1-.19.19-.39.29-.59.15-.31.3-.62.45-.92.1-.2.2-.41.3-.61.14-.3.29-.61.43-.92.1-.21.19-.41.29-.62.14-.31.29-.63.43-.94.09-.2.18-.39.27-.59.15-.34.31-.69.46-1.04.07-.17.15-.34.22-.5.22-.51.45-1.03.66-1.55,6.93-16.38,10.78-33.66,11.47-51.46.08-1.96.12-3.93.12-5.91v-79.34h22.67c27.14,0,51.14,13.71,65.45,34.56,8.76,12.76,13.89,28.18,13.89,44.79,0,2.16-.11,4.3-.28,6.42-3.28,40.76-37.47,72.93-79.06,72.93h-26.06c-7.44,13.49-16.73,25.85-27.75,36.87-1.11,1.11-2.26,2.18-3.39,3.26-11.93,11.28-25.31,20.64-39.96,27.88h97.16c19.88,0,39.18-3.9,57.37-11.59ZM7880.91,1662.11v66.51c0,16.77-5.25,32.33-14.16,45.16-14.34,20.64-38.2,34.18-65.18,34.18-41.59,0-75.78-32.17-79.06-72.93-.17-2.12-.28-4.25-.28-6.42,0-16.55,5.1-31.93,13.8-44.66,14.3-20.92,38.34-34.68,65.54-34.68h79.34v12.83Z"/>
       </g>
     </g>
-    <g id="health_app" data-name="health app" class="cls-34">
+    <g id="health_app" data-name="health app" class="cls-34" data-key-tags="sch str">
       <rect class="cls-26" x="3305.11" y="1426.84" width="433.59" height="433.59" rx="48.22" ry="48.22" transform="translate(5165.53 -1878.27) rotate(90)"/>
       <g>
         <path class="cls-29" d="M3606.17,1539.63c-24.2-5.44-47.29,1.21-63.76,17.59l-20.38,20.27-55.52,55.85c-8.5,7.72-17.42,17.06-25.16,25.65-.09.05-.13.09-.13.13-4.14,4.53-10.12,8.18-13.88,13.26-.34.02-2,1.26-1.6,1.73l1.53,1.76,33.65,34.05,43.93-44.52,30.33-30.21,38.34-37.56c4.31-4.23,13.27-5.21,18.16-3.15,4.33,1.82,9.86,6.42,11.44,11.97,1.91,6.73-3.14,14.19-7.31,19.04l-6.52,7.58c-14.3,16.63-31.51,31.84-47.29,47.37l-55.67,54.75,35.72,35.92,88-88.52,30.22-29.65c5.47-5.37,7.24-11.99,10.65-17.38,5.6-8.85,7.03-18.32,7.33-28.94.3-10.69-2.24-19.66-6.47-29.29-8.48-19.28-26.61-33.42-45.61-37.7Z"/>
         <path class="cls-29" d="M3500.57,1556c-17.92-16.39-41.84-22.41-66.21-15.35-18.96,5.49-37.12,21.17-44.13,42.71-9.85,22.57-3.72,50.29,13.86,69.5l68.34-69.36c8.83-8.97,19.98-16.7,28.14-27.5Z"/>
       </g>
     </g>
-    <g id="blob_storage" data-name="blob storage">
+    <g id="blob_storage" data-name="blob storage" data-key-tags="adh sch">
       <path class="cls-24" d="M5258.24,2704.17s-210.58-10.65-298.32,301.44c-87.74,312.1,298.32,293.98,298.32,293.98h27.6s386.07,18.11,298.32-293.98c-87.74-312.1-298.32-301.44-298.32-301.44h-27.6Z"/>
       <polygon class="cls-29" points="5271.77 2898.09 5134.59 3135.69 5408.94 3135.69 5271.77 2898.09"/>
     </g>
-    <g id="music_player" data-name="music player">
+    <g id="music_player" data-name="music player" data-key-tags="adh">
       <rect class="cls-26" x="3305.11" y="2785.16" width="433.59" height="433.59" rx="48.22" ry="48.22" transform="translate(6523.86 -519.95) rotate(90)"/>
       <g>
         <path class="cls-9" d="M3373.17,3023.12c2.7,67.35,58.02,121.23,126.08,121.45,21.54.07,41.82-5.25,59.61-14.68l-.02.02,68.74,18.8-17.41-68.94-.02.02c10.19-18.17,16.06-39.11,16.13-61.42.04-12.03-1.64-23.65-4.73-34.69,29.35-10.32,49.21-30.01,49.21-52.62,0-11.35-5-21.96-13.68-31.02-16.8-17.54-47.41-29.27-82.39-29.27-.89,0-1.76.03-2.64.05-.96-.02-1.93-.05-2.9-.05-29.02,0-55.01,8.01-72.63,20.65-68.29,1.66-123.25,57.39-123.48,126.12,0,1.87.05,3.73.12,5.58"/>
@@ -306,14 +306,14 @@
         <path class="cls-29" d="M3496.06,2959.96c6.48,8.21,10.36,18.59,10.36,29.87,0,26.64-21.6,48.24-48.24,48.24-21.27,0-39.32-13.76-45.74-32.87l83.62-45.23Z"/>
       </g>
     </g>
-    <g id="scrobbler">
+    <g id="scrobbler" data-key-tags="str">
       <rect class="cls-26" x="3305.11" y="69.84" width="433.59" height="433.59" rx="48.22" ry="48.22" transform="translate(3808.54 -3235.27) rotate(90)"/>
       <g>
         <path class="cls-29" d="M3584.26,276.15c2.04-22.43,28.76-33.47,49.51-27.13,8.72,2.66,14.63,8.4,19.11,16.55-1.89-19.54-13.61-37.95-36.17-37.45-19.06.43-36.6,11.46-46.05,28.05-7.12,12.5-8.09,27.49-1.75,40.37,11.22,22.82,47.35,23.46,59.9,38.9,6.13,7.54,6.05,18.06,1.13,26.4-17.31,29.37-87.33,38.92-118.36,33.23,4.65-6.22,8.35-12.18,11.17-19.32,14.85-37.68,16.31-93.81,5.49-133.11,14.22,1.34,23.01-4.94,32.75-14.53-11.95,2.64-22.06,5.86-33.98.01,19.36-2.87,27.3-10.01,30.49-29.39-11.25,9.11-22.13,20.26-37.9,13.18-9.93-4.46-20.28-5.22-30.71-1.6-40.42,13.99-75.07,51.03-95.84,87.48-1.46,2.56-2.43,4.74-5.42,5.65-4.37,1.34-8.55,1.1-14.02.04,3.72,3.66,8.41,6.01,14.43,7.56-3.66,2.48-7.43,3.29-12.4,4.5,13.97,4.27,27.86,24.16,37.33,37.07,5.4,7.36,11.03,13.74,17.95,19.84,28.47,25.07,66.81,43.03,105.53,42.69,24.48-.21,48.21-4.82,70.66-14.23,22.29-9.34,47.46-27.31,45.92-54.19-2.7-46.96-72.04-34.67-68.78-70.59ZM3459.81,342.89c1.39,11.5,3.92,21.86,7.52,33.64-25.09-15.79-47.16-40.23-59.19-67.29,7.47-15.92,17.72-29.65,30.69-41.67,9.14-8.47,18.05-16.54,28.69-23.85-3.47,12.96-6.15,24.32-7.63,36.89-2.39,20.88-2.56,41.41-.09,62.28ZM3494.19,386.27c-9.26-2.79-15.1-28.46-16.49-37.37-4.5-28.85-3.68-58.11,2.61-86.6,2.33-10.56,5.61-19.89,10.97-29.28,5.32-.85,11.54-.57,16.12,2.54,4.56,8.91,6.62,18.66,8.28,28.4-4.81,1.06-8.18,3.8-10.23,7.82,8.17,7.21,4.53,27.45-3.53,27.18-1.97-.07-3.86-1.31-5.15-2.79-2.3,13.75-1.45,49.85,16.19,54-1.94,8.98-9.12,33.68-18.77,36.12Z"/>
         <path class="cls-29" d="M3462.91,188.66c14.57-4.89,28.61-7.23,43.24-9.7,4.44-.75,7.2-4.46,6.92-8.63-.2-2.87-3.25-7.12-7.63-7.06-27.28.4-54.14,8.88-76.92,24.15-30.93,20.73-51.05,53.7-54.3,90.94,19.97-41.52,42.42-74.19,88.69-89.7Z"/>
       </g>
     </g>
-    <g id="github_repo" data-name="github repo">
+    <g id="github_repo" data-name="github repo" data-key-tags="adh sch ond">
       <path class="cls-24" d="M5881.98,1905.26h731.59s50.55-289.73-188.88-291.18c0,0,1.1-227.75-222.37-232.01s-237.34,178.24-237.34,178.24c0,0-153.26-12.19-189.41,178.3-19.17,101.03-19.17,166.65-19.17,166.65h125.58Z"/>
       <g id="xCRc5u">
         <path class="cls-29" d="M6098.1,1625.63c-6.37,18.84-17.03,32.11-14.21,53.48,2.6,19.71,6.64,39.64,22.81,53.28,13.88,11.72,31.51,16.59,50.43,18.95-4.74,5.93-7.89,13.59-9.48,20.42-17.85,11.64-38.74,3.6-48.84-14.12-6.22-10.91-17.17-16.59-29.81-13.56-1.35.32.16,5.14,1.58,6.02,32.77,20.4,10.17,54.02,75.99,46.15l.31,28.2c.03,2.33-.97,5.91-2.31,7.23-1.34,1.32-6.76,2.38-8.59,1.77-76.54-25.39-121.75-102.24-108.74-180.82,12.88-77.78,80.92-135.26,159.98-135.3,78.46-.04,146.22,56.77,159.7,133.83,13.82,79.01-31.53,156.72-108.31,182.37-2.21.74-6.25-.13-7.74-1.34-1.49-1.21-3.2-5.8-3.18-7.74l.46-43.68c.11-10.65-3.28-20.54-9.79-29.22,41.64-6.11,66.33-21.78,72.2-65.75,2.95-22.13-1.98-41.97-15.51-58.69,3.01-13.25,5.39-32.13-3.69-42.86-15.57-1.55-29.81,9.05-42.49,16.21-27.46-6.21-54.55-6.48-82.29.04-12.43-6.68-28.15-18.31-42.46-15.93-12.2,9.14-2.22,29.8-6.03,41.06Z"/>
@@ -321,52 +321,87 @@
     </g>
   </g>
   <g id="Labels">
-    <text class="cls-31" transform="translate(225.84 366.45)"><tspan x="0" y="0">inactIV</tspan></text>
-    <text class="cls-31" transform="translate(4859.54 3478.13)"><tspan x="0" y="0">vercel blob</tspan><tspan x="150" y="180">storage</tspan></text>
-    <text class="cls-31" transform="translate(5009.54 741.98)"><tspan x="0" y="0">last.fm</tspan></text>
-    <text class="cls-31" transform="translate(252.35 1582.5)"><tspan x="0" y="0">reflectIV</tspan></text>
-    <text class="cls-31" transform="translate(0 2898.09)"><tspan x="0" y="0">music library</tspan><tspan x="225" y="180">&amp; metadata</tspan></text>
-    <text class="cls-30" transform="translate(3281.9 3393.9)"><tspan x="0" y="0">musicbee</tspan></text>
     <g class="cls-34">
-      <text class="cls-30" transform="translate(3145.75 2034.97)"><tspan x="0" y="0">huawei health</tspan></text>
+      <text class="cls-31" data-key-tags="all" transform="translate(404.81 368.74)"><tspan x="0" y="0">inactIV</tspan></text>
     </g>
-    <text class="cls-30" transform="translate(3411.54 667.69)"><tspan x="0" y="0">pano</tspan><tspan x="-150" y="144">scrobbler</tspan></text>
-    <text class="cls-28" transform="translate(7436.58 2422.62)"><tspan x="0" y="0">KAPSIV.COM</tspan></text>
-    <text class="cls-31" transform="translate(5975.68 2115.4)"><tspan x="0" y="0">github</tspan></text>
-    <text class="cls-30" transform="translate(6499.65 222.35)"><tspan x="0" y="0">now playing</tspan></text>
-    <text class="cls-30" transform="translate(6680.77 1568.74)"><tspan x="0" y="0">commits</tspan></text>
-    <text class="cls-30" transform="translate(6727.02 1822.02)"><tspan x="0" y="0">cache</tspan></text>
-    <text class="cls-30" transform="translate(5689.47 2746.87)"><tspan x="0" y="0">cache</tspan></text>
-    <text class="cls-30" transform="translate(6369.92 2937.11)"><tspan x="0" y="0">data retrieval</tspan></text>
+    <text class="cls-31" data-key-tags="adh sch" transform="translate(4859.54 3478.13)"><tspan x="0" y="0">vercel blob</tspan><tspan x="150" y="180">storage</tspan></text>
+    <text class="cls-31" data-key-tags="str sch ond" transform="translate(5009.54 741.98)"><tspan x="0" y="0">last.fm</tspan></text>
+    <text class="cls-31" data-key-tags="all" transform="translate(252.35 1582.5)"><tspan x="0" y="0">reflectIV</tspan></text>
+    <text class="cls-31" data-key-tags="all" transform="translate(0 2898.09)"><tspan x="0" y="0">music library</tspan><tspan x="225" y="180">&amp; metadata</tspan></text>
+    <text class="cls-30" data-key-tags="adh" transform="translate(3281.9 3393.9)"><tspan x="0" y="0">musicbee</tspan></text>
+    <g class="cls-34">
+      <text class="cls-30" data-key-tags="sch str" transform="translate(3145.75 2034.97)"><tspan x="0" y="0">huawei health</tspan></text>
+    </g>
+    <text class="cls-30" data-key-tags="str" transform="translate(3411.54 667.69)"><tspan x="0" y="0">pano</tspan><tspan x="-150" y="144">scrobbler</tspan></text>
+    <text class="cls-28" data-key-tags="sch ond" transform="translate(7436.58 2422.62)"><tspan x="0" y="0">KAPSIV.COM</tspan></text>
+    <text class="cls-31" data-key-tags="adh sch ond" transform="translate(5975.68 2115.4)"><tspan x="0" y="0">github</tspan></text>
+    <text class="cls-30" data-key-tags="ond" transform="translate(6499.65 222.35)"><tspan x="0" y="0">now playing</tspan></text>
+    <text class="cls-30" data-key-tags="ond" transform="translate(6680.77 1568.74)"><tspan x="0" y="0">commits</tspan></text>
+    <text class="cls-30" data-key-tags="sch" transform="translate(6727.02 1822.02)"><tspan x="0" y="0">cache</tspan></text>
+    <text class="cls-30" data-key-tags="adh" transform="translate(5689.47 2746.87)"><tspan x="0" y="0">cache</tspan></text>
+    <text class="cls-30" data-key-tags="sch" transform="translate(6369.92 2937.11)"><tspan x="0" y="0">data retrieval</tspan></text>
     <g class="cls-35">
-      <text class="cls-30" transform="translate(1756.67 736.01) rotate(.27)"><tspan x="0" y="0">sleep</tspan><tspan x="0" y="144">data</tspan></text>
+      <text class="cls-30" data-key-tags="str" transform="translate(1756.67 736.01) rotate(.27)"><tspan x="0" y="0">sleep</tspan><tspan x="0" y="144">data</tspan></text>
     </g>
     <g class="cls-34">
-      <text class="cls-30" transform="translate(2156.52 1835.39)"><tspan x="0" y="0">sleep records</tspan></text>
+      <text class="cls-30" data-key-tags="str" transform="translate(2156.52 1835.39)"><tspan x="0" y="0">sleep records</tspan></text>
     </g>
-    <text class="cls-30" transform="translate(2448.63 2939.4)"><tspan x="0" y="0">metadata</tspan></text>
-    <text class="cls-30" transform="translate(2588.64 1167.07) rotate(-90)"><tspan x="0" y="0">scrobbles</tspan></text>
-    <text class="cls-30" transform="translate(5358.24 1432.55) rotate(90)"><tspan x="0" y="0">scrobbles</tspan></text>
+    <text class="cls-30" data-key-tags="adh" transform="translate(2448.63 2939.4)"><tspan x="0" y="0">metadata</tspan></text>
+    <text class="cls-30" data-key-tags="str" transform="translate(2588.64 1167.07) rotate(-90)"><tspan x="0" y="0">scrobbles</tspan></text>
+    <text class="cls-30" data-key-tags="sch" transform="translate(5358.24 1432.55) rotate(90)"><tspan x="0" y="0">scrobbles</tspan></text>
     <g>
-      <g>
-        <line class="cls-18" x1="6486.81" y1="4004.42" x2="7337.92" y2="4004.42"/>
+      <g id="hover_for_ad_hoc" data-key-trigger="key_ad_hoc" data-key-tags="adh">
+        <line class="cls-20" x1="6486.81" y1="4004.42" x2="7337.92" y2="4004.42"/>
         <polygon class="cls-29" points="7323.66 4110.73 7323.66 3898.11 7429.93 4004.41 7323.66 4110.73"/>
       </g>
-      <g>
-        <line class="cls-13" x1="6486.81" y1="4266.38" x2="7337.92" y2="4266.38"/>
+      <g id="hover_for_scheduled" data-key-trigger="key_scheduled" data-key-tags="sch">
+        <line class="cls-16" x1="6486.81" y1="4266.38" x2="7337.92" y2="4266.38"/>
         <polygon class="cls-29" points="7323.66 4372.68 7323.66 4160.07 7429.93 4266.37 7323.66 4372.68"/>
       </g>
-      <g>
-        <line class="cls-19" x1="6486.81" y1="4528.33" x2="7337.92" y2="4528.33"/>
+      <g id="hover_for_streaming" data-key-trigger="key_streaming" data-key-tags="str">
+        <line class="cls-21" x1="6486.81" y1="4528.33" x2="7337.92" y2="4528.33"/>
         <polygon class="cls-29" points="7323.66 4634.64 7323.66 4422.02 7429.93 4528.32 7323.66 4634.64"/>
       </g>
-      <line class="cls-12" x1="6486.81" y1="4790.54" x2="7335.95" y2="4790.54"/>
-      <polygon class="cls-20" points="7341.57 4720.62 7341.57 4859.96 7411.21 4790.29 7341.57 4720.62"/>
-      <text class="cls-30" transform="translate(7497.41 4025.85)"><tspan x="0" y="0">ad hoc</tspan></text>
-      <text class="cls-30" transform="translate(7497.41 4290.96)"><tspan x="0" y="0">scheduled batch</tspan></text>
-      <text class="cls-30" transform="translate(7497.41 4821.2)"><tspan x="0" y="0">on demand</tspan></text>
-      <text class="cls-30" transform="translate(7497.41 4556.08)"><tspan x="0" y="0">streaming</tspan></text>
-      <text class="cls-31" transform="translate(6478.34 3815.19)"><tspan x="0" y="0">key</tspan></text>
+      <line id="hover_for_on_demand" data-key-trigger="key_on_demand" data-key-tags="ond" class="cls-15" x1="6486.81" y1="4790.54" x2="7335.95" y2="4790.54"/>
+      <polygon data-key-trigger="key_on_demand" data-key-tags="ond" class="cls-22" points="7341.57 4720.62 7341.57 4859.96 7411.21 4790.29 7341.57 4720.62"/>
+      <text id="key_ad_hoc" data-key-trigger="key_ad_hoc" class="cls-30" transform="translate(7497.41 4025.85)"><tspan x="0" y="0">ad hoc</tspan></text>
+      <text id="key_scheduled" data-key-trigger="key_scheduled" class="cls-30" transform="translate(7497.41 4290.96)"><tspan x="0" y="0">scheduled batch</tspan></text>
+      <text id="key_on_demand" data-key-trigger="key_on_demand" class="cls-30" transform="translate(7497.41 4821.2)"><tspan x="0" y="0">on demand</tspan></text>
+      <text id="key_streaming" data-key-trigger="key_streaming" class="cls-30" transform="translate(7497.41 4556.08)"><tspan x="0" y="0">streaming</tspan></text>
+      <text class="cls-31" data-key-tags="all" transform="translate(6478.34 3815.19)"><tspan x="0" y="0">key</tspan></text>
+    </g>
+  </g>
+  <g id="New_Layer" data-name="New Layer">
+    <g id="streaming-3" data-name="streaming" data-key-tags="sch">
+      <path class="cls-19" d="M3789.11,4375.95H4343.64V3238.47L4832.54,3240.18"/>
+      <polygon class="cls-29" points="4818.66 3133.82 4817.91 3346.43 4924.55 3240.51 4818.66 3133.82"/>
+    </g>
+    <g id="puregym" data-key-tags="str sch">
+      <g id="music_player-2" data-name="music player">
+        <rect class="cls-26" x="3303.8" y="4152.74" width="433.59" height="433.59" rx="48.22" ry="48.22" transform="translate(7890.12 848.94) rotate(90)"/>
+      </g>
+      <g id="oAX8hI">
+        <g>
+          <path class="cls-29" d="M3519.11,4465c-9.4,19.9-9.73,33.31-21.54,50.39-9.71,14.04-24.96,20.63-41.78,19.58-47.85-2.98-49.14-58.13-49.16-93.91l-.05-138.94c-.01-35.63,15.75-67.46,48.06-83.42,13.77-6.8,28.5-10.6,44.05-10.64l40.2-.12c14.79-.04,28.71,2.85,42.15,8.74,32.18,14.12,50.21,46.12,51.5,80.5.47,12.41.4,24.41-.06,36.76-1.22,33.26-10.56,64.58-44.37,77.1-8.86,3.28-17.35,6.22-25.89,10.4-18.99,9.29-33.91,24.06-43.12,43.56ZM3511.68,4442.33c16.85-25.69,40.6-38,68.9-47.57,35.13-11.87,34.45-50.49,34.63-81.98.08-14.58-.68-28.24-6.05-41.76-12.18-30.7-38.96-44.46-71.23-44.32l-40.2.18c-13.11.06-25.5,3.55-36.94,9.58-24.41,12.85-35.99,37.46-36.02,64.66l-.13,137.02c-.02,20.98-.66,45.21,8.96,64.07,4.84,9.48,13.55,14.22,23.92,14.68,11.41.5,21.29-4.25,27.21-14.2,10.65-17.89,10.07-34.66,26.93-60.36Z"/>
+          <path class="cls-29" d="M3574.18,4447.6c22.28-3.43,42.15,12.34,45.06,33.27s-11.63,41.66-33.48,44.86-40.97-11.2-44.49-32.52,10.25-42.13,32.91-45.62Z"/>
+        </g>
+      </g>
+    </g>
+    <text class="cls-30" data-key-tags="str sch" transform="translate(3303.78 4757.78)"><tspan x="0" y="0">puregym</tspan></text>
+    <g id="streaming-4" data-name="streaming" data-key-tags="str">
+      <line class="cls-21" x1="2070.74" y1="4390.7" x2="3180.82" y2="4390.7"/>
+      <polygon class="cls-29" points="3166.56 4284.39 3166.56 4497.01 3272.83 4390.71 3166.56 4284.39"/>
+    </g>
+    <text class="cls-31" data-key-tags="all" transform="translate(604.06 4465.93)"><tspan x="0" y="0">actIV</tspan></text>
+    <text class="cls-30" data-key-tags="str" transform="translate(2357.51 4313.32)"><tspan x="0" y="0">gym visits</tspan></text>
+    <g id="actIV" data-key-tags="str">
+      <g id="github_repo-2" data-name="github repo">
+        <path class="cls-24" d="M1365.9,4640.36h731.59s50.55-289.73-188.88-291.18c0,0,1.1-227.75-222.37-232.01-223.47-4.27-237.34,178.24-237.34,178.24,0,0-153.26-12.19-189.41,178.3-19.17,101.03-19.17,166.65-19.17,166.65h125.58Z"/>
+      </g>
+      <g>
+        <path class="cls-5" d="M1668.43,4370.39c0-43.15,34.98-78.12,78.12-78.12h0c43.15,0,78.12,34.98,78.12,78.12,0,16.5-5.12,31.81-13.85,44.42-2.67,3.86-5.69,7.47-9,10.79l-19.91,20.08s-113.87,116.33-113.87,116.33l-113.87-116.33-19.91-20.08c-3.31-3.31-6.32-6.92-9-10.79-8.73-12.61-13.85-27.92-13.85-44.42,0-43.15,34.98-78.12,78.12-78.12h0c43.15,0,78.12,34.98,78.12,78.12"/>
+        <polyline class="cls-7" points="1530.14 4431.04 1625 4431.04 1653.98 4353.48 1676.38 4502.44 1723.81 4431.04 1804.18 4431.04"/>
+      </g>
     </g>
   </g>
 </svg>
