@@ -1341,7 +1341,7 @@ function isMobileLayout() {
     canvas._yearOptions = { useProportion, activeYear };
   }
 
-  function drawDurationDistributionLine(canvas, durations) {
+  function drawDurationDistributionLine(canvas, durations, options = {}) {
     const ctx = canvas?.getContext?.("2d");
     if (!ctx) return;
     const width = canvas.clientWidth || 720;
@@ -1350,15 +1350,22 @@ function isMobileLayout() {
     canvas.height = height;
     ctx.clearRect(0, 0, width, height);
 
+    const {
+      binSize = 30,
+      maxDurationCap = 16 * 60,
+      emptyText = "No duration data available",
+      peakCountLabel = "songs",
+      allowHours = false,
+      tickStep = 60,
+    } = options;
+
     if (!durations.length) {
       ctx.fillStyle = "#4e4738";
       ctx.font = "14px 'Ubuntu Mono', monospace";
-      ctx.fillText("No duration data available", 12, 20);
+      ctx.fillText(emptyText, 12, 20);
       return;
     }
 
-    const binSize = 30;
-    const maxDurationCap = 16 * 60;
     const countsByBin = new Map();
     const filteredDurations = [];
     durations.forEach((duration) => {
@@ -1370,7 +1377,7 @@ function isMobileLayout() {
     if (!countsByBin.size) {
       ctx.fillStyle = "#4e4738";
       ctx.font = "14px 'Ubuntu Mono', monospace";
-      ctx.fillText("No duration data available", 12, 20);
+      ctx.fillText(emptyText, 12, 20);
       return;
     }
     const minBin = 0;
@@ -1415,7 +1422,10 @@ function isMobileLayout() {
     ctx.fillStyle = "rgba(78,71,56,0.9)";
     ctx.textBaseline = "bottom";
     ctx.textAlign = meanX > width - 110 ? "right" : "left";
-    ctx.fillText(`mean ${meanM}:${meanS}`, meanX + (meanX > width - 110 ? -6 : 6), pad.t - 1);
+    const meanLabel = allowHours
+      ? formatDurationAxisLabel(meanDuration, { allowHours: true })
+      : `${meanM}:${meanS}`;
+    ctx.fillText(`mean ${meanLabel}`, meanX + (meanX > width - 110 ? -6 : 6), pad.t - 1);
 
     const points = bins.map((bin) => ({
       x: xForDuration(bin.duration),
@@ -1452,7 +1462,7 @@ function isMobileLayout() {
     if (peakBin && peakBin.count > 0) {
       const peakX = xForDuration(peakBin.duration);
       const peakY = yForCount(peakBin.count);
-      const peakLabel = `${peakBin.count} songs`;
+      const peakLabel = `${peakBin.count} ${peakCountLabel}`;
       const labelX = Math.max(pad.l + 6, peakX - 56);
       const labelY = Math.max(peakY - 10, pad.t + 14);
 
@@ -1480,8 +1490,8 @@ function isMobileLayout() {
     ctx.fillStyle = "rgba(78,71,56,0.85)";
     ctx.strokeStyle = "rgba(78,71,56,0.14)";
     const maxSeconds = maxBin;
-    const minuteStep = 60;
-    for (let sec = Math.floor(minBin / minuteStep) * minuteStep; sec <= maxSeconds; sec += minuteStep) {
+    const axisTickStep = Math.max(binSize, tickStep);
+    for (let sec = Math.floor(minBin / axisTickStep) * axisTickStep; sec <= maxSeconds; sec += axisTickStep) {
       if (sec < minBin || sec > maxBin) continue;
       const x = xForDuration(sec);
       ctx.beginPath();
@@ -1489,14 +1499,19 @@ function isMobileLayout() {
       ctx.lineTo(x, pad.t + usableH + 4);
       ctx.stroke();
       ctx.textAlign = x <= pad.l + 20 ? "left" : (x >= width - pad.r - 20 ? "right" : "center");
-      const mm = Math.floor(sec / 60);
-      const ss = String(sec % 60).padStart(2, "0");
-      ctx.fillText(`${mm}:${ss}`, x, pad.t + usableH + 8);
+      ctx.fillText(formatDurationAxisLabel(sec, { allowHours }), x, pad.t + usableH + 8);
     }
   }
 
-  function formatDurationAxisLabel(seconds) {
+  function formatDurationAxisLabel(seconds, options = {}) {
+    const { allowHours = false } = options;
     const totalSeconds = Math.max(0, Math.round(Number(seconds) || 0));
+    if (allowHours && totalSeconds >= 3600) {
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, "0");
+      const remainderSeconds = String(totalSeconds % 60).padStart(2, "0");
+      return `${hours}:${minutes}:${remainderSeconds}`;
+    }
     const minutes = Math.floor(totalSeconds / 60);
     const remainderSeconds = String(totalSeconds % 60).padStart(2, "0");
     return `${minutes}:${remainderSeconds}`;
@@ -2837,6 +2852,13 @@ function isMobileLayout() {
         countryAlbumCounts.set(country, (countryAlbumCounts.get(country) || 0) + 1);
       });
     });
+    const lpRuntimeValues = [];
+    const epRuntimeValues = [];
+    albumDurationTotals.forEach((duration, albumKey) => {
+      const formats = formatsByAlbum.get(albumKey);
+      if (formats?.has("lp")) lpRuntimeValues.push(duration);
+      if (formats?.has("ep")) epRuntimeValues.push(duration);
+    });
     const recordingTypeCounts = new Map();
     recordingTypesByAlbum.forEach((recordingTypes) => {
       recordingTypes.forEach((recordingType) => {
@@ -3055,6 +3077,22 @@ function isMobileLayout() {
     drawGenreUmbrellaPie(modal.querySelector("#libraryFileTypePie"), fileTypeCounts);
     drawGenreUmbrellaPie(modal.querySelector("#libraryRecordingTypePie"), recordingTypeCounts);
     drawGenreUmbrellaPie(modal.querySelector("#libraryFormatPie"), formatCounts);
+    drawDurationDistributionLine(modal.querySelector("#libraryLpDurationDistribution"), lpRuntimeValues, {
+      binSize: 5 * 60,
+      maxDurationCap: 200 * 60,
+      emptyText: "No LP runtime data available",
+      peakCountLabel: "albums",
+      allowHours: true,
+      tickStep: 30 * 60,
+    });
+    drawDurationDistributionLine(modal.querySelector("#libraryEpDurationDistribution"), epRuntimeValues, {
+      binSize: 2 * 60,
+      maxDurationCap: 60 * 60,
+      emptyText: "No EP runtime data available",
+      peakCountLabel: "albums",
+      allowHours: true,
+      tickStep: 10 * 60,
+    });
     drawDurationDistributionLine(modal.querySelector("#libraryDurationScatter"), durationValues);
     drawAverageSongLengthByGenreChart(modal.querySelector("#libraryGenreAverageDurationChart"), averageSongLengthByUmbrella);
   }
