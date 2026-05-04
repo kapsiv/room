@@ -3110,6 +3110,20 @@ b {
   .inventory-grid--organized {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
+
+  .sound-toggle {
+    right: 16px;
+    bottom: 16px;
+    width: 70px;
+    height: 70px;
+    border-width: 3px;
+    border-radius: 999px 999px 0 999px;
+  }
+
+  .sound-toggle-icon {
+    width: 34px;
+    height: 34px;
+  }
 }
 
 // Loading screen
@@ -3251,6 +3265,18 @@ b {
   cursor: pointer;
   touch-action: manipulation;
   transform-origin: center center;
+  background: #d9d2c5;
+  transition: background-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.loading-screen--fab:hover,
+.loading-screen--fab:focus-visible,
+.loading-screen--fab.is-expanded {
+  background: #ebe4d8;
+}
+
+.loading-screen--fab:focus-visible {
+  outline: none;
 }
 
 .loading-screen--dock {
@@ -3283,6 +3309,62 @@ b {
 
 .loading-screen--dock .loading-logo {
   display: none;
+}
+
+.sound-toggle {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 9988;
+  display: grid;
+  place-items: center;
+  width: 82px;
+  height: 82px;
+  border: 4px solid #4e4738;
+  border-radius: 999px 999px 0 999px;
+  background: #d9d2c5;
+  box-shadow: 0 12px 24px rgba(78, 71, 56, 0.18);
+  color: #4e4738;
+  cursor: pointer;
+  transition:
+    transform 0.16s ease,
+    background-color 0.16s ease,
+    box-shadow 0.16s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sound-toggle:hover,
+.sound-toggle:focus-visible {
+  background: #ebe4d8;
+  box-shadow: 0 16px 30px rgba(78, 71, 56, 0.22);
+  outline: none;
+}
+
+.sound-toggle:active {
+  transform: translateY(1px);
+}
+
+.sound-toggle.is-muted {
+  background: #cfc6b7;
+}
+
+.sound-toggle-icon {
+  width: 42px;
+  height: 42px;
+  background: currentColor;
+  -webkit-mask-image: url("/icons/sound%20on.svg");
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+  mask-image: url("/icons/sound%20on.svg");
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+}
+
+.sound-toggle.is-muted .sound-toggle-icon {
+  -webkit-mask-image: url("/icons/sound%20off.svg");
+  mask-image: url("/icons/sound%20off.svg");
 }
 
 .fab-dock-buttons {
@@ -3539,6 +3621,7 @@ b {
   line-height: 1;
   pointer-events: none;
   user-select: none;
+  transition: color 0.16s ease;
 }
 
 .loading-logo {

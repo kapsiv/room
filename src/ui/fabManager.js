@@ -88,6 +88,7 @@ export function createFabManager({
   let loadingRevealStarted = false;
   let fabOrbitAnimating = false;
   let fabExpanded = false;
+  let fabCloseEnabled = false;
   let assetsLoaded = false;
   let loadingLogoDrawDone = true;
   let selectedMobileMode = isMobileDockLayout() ? null : "full";
@@ -654,6 +655,8 @@ export function createFabManager({
     const openFab = () => {
       if (fabOrbitAnimating || fabExpanded) return;
       fabOrbitAnimating = true;
+      fabCloseEnabled = false;
+      loadingScreen.classList.add("is-expanded");
       positionWheelToFab();
       resetNowPlayingPreview();
 
@@ -709,7 +712,6 @@ export function createFabManager({
         x: 0,
         duration: 0.55,
         ease: "power1.out",
-        pointerEvents: "auto",
       });
 
       gsap.to(centerIconWrap, {
@@ -718,12 +720,18 @@ export function createFabManager({
         delay: 0.92,
         ease: "power1.out",
         pointerEvents: "auto",
+        onComplete: () => {
+          fabCloseEnabled = true;
+          gsap.set(closeBtn, { pointerEvents: "auto" });
+        },
       });
     };
 
     const closeFab = () => {
-      if (fabOrbitAnimating || !fabExpanded) return;
+      if (fabOrbitAnimating || !fabExpanded || !fabCloseEnabled) return;
       fabOrbitAnimating = true;
+      fabCloseEnabled = false;
+      loadingScreen.classList.remove("is-expanded");
       resetNowPlayingPreview();
       gsap.to(pathEl, {
         strokeDashoffset: pathLength,
