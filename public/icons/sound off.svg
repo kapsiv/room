@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_4" data-name="Layer 4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #4e4738;
+      }
+
+      .cls-2 {
+        fill: none;
+        stroke: #4e4738;
+        stroke-linecap: round;
+        stroke-miterlimit: 10;
+        stroke-width: 32px;
+      }
+    </style>
+  </defs>
+  <g id="PFzcuI.tif">
+    <path class="cls-1" d="M250.66,117c8.36,4.3,18.09,9.46,18.09,20.95l.06,222.94c0,9.08-5.76,16.22-12,19.51-7.77,4.09-16.45,3.31-23.55-2.12l-83.34-63.76-41.11-.2c-10.9-.05-18.87-8.95-18.87-19.66v-88.91c0-10.86,7.96-19.64,18.89-19.71l41.17-.27,84.95-65.14,7.16-3.62h8.55Z"/>
+  </g>
+  <line class="cls-2" x1="309.76" y1="206.68" x2="395.58" y2="292.5"/>
+  <line class="cls-2" x1="395.58" y1="206.68" x2="309.76" y2="292.5"/>
+</svg>

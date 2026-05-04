@@ -1449,6 +1449,7 @@ function initModellingViewer(modal) {
 }
 
 const modellingViewer = initModellingViewer(modals.modelling);
+const soundToggleButton = document.querySelector(".sound-toggle");
 
 const stringAudioByIndex = {
   1: new Audio("/audio/guitar-string-1.mp3"),
@@ -1456,15 +1457,58 @@ const stringAudioByIndex = {
   3: new Audio("/audio/guitar-string-3.mp3"),
   4: new Audio("/audio/guitar-string-4.mp3"),
 };
+const backgroundAudio = new Audio("/audio/bensound-rainyday.mp3");
 
 Object.values(stringAudioByIndex).forEach((a) => {
   a.preload = "auto";
 });
 
+backgroundAudio.loop = true;
+backgroundAudio.preload = "auto";
+backgroundAudio.volume = 0.42;
+
 let audioUnlocked = false;
+let backgroundAudioMuted = false;
+
+function updateSoundToggleButton() {
+  if (!soundToggleButton) return;
+
+  const label = backgroundAudioMuted ? "Unmute background music" : "Mute background music";
+  soundToggleButton.classList.toggle("is-muted", backgroundAudioMuted);
+  soundToggleButton.setAttribute("aria-label", label);
+  soundToggleButton.setAttribute("aria-pressed", String(backgroundAudioMuted));
+  soundToggleButton.setAttribute("title", label);
+}
+
+async function playBackgroundAudio() {
+  if (backgroundAudioMuted) return;
+
+  try {
+    backgroundAudio.muted = false;
+    await backgroundAudio.play();
+  } catch (err) {
+    console.warn("Background audio autoplay was blocked:", err);
+  }
+}
+
+function setBackgroundAudioMuted(nextMuted) {
+  backgroundAudioMuted = nextMuted;
+  backgroundAudio.muted = nextMuted;
+
+  if (nextMuted) {
+    backgroundAudio.pause();
+  } else {
+    void playBackgroundAudio();
+  }
+
+  updateSoundToggleButton();
+}
 
 function unlockAudio() {
-  if (audioUnlocked) return;
+  if (audioUnlocked) {
+    void playBackgroundAudio();
+    return;
+  }
 
   const first = stringAudioByIndex[1];
   if (!first) return;
@@ -1478,6 +1522,7 @@ function unlockAudio() {
       first.currentTime = 0;
       first.volume = prevVol;
       audioUnlocked = true;
+      void playBackgroundAudio();
       console.log("Audio working");
     })
     .catch((err) => {
@@ -1486,9 +1531,33 @@ function unlockAudio() {
 }
 
 canvas.addEventListener("pointerdown", unlockAudio, { once: true });
+window.addEventListener("pointerdown", unlockAudio, { once: true });
+window.addEventListener(
+  "keydown",
+  () => {
+    unlockAudio();
+  },
+  { once: true },
+);
+
+soundToggleButton?.addEventListener("click", () => {
+  if (!backgroundAudioMuted && backgroundAudio.paused) {
+    unlockAudio();
+    return;
+  }
+
+  const nextMuted = !backgroundAudioMuted;
+  setBackgroundAudioMuted(nextMuted);
+  if (!nextMuted) {
+    unlockAudio();
+  }
+});
+
+updateSoundToggleButton();
+void playBackgroundAudio();
 
 function playStringSoundByIndex(i) {
-  if (!audioUnlocked) return;
+  if (!audioUnlocked || backgroundAudioMuted) return;
 
   const base = stringAudioByIndex[i];
   if (!base) return;
