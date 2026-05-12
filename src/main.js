@@ -156,6 +156,9 @@ let isLoading = true;
 let selectedMobileExperienceMode = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`).matches ? null : "full";
 let mobileLiteModeActive = false;
 let roomModelLoadStarted = false;
+let roomModelSceneReady = false;
+let managedAssetsReady = false;
+let loadingRevealQueued = false;
 const manager = new THREE.LoadingManager();
 
 const loadingScreen = document.querySelector(".loading-screen");
@@ -171,6 +174,9 @@ const fabManager = createFabManager({
       activateMobileLiteMode();
       return;
     }
+    roomModelSceneReady = false;
+    managedAssetsReady = false;
+    loadingRevealQueued = false;
     fabManager.markAssetsPending();
     loadRoomModel();
   },
@@ -185,8 +191,22 @@ const fabManager = createFabManager({
 });
 
 fabManager.init();
+
+function maybeRevealAfterSceneReady() {
+  if (loadingRevealQueued) return;
+  if (!roomModelSceneReady || !managedAssetsReady) return;
+
+  loadingRevealQueued = true;
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(() => {
+      fabManager.markAssetsLoaded();
+    });
+  });
+}
+
 manager.onLoad = () => {
-  fabManager.markAssetsLoaded();
+  managedAssetsReady = true;
+  maybeRevealAfterSceneReady();
 };
 
 const canvas = document.querySelector("#experience-canvas")
@@ -2557,7 +2577,8 @@ function loadRoomModel() {
     createDetachedHitboxForTarget(guitarGroup);
   }
 
-    fabManager.markAssetsLoaded();
+  roomModelSceneReady = true;
+  maybeRevealAfterSceneReady();
   });
 }
 
