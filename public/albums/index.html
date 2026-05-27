@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Albums</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #000;
+      }
+
+      body {
+        position: fixed;
+        inset: 0;
+      }
+
+      #collage {
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: grid;
+        overflow: hidden;
+        will-change: transform;
+      }
+
+      .tile {
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-size: cover;
+      }
+
+      #fallback {
+        position: absolute;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-family: sans-serif;
+        font-size: 14px;
+        letter-spacing: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="collage" aria-label="Album collage"></div>
+    <div id="fallback">Unable to load album covers.</div>
+
+    <script>
+      const collage = document.getElementById("collage");
+      const fallback = document.getElementById("fallback");
+
+      function shuffle(arr) {
+        const out = arr.slice();
+        for (let i = out.length - 1; i > 0; i -= 1) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [out[i], out[j]] = [out[j], out[i]];
+        }
+        return out;
+      }
+
+      function pickForGrid(urls, count) {
+        if (!urls.length || count <= 0) return [];
+        const shuffled = shuffle(urls);
+        const selected = [];
+        for (let i = 0; i < count; i += 1) {
+          selected.push(shuffled[i % shuffled.length]);
+        }
+        return selected;
+      }
+
+      function render(urls) {
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+
+        const baseTile = Math.max(88, Math.min(170, Math.round(Math.min(vw, vh) / 7)));
+        const cols = Math.ceil(vw / baseTile) + 2;
+        const rows = Math.ceil(vh / baseTile) + 2;
+        const tileW = Math.ceil(vw / (cols - 2));
+        const tileH = Math.ceil(vh / (rows - 2));
+        const total = cols * rows;
+        const fills = pickForGrid(urls, total);
+
+        const gridW = cols * tileW;
+        const gridH = rows * tileH;
+        collage.style.width = `${gridW}px`;
+        collage.style.height = `${gridH}px`;
+        collage.style.gridTemplateColumns = `repeat(${cols}, ${tileW}px)`;
+        collage.style.gridTemplateRows = `repeat(${rows}, ${tileH}px)`;
+        collage.style.transform = `translate(${Math.floor((vw - gridW) / 2)}px, ${Math.floor((vh - gridH) / 2)}px)`;
+
+        const frag = document.createDocumentFragment();
+        for (let i = 0; i < fills.length; i += 1) {
+          const tile = document.createElement("div");
+          tile.className = "tile";
+          tile.style.width = `${tileW}px`;
+          tile.style.height = `${tileH}px`;
+          tile.style.backgroundImage = `url("${fills[i]}")`;
+          frag.appendChild(tile);
+        }
+        collage.replaceChildren(frag);
+      }
+
+      async function loadAndRender() {
+        try {
+          const res = await fetch("/api/collectiv-covers", { cache: "no-store" });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const payload = await res.json();
+          const urls = Array.isArray(payload?.urls) ? payload.urls : [];
+          if (!urls.length) throw new Error("No covers found");
+          fallback.style.display = "none";
+          render(urls);
+        } catch (err) {
+          collage.replaceChildren();
+          fallback.style.display = "flex";
+        }
+      }
+
+      let resizeTimer;
+      window.addEventListener("resize", () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => loadAndRender(), 120);
+      });
+
+      loadAndRender();
+    </script>
+  </body>
+</html>
