@@ -106,6 +106,37 @@
         collage.replaceChildren(frag);
       }
 
+      function probeImage(url, timeoutMs = 5000) {
+        return new Promise((resolve) => {
+          const img = new Image();
+          let done = false;
+
+          const finish = (ok) => {
+            if (done) return;
+            done = true;
+            resolve(ok);
+          };
+
+          const timer = setTimeout(() => finish(false), timeoutMs);
+          img.onload = () => {
+            clearTimeout(timer);
+            finish(true);
+          };
+          img.onerror = () => {
+            clearTimeout(timer);
+            finish(false);
+          };
+          img.referrerPolicy = "no-referrer";
+          img.src = url;
+        });
+      }
+
+      async function hasLoadableImages(urls) {
+        const sample = urls.slice(0, Math.min(8, urls.length));
+        const checks = await Promise.all(sample.map((u) => probeImage(u)));
+        return checks.some(Boolean);
+      }
+
       async function loadAndRender() {
         try {
           const res = await fetch("/api/collectiv-covers", { cache: "no-store" });
@@ -113,10 +144,13 @@
           const payload = await res.json();
           const urls = Array.isArray(payload?.urls) ? payload.urls : [];
           if (!urls.length) throw new Error("No covers found");
+          const accessible = await hasLoadableImages(urls);
+          if (!accessible) throw new Error("Covers are not publicly accessible");
           fallback.style.display = "none";
           render(urls);
         } catch (err) {
           collage.replaceChildren();
+          fallback.textContent = "Unable to load album covers.";
           fallback.style.display = "flex";
         }
       }
