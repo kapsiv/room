@@ -150,7 +150,8 @@
           render(urls);
         } catch (err) {
           collage.replaceChildren();
-          fallback.textContent = "Unable to load album covers.";
+          const detail = err instanceof Error ? err.message : "Unknown error";
+          fallback.textContent = `Unable to load album covers: ${detail}`;
           fallback.style.display = "flex";
         }
       }

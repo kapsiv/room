@@ -23,7 +23,7 @@ export default async function handler(request, response) {
 
   try {
     let cursor;
-    const urls = [];
+    const pathnames = [];
 
     do {
       const page = await list({
@@ -35,12 +35,16 @@ export default async function handler(request, response) {
 
       for (const blob of page.blobs || []) {
         if (isImagePath(blob.pathname)) {
-          urls.push(blob.downloadUrl || blob.url);
+          pathnames.push(blob.pathname);
         }
       }
 
       cursor = page.hasMore ? page.cursor : undefined;
     } while (cursor);
+
+    const urls = pathnames.map(
+      (pathname) => `/api/collectiv-cover?pathname=${encodeURIComponent(pathname)}`,
+    );
 
     response.setHeader("Cache-Control", "public, max-age=0, s-maxage=3600");
     response.status(200).json({ prefix: PREFIX, count: urls.length, urls });
