@@ -54,6 +54,10 @@
     <script>
       const collage = document.getElementById("collage");
       const fallback = document.getElementById("fallback");
+      const MIN_VISIBLE_COLS = 6;
+      const MIN_TILE_SIZE = 48;
+      let currentUrls = [];
+      let visibleCols = null;
 
       function shuffle(arr) {
         const out = arr.slice();
@@ -78,32 +82,59 @@
         const vw = window.innerWidth;
         const vh = window.innerHeight;
 
-        const baseTile = Math.max(88, Math.min(170, Math.round(Math.min(vw, vh) / 7)));
-        const cols = Math.ceil(vw / baseTile) + 2;
-        const rows = Math.ceil(vh / baseTile) + 2;
-        const tileW = Math.ceil(vw / (cols - 2));
-        const tileH = Math.ceil(vh / (rows - 2));
+        const maxVisibleCols = Math.max(
+          MIN_VISIBLE_COLS,
+          Math.floor(vw / MIN_TILE_SIZE),
+        );
+        if (visibleCols == null) {
+          visibleCols = maxVisibleCols;
+        } else {
+          visibleCols = Math.min(maxVisibleCols, Math.max(MIN_VISIBLE_COLS, visibleCols));
+        }
+
+        const tileSize = Math.ceil(vw / visibleCols);
+        const cols = visibleCols + 2;
+        const visibleRows = Math.ceil(vh / tileSize);
+        const rows = visibleRows + 2;
         const total = cols * rows;
         const fills = pickForGrid(urls, total);
 
-        const gridW = cols * tileW;
-        const gridH = rows * tileH;
+        const gridW = cols * tileSize;
+        const gridH = rows * tileSize;
         collage.style.width = `${gridW}px`;
         collage.style.height = `${gridH}px`;
-        collage.style.gridTemplateColumns = `repeat(${cols}, ${tileW}px)`;
-        collage.style.gridTemplateRows = `repeat(${rows}, ${tileH}px)`;
+        collage.style.gridTemplateColumns = `repeat(${cols}, ${tileSize}px)`;
+        collage.style.gridTemplateRows = `repeat(${rows}, ${tileSize}px)`;
         collage.style.transform = `translate(${Math.floor((vw - gridW) / 2)}px, ${Math.floor((vh - gridH) / 2)}px)`;
 
         const frag = document.createDocumentFragment();
         for (let i = 0; i < fills.length; i += 1) {
           const tile = document.createElement("div");
           tile.className = "tile";
-          tile.style.width = `${tileW}px`;
-          tile.style.height = `${tileH}px`;
+          tile.style.width = `${tileSize}px`;
+          tile.style.height = `${tileSize}px`;
           tile.style.backgroundImage = `url("${fills[i]}")`;
           frag.appendChild(tile);
         }
         collage.replaceChildren(frag);
+      }
+
+      function adjustZoom(deltaY) {
+        if (!currentUrls.length) return;
+        const vw = window.innerWidth;
+        const maxVisibleCols = Math.max(
+          MIN_VISIBLE_COLS,
+          Math.floor(vw / MIN_TILE_SIZE),
+        );
+        const step = Math.abs(deltaY) > 40 ? 2 : 1;
+        const direction = deltaY < 0 ? 1 : -1;
+        const next = Math.min(
+          maxVisibleCols,
+          Math.max(MIN_VISIBLE_COLS, (visibleCols ?? maxVisibleCols) + direction * step),
+        );
+        if (next === visibleCols) return;
+        visibleCols = next;
+        render(currentUrls);
       }
 
       function probeImage(url, timeoutMs = 5000) {
@@ -146,10 +177,12 @@
           if (!urls.length) throw new Error("No covers found");
           const accessible = await hasLoadableImages(urls);
           if (!accessible) throw new Error("Covers are not publicly accessible");
+          currentUrls = urls;
           fallback.style.display = "none";
-          render(urls);
+          render(currentUrls);
         } catch (err) {
           collage.replaceChildren();
+          currentUrls = [];
           const detail = err instanceof Error ? err.message : "Unknown error";
           fallback.textContent = `Unable to load album covers: ${detail}`;
           fallback.style.display = "flex";
@@ -159,8 +192,23 @@
       let resizeTimer;
       window.addEventListener("resize", () => {
         clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(() => loadAndRender(), 120);
+        resizeTimer = setTimeout(() => {
+          if (!currentUrls.length) {
+            loadAndRender();
+            return;
+          }
+          render(currentUrls);
+        }, 120);
       });
+
+      window.addEventListener(
+        "wheel",
+        (event) => {
+          event.preventDefault();
+          adjustZoom(event.deltaY);
+        },
+        { passive: false },
+      );
 
       loadAndRender();
     </script>
