@@ -35,7 +35,7 @@ export default async function handler(request, response) {
 
       for (const blob of page.blobs || []) {
         if (isImagePath(blob.pathname)) {
-          urls.push(blob.url);
+          urls.push(blob.downloadUrl || blob.url);
         }
       }
 
