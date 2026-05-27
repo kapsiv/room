@@ -55,6 +55,7 @@
       const collage = document.getElementById("collage");
       const fallback = document.getElementById("fallback");
       const MIN_VISIBLE_COLS = 6;
+      const MAX_VISIBLE_COLS = 37;
       const MIN_TILE_SIZE = 48;
       let currentUrls = [];
       let visibleCols = null;
@@ -84,7 +85,7 @@
 
         const maxVisibleCols = Math.max(
           MIN_VISIBLE_COLS,
-          Math.floor(vw / MIN_TILE_SIZE),
+          Math.min(MAX_VISIBLE_COLS, Math.floor(vw / MIN_TILE_SIZE)),
         );
         if (visibleCols == null) {
           visibleCols = maxVisibleCols;
@@ -124,7 +125,7 @@
         const vw = window.innerWidth;
         const maxVisibleCols = Math.max(
           MIN_VISIBLE_COLS,
-          Math.floor(vw / MIN_TILE_SIZE),
+          Math.min(MAX_VISIBLE_COLS, Math.floor(vw / MIN_TILE_SIZE)),
         );
         const step = Math.abs(deltaY) > 40 ? 2 : 1;
         const direction = deltaY < 0 ? 1 : -1;
