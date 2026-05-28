@@ -45,20 +45,192 @@
         font-size: 14px;
         letter-spacing: 0;
       }
+
+      #layout-toggle {
+        position: fixed;
+        left: 16px;
+        bottom: 16px;
+        z-index: 20;
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        background: rgba(0, 0, 0, 0.7);
+        color: #fff;
+        padding: 8px 10px;
+        border-radius: 6px;
+        font-family: sans-serif;
+        font-size: 12px;
+        line-height: 1;
+        letter-spacing: 0;
+        cursor: pointer;
+      }
+
+      #layout-toggle:hover {
+        background: rgba(20, 20, 20, 0.85);
+      }
     </style>
   </head>
   <body>
     <div id="collage" aria-label="Album collage"></div>
     <div id="fallback">Unable to load album covers.</div>
+    <button id="layout-toggle" type="button" aria-label="Toggle collage layout">
+      Mode: Random
+    </button>
 
     <script>
       const collage = document.getElementById("collage");
       const fallback = document.getElementById("fallback");
+      const layoutToggle = document.getElementById("layout-toggle");
       const MIN_VISIBLE_COLS = 6;
       const MAX_VISIBLE_COLS = 37;
       const MIN_TILE_SIZE = 48;
       let currentUrls = [];
       let visibleCols = null;
+      let layoutMode = "random";
+      let coverColourMap = new Map();
+      const hslMemo = new Map();
+
+      function normalizeKey(s) {
+        return (s || "").normalize("NFKD").toLowerCase().trim();
+      }
+
+      function parseCsvLine(line) {
+        const fields = [];
+        let current = "";
+        let inQuotes = false;
+        for (let i = 0; i < line.length; i += 1) {
+          const ch = line[i];
+          if (ch === '"') {
+            if (inQuotes && line[i + 1] === '"') {
+              current += '"';
+              i += 1;
+            } else {
+              inQuotes = !inQuotes;
+            }
+            continue;
+          }
+          if (ch === "," && !inQuotes) {
+            fields.push(current);
+            current = "";
+            continue;
+          }
+          current += ch;
+        }
+        fields.push(current);
+        return fields;
+      }
+
+      function parseCsv(text) {
+        const lines = text.split(/\r?\n/).filter((line) => line.trim().length > 0);
+        if (!lines.length) return [];
+        const headers = parseCsvLine(lines[0]);
+        const rows = [];
+        for (let i = 1; i < lines.length; i += 1) {
+          const values = parseCsvLine(lines[i]);
+          const row = {};
+          for (let j = 0; j < headers.length; j += 1) {
+            row[headers[j]] = values[j] ?? "";
+          }
+          rows.push(row);
+        }
+        return rows;
+      }
+
+      async function loadCoverColours() {
+        if (coverColourMap.size > 0) return coverColourMap;
+        const res = await fetch("/data/collection_with_colours.csv", { cache: "no-store" });
+        if (!res.ok) return coverColourMap;
+        const text = await res.text();
+        const rows = parseCsv(text);
+        const map = new Map();
+        for (const row of rows) {
+          const imageFile = (row.ImageFile || "").trim();
+          const hex = (row.AlbumColorHex || "").trim().toLowerCase();
+          if (!imageFile || !/^#[0-9a-f]{6}$/.test(hex)) continue;
+          map.set(normalizeKey(imageFile), hex);
+        }
+        coverColourMap = map;
+        return coverColourMap;
+      }
+
+      function extractFilenameFromCoverUrl(url) {
+        try {
+          const u = new URL(url, window.location.origin);
+          const fromParam = u.searchParams.get("pathname");
+          const path = fromParam ? decodeURIComponent(fromParam) : decodeURIComponent(u.pathname);
+          const parts = path.split("/");
+          return parts[parts.length - 1] || "";
+        } catch {
+          return "";
+        }
+      }
+
+      function hexToHsl(hex) {
+        if (hslMemo.has(hex)) return hslMemo.get(hex);
+        const r = parseInt(hex.slice(1, 3), 16) / 255;
+        const g = parseInt(hex.slice(3, 5), 16) / 255;
+        const b = parseInt(hex.slice(5, 7), 16) / 255;
+        const max = Math.max(r, g, b);
+        const min = Math.min(r, g, b);
+        const d = max - min;
+        let h = 0;
+        const l = (max + min) / 2;
+        let s = 0;
+        if (d !== 0) {
+          s = d / (1 - Math.abs(2 * l - 1));
+          switch (max) {
+            case r:
+              h = ((g - b) / d) % 6;
+              break;
+            case g:
+              h = (b - r) / d + 2;
+              break;
+            default:
+              h = (r - g) / d + 4;
+              break;
+          }
+          h *= 60;
+          if (h < 0) h += 360;
+        }
+        const out = [h, s, l];
+        hslMemo.set(hex, out);
+        return out;
+      }
+
+      function sortUrlsByColour(urls) {
+        if (!coverColourMap.size) return urls.slice();
+        const withHex = [];
+        const withoutHex = [];
+        for (const url of urls) {
+          const filename = normalizeKey(extractFilenameFromCoverUrl(url));
+          const hex = coverColourMap.get(filename);
+          if (hex) {
+            withHex.push({ url, hex });
+          } else {
+            withoutHex.push(url);
+          }
+        }
+        withHex.sort((a, b) => {
+          const [ha, sa, la] = hexToHsl(a.hex);
+          const [hb, sb, lb] = hexToHsl(b.hex);
+          if (ha !== hb) return ha - hb;
+          if (la !== lb) return la - lb;
+          if (sa !== sb) return sa - sb;
+          return a.hex.localeCompare(b.hex);
+        });
+        return withHex.map((x) => x.url).concat(shuffle(withoutHex));
+      }
+
+      function diagonalPositions(cols, rows) {
+        const out = [];
+        for (let sum = 0; sum <= cols + rows - 2; sum += 1) {
+          for (let r = 0; r < rows; r += 1) {
+            const c = sum - r;
+            if (c >= 0 && c < cols) {
+              out.push(r * cols + c);
+            }
+          }
+        }
+        return out;
+      }
 
       function shuffle(arr) {
         const out = arr.slice();
@@ -77,6 +249,21 @@
           selected.push(shuffled[i % shuffled.length]);
         }
         return selected;
+      }
+
+      function pickForGridGradient(urls, count, cols, rows) {
+        if (!urls.length || count <= 0) return [];
+        const sorted = sortUrlsByColour(urls);
+        const selected = [];
+        for (let i = 0; i < count; i += 1) {
+          selected.push(sorted[i % sorted.length]);
+        }
+        const fills = new Array(count);
+        const positions = diagonalPositions(cols, rows);
+        for (let i = 0; i < count; i += 1) {
+          fills[positions[i]] = selected[i];
+        }
+        return fills;
       }
 
       function render(urls) {
@@ -98,7 +285,10 @@
         const visibleRows = Math.ceil(vh / tileSize);
         const rows = visibleRows + 2;
         const total = cols * rows;
-        const fills = pickForGrid(urls, total);
+        const fills =
+          layoutMode === "gradient"
+            ? pickForGridGradient(urls, total, cols, rows)
+            : pickForGrid(urls, total);
 
         const gridW = cols * tileSize;
         const gridH = rows * tileSize;
@@ -176,6 +366,7 @@
           const payload = await res.json();
           const urls = Array.isArray(payload?.urls) ? payload.urls : [];
           if (!urls.length) throw new Error("No covers found");
+          await loadCoverColours();
           const accessible = await hasLoadableImages(urls);
           if (!accessible) throw new Error("Covers are not publicly accessible");
           currentUrls = urls;
@@ -210,6 +401,13 @@
         },
         { passive: false },
       );
+
+      layoutToggle.addEventListener("click", () => {
+        layoutMode = layoutMode === "random" ? "gradient" : "random";
+        layoutToggle.textContent =
+          layoutMode === "gradient" ? "Mode: Colour Gradient" : "Mode: Random";
+        if (currentUrls.length) render(currentUrls);
+      });
 
       loadAndRender();
     </script>
