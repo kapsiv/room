@@ -82,11 +82,15 @@
       const MIN_VISIBLE_COLS = 6;
       const MAX_VISIBLE_COLS = 37;
       const MIN_TILE_SIZE = 48;
+      const WHEEL_NOTCH_PX = 100;
       let currentUrls = [];
       let visibleCols = null;
       let layoutMode = "random";
       let coverColourMap = new Map();
+      let randomOrder = [];
       const hslMemo = new Map();
+      let renderState = null;
+      let wheelRemainder = 0;
 
       function normalizeKey(s) {
         return (s || "").normalize("NFKD").toLowerCase().trim();
@@ -243,7 +247,7 @@
 
       function pickForGrid(urls, count) {
         if (!urls.length || count <= 0) return [];
-        const shuffled = shuffle(urls);
+        const shuffled = randomOrder.length ? randomOrder : shuffle(urls);
         const selected = [];
         for (let i = 0; i < count; i += 1) {
           selected.push(shuffled[i % shuffled.length]);
@@ -266,18 +270,71 @@
         return fills;
       }
 
-      function render(urls) {
-        const vw = window.innerWidth;
-        const vh = window.innerHeight;
-
+      function clampVisibleCols(value, vw) {
         const maxVisibleCols = Math.max(
           MIN_VISIBLE_COLS,
           Math.min(MAX_VISIBLE_COLS, Math.floor(vw / MIN_TILE_SIZE)),
         );
+        return Math.min(maxVisibleCols, Math.max(MIN_VISIBLE_COLS, value));
+      }
+
+      function clampOffset(offset, viewportSize, gridSize) {
+        return Math.min(0, Math.max(viewportSize - gridSize, offset));
+      }
+
+      function findClosestIndex(fills, url, preferredIndex = 0) {
+        let bestIndex = -1;
+        let bestDistance = Number.POSITIVE_INFINITY;
+        for (let i = 0; i < fills.length; i += 1) {
+          if (fills[i] !== url) continue;
+          const d = Math.abs(i - preferredIndex);
+          if (d < bestDistance) {
+            bestDistance = d;
+            bestIndex = i;
+          }
+        }
+        return bestIndex;
+      }
+
+      function captureAnchor(clientX, clientY) {
+        if (!renderState) return null;
+        const { offsetX, offsetY, tileSize, cols, rows, fills } = renderState;
+        const relX = clientX - offsetX;
+        const relY = clientY - offsetY;
+        if (relX < 0 || relY < 0 || relX >= cols * tileSize || relY >= rows * tileSize) {
+          return {
+            x: clientX,
+            y: clientY,
+            fx: 0.5,
+            fy: 0.5,
+            index: null,
+            url: null,
+          };
+        }
+        const col = Math.floor(relX / tileSize);
+        const row = Math.floor(relY / tileSize);
+        const index = row * cols + col;
+        return {
+          x: clientX,
+          y: clientY,
+          fx: relX / tileSize - col,
+          fy: relY / tileSize - row,
+          index,
+          url: fills[index] || null,
+        };
+      }
+
+      function render(urls, options = {}) {
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+
         if (visibleCols == null) {
-          visibleCols = maxVisibleCols;
+          visibleCols = clampVisibleCols(MAX_VISIBLE_COLS, vw);
         } else {
-          visibleCols = Math.min(maxVisibleCols, Math.max(MIN_VISIBLE_COLS, visibleCols));
+          visibleCols = clampVisibleCols(visibleCols, vw);
+        }
+        if (typeof options.visibleCols === "number") {
+          visibleCols = clampVisibleCols(options.visibleCols, vw);
         }
 
         const tileSize = Math.ceil(vw / visibleCols);
@@ -292,11 +349,38 @@
 
         const gridW = cols * tileSize;
         const gridH = rows * tileSize;
+        let offsetX = Math.floor((vw - gridW) / 2);
+        let offsetY = Math.floor((vh - gridH) / 2);
+
+        const anchor = options.anchor;
+        if (anchor && (anchor.url || anchor.index != null)) {
+          let anchorIndex = -1;
+          if (anchor.url) {
+            anchorIndex = findClosestIndex(fills, anchor.url, anchor.index ?? 0);
+          }
+          if (anchorIndex < 0 && anchor.index != null && anchor.index < fills.length) {
+            anchorIndex = anchor.index;
+          }
+          if (anchorIndex >= 0) {
+            const anchorCol = anchorIndex % cols;
+            const anchorRow = Math.floor(anchorIndex / cols);
+            const fx = Number.isFinite(anchor.fx) ? anchor.fx : 0.5;
+            const fy = Number.isFinite(anchor.fy) ? anchor.fy : 0.5;
+            const tileX = anchorCol * tileSize + fx * tileSize;
+            const tileY = anchorRow * tileSize + fy * tileSize;
+            offsetX = Math.round(anchor.x - tileX);
+            offsetY = Math.round(anchor.y - tileY);
+          }
+        }
+
+        offsetX = clampOffset(offsetX, vw, gridW);
+        offsetY = clampOffset(offsetY, vh, gridH);
+
         collage.style.width = `${gridW}px`;
         collage.style.height = `${gridH}px`;
         collage.style.gridTemplateColumns = `repeat(${cols}, ${tileSize}px)`;
         collage.style.gridTemplateRows = `repeat(${rows}, ${tileSize}px)`;
-        collage.style.transform = `translate(${Math.floor((vw - gridW) / 2)}px, ${Math.floor((vh - gridH) / 2)}px)`;
+        collage.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
 
         const frag = document.createDocumentFragment();
         for (let i = 0; i < fills.length; i += 1) {
@@ -308,24 +392,23 @@
           frag.appendChild(tile);
         }
         collage.replaceChildren(frag);
+        renderState = { tileSize, cols, rows, gridW, gridH, offsetX, offsetY, fills };
       }
 
-      function adjustZoom(deltaY) {
+      function adjustZoomByColumns(stepColumns, anchor) {
         if (!currentUrls.length) return;
         const vw = window.innerWidth;
-        const maxVisibleCols = Math.max(
-          MIN_VISIBLE_COLS,
-          Math.min(MAX_VISIBLE_COLS, Math.floor(vw / MIN_TILE_SIZE)),
-        );
-        const step = Math.abs(deltaY) > 40 ? 2 : 1;
-        const direction = deltaY < 0 ? 1 : -1;
-        const next = Math.min(
-          maxVisibleCols,
-          Math.max(MIN_VISIBLE_COLS, (visibleCols ?? maxVisibleCols) + direction * step),
-        );
+        const current = visibleCols == null ? clampVisibleCols(MAX_VISIBLE_COLS, vw) : visibleCols;
+        const next = clampVisibleCols(current + stepColumns, vw);
         if (next === visibleCols) return;
-        visibleCols = next;
-        render(currentUrls);
+        render(currentUrls, { visibleCols: next, anchor });
+      }
+
+      function normalizeWheelDelta(event) {
+        let delta = event.deltaY;
+        if (event.deltaMode === 1) delta *= 40;
+        if (event.deltaMode === 2) delta *= window.innerHeight;
+        return delta;
       }
 
       function probeImage(url, timeoutMs = 5000) {
@@ -370,11 +453,14 @@
           const accessible = await hasLoadableImages(urls);
           if (!accessible) throw new Error("Covers are not publicly accessible");
           currentUrls = urls;
+          randomOrder = shuffle(urls);
           fallback.style.display = "none";
           render(currentUrls);
         } catch (err) {
           collage.replaceChildren();
           currentUrls = [];
+          randomOrder = [];
+          renderState = null;
           const detail = err instanceof Error ? err.message : "Unknown error";
           fallback.textContent = `Unable to load album covers: ${detail}`;
           fallback.style.display = "flex";
@@ -397,7 +483,18 @@
         "wheel",
         (event) => {
           event.preventDefault();
-          adjustZoom(event.deltaY);
+          if (!currentUrls.length) return;
+          const anchor = captureAnchor(event.clientX, event.clientY);
+          wheelRemainder += normalizeWheelDelta(event);
+          let steps = 0;
+          while (Math.abs(wheelRemainder) >= WHEEL_NOTCH_PX) {
+            const sign = wheelRemainder > 0 ? 1 : -1;
+            wheelRemainder -= sign * WHEEL_NOTCH_PX;
+            steps += sign;
+          }
+          if (steps !== 0) {
+            adjustZoomByColumns(steps, anchor);
+          }
         },
         { passive: false },
       );
