@@ -86,6 +86,13 @@
       let currentUrls = [];
       let visibleCols = null;
       let layoutMode = "random";
+      const layoutModes = ["random", "gradient1", "gradient2", "gradient3"];
+      const layoutLabels = {
+        random: "Mode: Random",
+        gradient1: "Mode: Colour Gradient 1",
+        gradient2: "Mode: Colour Gradient 2",
+        gradient3: "Mode: Colour Gradient 3",
+      };
       let coverColourMap = new Map();
       let randomOrder = [];
       const hslMemo = new Map();
@@ -147,9 +154,15 @@
         const map = new Map();
         for (const row of rows) {
           const imageFile = (row.ImageFile || "").trim();
-          const hex = (row.AlbumColorHex || "").trim().toLowerCase();
-          if (!imageFile || !/^#[0-9a-f]{6}$/.test(hex)) continue;
-          map.set(normalizeKey(imageFile), hex);
+          if (!imageFile) continue;
+          const mixedHex = (row.AlbumColorHex || "").trim().toLowerCase();
+          const avgHex = (row.AverageHex || "").trim().toLowerCase();
+          const domHex = (row.DominantHex || "").trim().toLowerCase();
+          map.set(normalizeKey(imageFile), {
+            mixed: /^#[0-9a-f]{6}$/.test(mixedHex) ? mixedHex : "",
+            average: /^#[0-9a-f]{6}$/.test(avgHex) ? avgHex : "",
+            dominant: /^#[0-9a-f]{6}$/.test(domHex) ? domHex : "",
+          });
         }
         coverColourMap = map;
         return coverColourMap;
@@ -199,13 +212,20 @@
         return out;
       }
 
-      function sortUrlsByColour(urls) {
+      function sortUrlsByColour(urls, gradientMode) {
         if (!coverColourMap.size) return urls.slice();
+        const key =
+          gradientMode === "gradient2"
+            ? "average"
+            : gradientMode === "gradient3"
+              ? "dominant"
+              : "mixed";
         const withHex = [];
         const withoutHex = [];
         for (const url of urls) {
           const filename = normalizeKey(extractFilenameFromCoverUrl(url));
-          const hex = coverColourMap.get(filename);
+          const colourRecord = coverColourMap.get(filename);
+          const hex = colourRecord ? colourRecord[key] : "";
           if (hex) {
             withHex.push({ url, hex });
           } else {
@@ -255,9 +275,9 @@
         return selected;
       }
 
-      function pickForGridGradient(urls, count, cols, rows) {
+      function pickForGridGradient(urls, count, cols, rows, gradientMode) {
         if (!urls.length || count <= 0) return [];
-        const sorted = sortUrlsByColour(urls);
+        const sorted = sortUrlsByColour(urls, gradientMode);
         const selected = [];
         for (let i = 0; i < count; i += 1) {
           selected.push(sorted[i % sorted.length]);
@@ -343,8 +363,8 @@
         const rows = visibleRows + 2;
         const total = cols * rows;
         const fills =
-          layoutMode === "gradient"
-            ? pickForGridGradient(urls, total, cols, rows)
+          layoutMode !== "random"
+            ? pickForGridGradient(urls, total, cols, rows, layoutMode)
             : pickForGrid(urls, total);
 
         const gridW = cols * tileSize;
@@ -500,9 +520,9 @@
       );
 
       layoutToggle.addEventListener("click", () => {
-        layoutMode = layoutMode === "random" ? "gradient" : "random";
-        layoutToggle.textContent =
-          layoutMode === "gradient" ? "Mode: Colour Gradient" : "Mode: Random";
+        const idx = layoutModes.indexOf(layoutMode);
+        layoutMode = layoutModes[(idx + 1) % layoutModes.length];
+        layoutToggle.textContent = layoutLabels[layoutMode];
         if (currentUrls.length) render(currentUrls);
       });
 
