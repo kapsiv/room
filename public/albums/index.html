@@ -83,34 +83,21 @@
       const MAX_VISIBLE_COLS = 37;
       const MIN_TILE_SIZE = 48;
       const WHEEL_NOTCH_PX = 100;
-      const GRADIENT5_STEP_MS = 260;
       let currentUrls = [];
       let visibleCols = null;
       let layoutMode = "random";
-      const layoutModes = [
-        "random",
-        "gradient1",
-        "gradient2",
-        "gradient3",
-        "gradient4",
-        "gradient5",
-      ];
+      const layoutModes = ["random", "gradient1", "gradient2", "gradient3"];
       const layoutLabels = {
         random: "Mode: Random",
         gradient1: "Mode: Colour Gradient 1",
         gradient2: "Mode: Colour Gradient 2",
         gradient3: "Mode: Colour Gradient 3",
-        gradient4: "Mode: Colour Gradient 4",
-        gradient5: "Mode: Colour Gradient 5",
       };
       let coverColourMap = new Map();
       let randomOrder = [];
       const hslMemo = new Map();
       let renderState = null;
       let wheelRemainder = 0;
-      let gradient5Offset = 0;
-      let gradient5Raf = null;
-      let gradient5LastTs = 0;
 
       function normalizeKey(s) {
         return (s || "").normalize("NFKD").toLowerCase().trim();
@@ -200,8 +187,6 @@
             return colourRecord.average || "";
           case "gradient3":
             return colourRecord.dominant || "";
-          case "gradient4":
-          case "gradient5":
           case "gradient1":
           default:
             return colourRecord.mixed || "";
@@ -265,23 +250,6 @@
         return withHex.map((x) => x.url).concat(shuffle(withoutHex));
       }
 
-      function buildColourItems(urls, gradientMode) {
-        const items = [];
-        const fallbackUrls = [];
-        for (const url of urls) {
-          const filename = normalizeKey(extractFilenameFromCoverUrl(url));
-          const colourRecord = coverColourMap.get(filename);
-          const hex = getHexForMode(colourRecord, gradientMode);
-          if (!hex) {
-            fallbackUrls.push(url);
-            continue;
-          }
-          const [h, s, l] = hexToHsl(hex);
-          items.push({ url, hex, h, s, l });
-        }
-        return { items, fallbackUrls };
-      }
-
       function diagonalPositions(cols, rows) {
         const out = [];
         for (let sum = 0; sum <= cols + rows - 2; sum += 1) {
@@ -327,127 +295,6 @@
           fills[positions[i]] = selected[i];
         }
         return fills;
-      }
-
-      function pickForGridGradientAdaptive(urls, count, cols, rows) {
-        if (!urls.length || count <= 0) return [];
-        const { items, fallbackUrls } = buildColourItems(urls, "gradient4");
-        if (!items.length) return pickForGrid(urls, count);
-
-        const hueBins = 24;
-        const hueCounts = new Array(hueBins).fill(0);
-        for (const item of items) {
-          const bin = Math.floor((item.h / 360) * hueBins) % hueBins;
-          hueCounts[bin] += 1;
-        }
-        let minCount = Number.POSITIVE_INFINITY;
-        let maxCount = Number.NEGATIVE_INFINITY;
-        for (const c of hueCounts) {
-          if (c < minCount) minCount = c;
-          if (c > maxCount) maxCount = c;
-        }
-        const span = Math.max(1, maxCount - minCount);
-
-        const weighted = items.map((item) => {
-          const bin = Math.floor((item.h / 360) * hueBins) % hueBins;
-          const density = (hueCounts[bin] - minCount) / span;
-          const radial =
-            0.56 * density + 0.24 * (1 - item.s) + 0.2 * Math.abs(item.l - 0.5);
-          const radiusTarget = Math.max(0, Math.min(1, radial));
-          return { ...item, radiusTarget };
-        });
-
-        const selected = [];
-        const source = weighted.concat(
-          shuffle(fallbackUrls).map((url) => ({
-            url,
-            h: Math.random() * 360,
-            s: 0,
-            l: 0.5,
-            radiusTarget: 0.5,
-          })),
-        );
-        for (let i = 0; i < count; i += 1) {
-          selected.push(source[i % source.length]);
-        }
-
-        const centerCol = (cols - 1) / 2;
-        const centerRow = (rows - 1) / 2;
-        const maxDist = Math.sqrt(centerCol * centerCol + centerRow * centerRow) || 1;
-        const cells = [];
-        for (let row = 0; row < rows; row += 1) {
-          for (let col = 0; col < cols; col += 1) {
-            const dx = col - centerCol;
-            const dy = row - centerRow;
-            const radius = Math.sqrt(dx * dx + dy * dy) / maxDist;
-            let angle = (Math.atan2(dy, dx) * 180) / Math.PI;
-            if (angle < 0) angle += 360;
-            cells.push({ index: row * cols + col, radius, angle });
-          }
-        }
-
-        cells.sort((a, b) => {
-          if (a.radius !== b.radius) return a.radius - b.radius;
-          return a.angle - b.angle;
-        });
-        selected.sort((a, b) => {
-          if (a.radiusTarget !== b.radiusTarget) return a.radiusTarget - b.radiusTarget;
-          if (a.h !== b.h) return a.h - b.h;
-          if (a.l !== b.l) return a.l - b.l;
-          return a.s - b.s;
-        });
-
-        const fills = new Array(count);
-        for (let i = 0; i < count; i += 1) {
-          fills[cells[i].index] = selected[i].url;
-        }
-        return fills;
-      }
-
-      function pickForGridGradientAnimated(urls, count, cols, rows) {
-        if (!urls.length || count <= 0) return [];
-        const sorted = sortUrlsByColour(urls, "gradient5");
-        const selected = [];
-        for (let i = 0; i < count; i += 1) {
-          selected.push(sorted[i % sorted.length]);
-        }
-        const offset = ((gradient5Offset % count) + count) % count;
-        const shifted = new Array(count);
-        for (let i = 0; i < count; i += 1) {
-          shifted[i] = selected[(i + offset) % count];
-        }
-        const fills = new Array(count);
-        const positions = diagonalPositions(cols, rows);
-        for (let i = 0; i < count; i += 1) {
-          fills[positions[i]] = shifted[i];
-        }
-        return fills;
-      }
-
-      function stopGradient5Animation() {
-        if (gradient5Raf != null) {
-          cancelAnimationFrame(gradient5Raf);
-          gradient5Raf = null;
-        }
-        gradient5LastTs = 0;
-      }
-
-      function startGradient5Animation() {
-        if (gradient5Raf != null) return;
-        const tick = (ts) => {
-          if (layoutMode !== "gradient5") {
-            stopGradient5Animation();
-            return;
-          }
-          if (!gradient5LastTs) gradient5LastTs = ts;
-          if (ts - gradient5LastTs >= GRADIENT5_STEP_MS) {
-            gradient5Offset += 1;
-            gradient5LastTs = ts;
-            if (currentUrls.length) render(currentUrls);
-          }
-          gradient5Raf = requestAnimationFrame(tick);
-        };
-        gradient5Raf = requestAnimationFrame(tick);
       }
 
       function clampVisibleCols(value, vw) {
@@ -522,16 +369,10 @@
         const visibleRows = Math.ceil(vh / tileSize);
         const rows = visibleRows + 2;
         const total = cols * rows;
-        let fills;
-        if (layoutMode === "random") {
-          fills = pickForGrid(urls, total);
-        } else if (layoutMode === "gradient4") {
-          fills = pickForGridGradientAdaptive(urls, total, cols, rows);
-        } else if (layoutMode === "gradient5") {
-          fills = pickForGridGradientAnimated(urls, total, cols, rows);
-        } else {
-          fills = pickForGridGradient(urls, total, cols, rows, layoutMode);
-        }
+        const fills =
+          layoutMode !== "random"
+            ? pickForGridGradient(urls, total, cols, rows, layoutMode)
+            : pickForGrid(urls, total);
 
         const gridW = cols * tileSize;
         const gridH = rows * tileSize;
@@ -689,11 +530,6 @@
         const idx = layoutModes.indexOf(layoutMode);
         layoutMode = layoutModes[(idx + 1) % layoutModes.length];
         layoutToggle.textContent = layoutLabels[layoutMode];
-        if (layoutMode === "gradient5") {
-          startGradient5Animation();
-        } else {
-          stopGradient5Animation();
-        }
         if (currentUrls.length) render(currentUrls);
       });
 
