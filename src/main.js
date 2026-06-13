@@ -543,9 +543,23 @@ const inventoryState = {
   organized: false,
 };
 
+const INVENTORY_CUSTOM_ITEMS = [
+  {
+    key: "albums",
+    label: "albums",
+    icon: "/icons/albums.svg",
+    href: "https://www.kapsiv.com/albums",
+  },
+];
+
+const INVENTORY_LABEL_OVERRIDES = {
+  activ: "actIV",
+  inactiv: "inactIV",
+};
+
 const INVENTORY_CATEGORY_DEFS = [
   { key: "K", label: "knowledge", items: ["book", "info", "logo", "libraryLookup", "faq"] },
-  { key: "A", label: "art", items: ["guitar", "modelling", "projects", "designPhilosophy"] },
+  { key: "A", label: "art", items: ["guitar", "modelling", "projects", "designPhilosophy", "albums"] },
   { key: "P", label: "profession", items: ["cv", "archive", "dataPipelines", "utilities", "vinaflow"] },
   { key: "S", label: "social", items: ["blu", "calendar", "gallery", "links"] },
   { key: "I", label: "introspection", items: ["about", "nowplaying", "reflectiv"] },
@@ -562,9 +576,12 @@ function escapeHtml(value) {
 }
 
 function buildInventoryItemMarkup(item) {
+  const actionAttr = item.href ? "data-inventory-href" : "data-inventory-modal";
+  const actionValue = item.href || item.key;
+  const verb = item.href ? "Open" : "Open";
   return `
     <div class="inventory-item">
-      <button type="button" class="inventory-item-button" data-inventory-modal="${escapeHtml(item.key)}" aria-label="Open ${escapeHtml(item.label)}">
+      <button type="button" class="inventory-item-button" ${actionAttr}="${escapeHtml(actionValue)}" aria-label="${verb} ${escapeHtml(item.label)}">
         <span class="inventory-item-squircle">
           <span class="inventory-item-icon" style="--inventory-icon: url('${item.icon}')"></span>
         </span>
@@ -583,15 +600,17 @@ function initInventoryModal() {
     .filter(([key, modal]) => {
       if (!modal || key === "inventory") return false;
       if (isMobileLayout() && key === "genreDistribution") return false;
+      if (key === "genreDistribution") return false;
       return true;
     })
     .map(([key, modal]) => ({
       key,
       modal,
-      label: getModalInventoryLabel(modal),
+      label: INVENTORY_LABEL_OVERRIDES[key] || getModalInventoryLabel(modal),
       icon: modal.dataset.modalIcon || "",
     }))
-    .filter((item) => item.icon && item.label);
+    .filter((item) => item.icon && item.label)
+    .concat(INVENTORY_CUSTOM_ITEMS);
 
   const itemsByKey = new Map(items.map((item) => [item.key, item]));
 
@@ -602,6 +621,14 @@ function initInventoryModal() {
         const modal = modals[modalKey];
         if (!modal) return;
         showModal(modal);
+      });
+    });
+
+    grid.querySelectorAll("[data-inventory-href]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const href = button.getAttribute("data-inventory-href") || "";
+        if (!href) return;
+        window.open(href, "_blank", "noopener,noreferrer");
       });
     });
   };
