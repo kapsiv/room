@@ -1,4 +1,3 @@
-Artist,Song,Album,Genres,Year,Countries,Bitrate,File,Duration,Recording Type,Format
 青葉市子 [Ichiko Aoba],いきのこり●ぼくら,0,Contemporary Folk,2013,Japan,476k,flac,6:46,Studio,LP
 青葉市子 [Ichiko Aoba],iam POD (0%),0,Contemporary Folk,2013,Japan,385k,flac,5:33,Studio,LP
 青葉市子 [Ichiko Aoba],Mars 2027,0,Contemporary Folk,2013,Japan,602k,flac,8:07,Studio,LP
@@ -18,6 +17,24 @@ Artist,Song,Album,Genres,Year,Countries,Bitrate,File,Duration,Recording Type,For
 青葉市子 [Ichiko Aoba],はるなつあきふゆ (20131125),0%,Contemporary Folk,2014,Japan,320k,mp3,6:23,Live,LP
 青葉市子 [Ichiko Aoba],いりぐちでぐち (20131125),0%,Contemporary Folk,2014,Japan,320k,mp3,22:13,Live,LP
 青葉市子 [Ichiko Aoba],永遠はさよなら (20131125),0%,Contemporary Folk,2014,Japan,320k,mp3,1:55,Live,LP
+The George–Edwards Group,You Without Me,38:38:00,Psychedelic Rock,1977,USA,256k,mp3,2:36,Studio,LP
+The George–Edwards Group,Planets and Stars,38:38:00,Psychedelic Rock,1977,USA,256k,mp3,5:27,Studio,LP
+The George–Edwards Group,La Jolla,38:38:00,Psychedelic Rock,1977,USA,256k,mp3,2:02,Studio,LP
+The George–Edwards Group,Wintertime,38:38:00,Psychedelic Rock,1977,USA,256k,mp3,4:47,Studio,LP
+The George–Edwards Group,Country Interlude,38:38:00,Psychedelic Rock,1977,USA,256k,mp3,1:16,Studio,LP
+The George–Edwards Group,I See Your Smile,38:38:00,Psychedelic Rock,1977,USA,256k,mp3,2:27,Studio,LP
+The George–Edwards Group,Easternia,38:38:00,Psychedelic Rock,1977,USA,256k,mp3,1:41,Studio,LP
+The George–Edwards Group,You Came Away,38:38:00,Psychedelic Rock,1977,USA,256k,mp3,3:48,Studio,LP
+The George–Edwards Group,Hypertrain,38:38:00,Psychedelic Rock,1977,USA,256k,mp3,4:13,Studio,LP
+The George–Edwards Group,Floating Away,38:38:00,Psychedelic Rock,1977,USA,256k,mp3,3:42,Studio,LP
+The George–Edwards Group,Magnetic Variation,38:38:00,Psychedelic Rock,1977,USA,256k,mp3,6:25,Studio,LP
+The George–Edwards Group,Just a Minute,38:38:00,Psychedelic Rock,1977,USA,256k,mp3,1:08,Studio,LP
+The George–Edwards Group,Some Fun,38:38:00,Psychedelic Rock,1977,USA,256k,mp3,1:18,Studio,LP
+The George–Edwards Group,Solar Flare,38:38:00,Psychedelic Rock,1977,USA,256k,mp3,1:22,Studio,LP
+The George–Edwards Group,The Blowing Wind,38:38:00,Psychedelic Rock,1977,USA,256k,mp3,2:53,Studio,LP
+The George–Edwards Group,I Can Find My Way,38:38:00,Psychedelic Rock,1977,USA,256k,mp3,3:30,Studio,LP
+The George–Edwards Group,She Was All,38:38:00,Psychedelic Rock,1977,USA,256k,mp3,3:46,Studio,LP
+The George–Edwards Group,Nevada,38:38:00,Psychedelic Rock,1977,USA,256k,mp3,4:02,Studio,LP
 Supersilent,6.1,6,EAI; Free Improvisation,2003,Norway,320k,mp3,11:06,Studio,LP
 Supersilent,6.2,6,EAI; Free Improvisation,2003,Norway,320k,mp3,9:57,Studio,LP
 Supersilent,6.3,6,EAI; Free Improvisation,2003,Norway,320k,mp3,13:32,Studio,LP
@@ -55,7 +72,7 @@ Duster,The Motion Picture,1975,Slowcore,1999,USA,320k,mp3,2:41,Studio,EP
 Duster,And Things (Are Mostly Ghosts),1975,Slowcore,1999,USA,320k,mp3,3:18,Studio,EP
 Duster,August Relativity,1975,Slowcore,1999,USA,320k,mp3,3:08,Studio,EP
 Duster,Want No Light to Shine,1975,Slowcore,1999,USA,320k,mp3,5:59,Studio,EP
-Supersilent,1.1,1-3,EAI; Free Improvisation,1997,Norway,320k,mp3,29:01,Studio,LP
+Supersilent,1.1,1-3,EAI; Free Improvisation,1997,Norway,320k,mp3,29:01:00,Studio,LP
 Supersilent,1.2,1-3,EAI; Free Improvisation,1997,Norway,320k,mp3,5:08,Studio,LP
 Supersilent,1.3,1-3,EAI; Free Improvisation,1997,Norway,320k,mp3,14:02,Studio,LP
 Supersilent,1.4,1-3,EAI; Free Improvisation,1997,Norway,320k,mp3,15:52,Studio,LP
@@ -63,10 +80,10 @@ Supersilent,2.1,1-3,EAI; Free Improvisation,1997,Norway,320k,mp3,13:46,Studio,LP
 Supersilent,2.2,1-3,EAI; Free Improvisation,1997,Norway,320k,mp3,9:26,Studio,LP
 Supersilent,2.3,1-3,EAI; Free Improvisation,1997,Norway,320k,mp3,5:28,Studio,LP
 Supersilent,2.4,1-3,EAI; Free Improvisation,1997,Norway,320k,mp3,6:28,Studio,LP
-Supersilent,2.5,1-3,EAI; Free Improvisation,1997,Norway,320k,mp3,27:09,Studio,LP
+Supersilent,2.5,1-3,EAI; Free Improvisation,1997,Norway,320k,mp3,27:09:00,Studio,LP
 Supersilent,3.1,1-3,EAI; Free Improvisation,1997,Norway,320k,mp3,9:58,Studio,LP
 Supersilent,3.2,1-3,EAI; Free Improvisation,1997,Norway,320k,mp3,7:11,Studio,LP
-Supersilent,3.3,1-3,EAI; Free Improvisation,1997,Norway,320k,mp3,24:48,Studio,LP
+Supersilent,3.3,1-3,EAI; Free Improvisation,1997,Norway,320k,mp3,24:48:00,Studio,LP
 Supersilent,3.4,1-3,EAI; Free Improvisation,1997,Norway,320k,mp3,20:03,Studio,LP
 Aphex Twin,Acrid Avid Jam Shred,…I Care Because You Do,IDM; Acid Techno,1995,UK; England,892k,flac,7:38,Studio,LP
 Aphex Twin,The Waxen Pith,…I Care Because You Do,IDM; Acid Techno,1995,UK; England,895k,flac,4:49,Studio,LP
@@ -154,27 +171,9 @@ The Velvet Underground,I'll Be Your Mirror,1969: Velvet Underground Live with Lo
 不失者 [Fushitsusha],ふわ　ふわ,1st,Psychedelic Rock; Noise Rock; Experimental Rock,1997,Japan,206k VBR,mp3,8:04,Live,LP
 不失者 [Fushitsusha],なったんじゃない,1st,Psychedelic Rock; Noise Rock; Experimental Rock,1997,Japan,221k VBR,mp3,7:46,Live,LP
 不失者 [Fushitsusha],迷子,1st,Psychedelic Rock; Noise Rock; Experimental Rock,1997,Japan,216k VBR,mp3,10:03,Live,LP
-不失者 [Fushitsusha],ここ,1st,Psychedelic Rock; Noise Rock; Experimental Rock,1997,Japan,208k VBR,mp3,26:06,Live,LP
+不失者 [Fushitsusha],ここ,1st,Psychedelic Rock; Noise Rock; Experimental Rock,1997,Japan,208k VBR,mp3,26:06:00,Live,LP
 "25,000 Kittens",Boo 1991-2011,"25,000 Kittens",Drone; Ambient,2014,Japan,1263k,flac,9:54,Studio,EP
 "25,000 Kittens",Hanakichi 2012-2013,"25,000 Kittens",Drone; Ambient,2014,Japan,1259k,flac,9:53,Studio,EP
-The George–Edwards Group,You Without Me,38:38,Psychedelic Rock,1977,USA,256k,mp3,2:36,Studio,LP
-The George–Edwards Group,Planets and Stars,38:38,Psychedelic Rock,1977,USA,256k,mp3,5:27,Studio,LP
-The George–Edwards Group,La Jolla,38:38,Psychedelic Rock,1977,USA,256k,mp3,2:02,Studio,LP
-The George–Edwards Group,Wintertime,38:38,Psychedelic Rock,1977,USA,256k,mp3,4:47,Studio,LP
-The George–Edwards Group,Country Interlude,38:38,Psychedelic Rock,1977,USA,256k,mp3,1:16,Studio,LP
-The George–Edwards Group,I See Your Smile,38:38,Psychedelic Rock,1977,USA,256k,mp3,2:27,Studio,LP
-The George–Edwards Group,Easternia,38:38,Psychedelic Rock,1977,USA,256k,mp3,1:41,Studio,LP
-The George–Edwards Group,You Came Away,38:38,Psychedelic Rock,1977,USA,256k,mp3,3:48,Studio,LP
-The George–Edwards Group,Hypertrain,38:38,Psychedelic Rock,1977,USA,256k,mp3,4:13,Studio,LP
-The George–Edwards Group,Floating Away,38:38,Psychedelic Rock,1977,USA,256k,mp3,3:42,Studio,LP
-The George–Edwards Group,Magnetic Variation,38:38,Psychedelic Rock,1977,USA,256k,mp3,6:25,Studio,LP
-The George–Edwards Group,Just a Minute,38:38,Psychedelic Rock,1977,USA,256k,mp3,1:08,Studio,LP
-The George–Edwards Group,Some Fun,38:38,Psychedelic Rock,1977,USA,256k,mp3,1:18,Studio,LP
-The George–Edwards Group,Solar Flare,38:38,Psychedelic Rock,1977,USA,256k,mp3,1:22,Studio,LP
-The George–Edwards Group,The Blowing Wind,38:38,Psychedelic Rock,1977,USA,256k,mp3,2:53,Studio,LP
-The George–Edwards Group,I Can Find My Way,38:38,Psychedelic Rock,1977,USA,256k,mp3,3:30,Studio,LP
-The George–Edwards Group,She Was All,38:38,Psychedelic Rock,1977,USA,256k,mp3,3:46,Studio,LP
-The George–Edwards Group,Nevada,38:38,Psychedelic Rock,1977,USA,256k,mp3,4:02,Studio,LP
 Geese,2122,3D Country,Indie Rock; Art Punk; Alt-Country,2023,USA,944k,flac,3:52,Studio,LP
 Geese,3D Country,3D Country,Indie Rock; Art Punk; Alt-Country,2023,USA,905k,flac,5:13,Studio,LP
 Geese,Cowboy Nudes,3D Country,Indie Rock; Art Punk; Alt-Country,2023,USA,933k,flac,2:50,Studio,LP
@@ -196,8 +195,8 @@ YHWH Nailgun,Tear Pusher,45 Pounds,Experimental Rock,2025,USA,2988k,flac,3:07,St
 YHWH Nailgun,Sickle Walk,45 Pounds,Experimental Rock,2025,USA,3207k,flac,1:26,Studio,LP
 YHWH Nailgun,Blackout,45 Pounds,Experimental Rock,2025,USA,2936k,flac,2:58,Studio,LP
 YHWH Nailgun,Changer,45 Pounds,Experimental Rock,2025,USA,3251k,flac,1:34,Studio,LP
-Boredoms,77 Boa Drum Part.1 / Seven,77 Boa Drum,Experimental Rock,2007,Japan,997k,FLAC,53:32,Live,LP
-Boredoms,77 Boa Drum Part.2 / Sun Loard,77 Boa Drum,Experimental Rock,2007,Japan,1025k,FLAC,46:39,Live,LP
+Boredoms,77 Boa Drum Part.1 / Seven,77 Boa Drum,Experimental Rock,2007,Japan,997k,FLAC,53:32:00,Live,LP
+Boredoms,77 Boa Drum Part.2 / Sun Loard,77 Boa Drum,Experimental Rock,2007,Japan,1025k,FLAC,46:39:00,Live,LP
 Les Rallizes Dénudés,Enter The Mirror,77 Live,Noise Rock; Psychedelic Rock,1991,Japan,192k,mp3,11:43,Live,LP
 Les Rallizes Dénudés,夜、暗殺者の夜 (Night Of The Assassins),77 Live,Noise Rock; Psychedelic Rock,1991,Japan,192k,mp3,12:03,Live,LP
 Les Rallizes Dénudés,氷の炎 (Flames Of Ice),77 Live,Noise Rock; Psychedelic Rock,1991,Japan,192k,mp3,16:13,Live,LP
@@ -218,7 +217,7 @@ Fishmans,"Smilin' Days, Summer Holiday",98.12.28 男達の別れ,Dream Pop; Neo-
 Fishmans,MELODY,98.12.28 男達の別れ,Dream Pop; Neo-Psychedelia,1999,Japan,240k VBR,mp3,5:49,Live,LP
 Fishmans,ゆらめき IN THE AIR,98.12.28 男達の別れ,Dream Pop; Neo-Psychedelia,1999,Japan,238k VBR,mp3,15:59,Live,LP
 Fishmans,いかれたBaby,98.12.28 男達の別れ,Dream Pop; Neo-Psychedelia,1999,Japan,243k VBR,mp3,5:38,Live,LP
-Fishmans,Long Season,98.12.28 男達の別れ,Dream Pop; Neo-Psychedelia,1999,Japan,251k VBR,mp3,41:31,Live,LP
+Fishmans,Long Season,98.12.28 男達の別れ,Dream Pop; Neo-Psychedelia,1999,Japan,251k VBR,mp3,41:31:00,Live,LP
 The Smile,The Same,A Light For Attracting Attention,Art Rock,2022,UK; England,320k,mp3,4:19,Studio,LP
 The Smile,The Opposite,A Light For Attracting Attention,Art Rock,2022,UK; England,320k,mp3,3:06,Studio,LP
 The Smile,You Will Never Work In Television Again,A Light For Attracting Attention,Art Rock,2022,UK; England,320k,mp3,2:48,Studio,LP
@@ -294,7 +293,7 @@ Sonic Youth,Karen Koltrane,A Thousand Leaves,Experimental Rock; Noise Rock; Post
 Sonic Youth,The Ineffable Me,A Thousand Leaves,Experimental Rock; Noise Rock; Post-Rock,1998,USA,320k,mp3,5:21,Studio,LP
 Sonic Youth,"Snare, Girl",A Thousand Leaves,Experimental Rock; Noise Rock; Post-Rock,1998,USA,320k,mp3,6:38,Studio,LP
 Sonic Youth,Heather Angel,A Thousand Leaves,Experimental Rock; Noise Rock; Post-Rock,1998,USA,320k,mp3,6:08,Studio,LP
-吉村弘 [Hiroshi Yoshimura],森の夜明け,A・I・R - Air in Resort,Ambient; New Age,1984,Japan,32k,mp3,39:10,Studio,LP
+吉村弘 [Hiroshi Yoshimura],森の夜明け,A・I・R - Air in Resort,Ambient; New Age,1984,Japan,32k,mp3,39:10:00,Studio,LP
 吉村弘 [Hiroshi Yoshimura],小川にそって,A・I・R - Air in Resort,Ambient; New Age,1984,Japan,224k,mp3,5:31,Studio,LP
 吉村弘 [Hiroshi Yoshimura],小鳥たこちのカフェ,A・I・R - Air in Resort,Ambient; New Age,1984,Japan,224k,mp3,5:13,Studio,LP
 吉村弘 [Hiroshi Yoshimura],きらめく海,A・I・R - Air in Resort,Ambient; New Age,1984,Japan,192k,mp3,6:46,Studio,LP
@@ -371,6 +370,7 @@ Steely Dan,Peg,Aja,Jazz Rock; Yacht Rock,1977,USA,3015k,flac,3:57,Studio,LP
 Steely Dan,Home At Last,Aja,Jazz Rock; Yacht Rock,1977,USA,2986k,flac,5:35,Studio,LP
 Steely Dan,I Got The News,Aja,Jazz Rock; Yacht Rock,1977,USA,2990k,flac,5:07,Studio,LP
 Steely Dan,Josie,Aja,Jazz Rock; Yacht Rock,1977,USA,2967k,flac,4:33,Studio,LP
+Artist,Song,Album,Genres,Year,Countries,Bitrate,File,Duration,Recording Type,Format
 Flipper,Ever,Album – Generic Flipper,Hardcore Punk; Noise Rock,1982,USA,249k VBR,mp3,2:59,Studio,LP
 Flipper,Life Is Cheap,Album – Generic Flipper,Hardcore Punk; Noise Rock,1982,USA,247k VBR,mp3,3:56,Studio,LP
 Flipper,Shed No Tears,Album – Generic Flipper,Hardcore Punk; Noise Rock,1982,USA,257k VBR,mp3,4:27,Studio,LP
@@ -654,8 +654,8 @@ Satanicpornocultshop,Kanariya,Arkhaiomelisidonophunikheratos,Plunderphonics; Fol
 Satanicpornocultshop,Nido,Arkhaiomelisidonophunikheratos,Plunderphonics; Folktronica; Glitch Pop,2010,Japan,320k,mp3,5:53,Studio,LP
 Satanicpornocultshop,Next Year's Snow,Arkhaiomelisidonophunikheratos,Plunderphonics; Folktronica; Glitch Pop,2010,Japan,320k,mp3,1:42,Studio,LP
 Satanicpornocultshop,Comment Te Dire Adieu?,Arkhaiomelisidonophunikheratos,Plunderphonics; Folktronica; Glitch Pop,2010,Japan,320k,mp3,2:41,Studio,LP
-John Coltrane,Ascension: Edition II,Ascension,Free Jazz; Spiritual Jazz,1965,USA,256k,mp3,40:58,Studio,LP
-John Coltrane,Ascension: Edition I,Ascension,Free Jazz; Spiritual Jazz,1965,USA,256k,mp3,38:30,Studio,LP
+John Coltrane,Ascension: Edition II,Ascension,Free Jazz; Spiritual Jazz,1965,USA,256k,mp3,40:58:00,Studio,LP
+John Coltrane,Ascension: Edition I,Ascension,Free Jazz; Spiritual Jazz,1965,USA,256k,mp3,38:30:00,Studio,LP
 Krzysztof Komeda Quintet,Astigmatic,Astigmatic,Avant-Garde Jazz; Post-Bop,1965,Poland,320k,mp3,23:10,Studio,LP
 Krzysztof Komeda Quintet,Kattorna,Astigmatic,Avant-Garde Jazz; Post-Bop,1965,Poland,320k,mp3,7:36,Studio,LP
 Krzysztof Komeda Quintet,Svantetic,Astigmatic,Avant-Garde Jazz; Post-Bop,1965,Poland,320k,mp3,16:00,Studio,LP
@@ -687,7 +687,7 @@ Harold Budd,Arabesque 1,Avalon Sutra,Ambient; New Age; Minimalism; Classical,200
 Harold Budd,Porcelain Ginger,Avalon Sutra,Ambient; New Age; Minimalism; Classical,2005,USA,320k,mp3,2:01,Studio,LP
 Harold Budd,Faraon,Avalon Sutra,Ambient; New Age; Minimalism; Classical,2005,USA,320k,mp3,1:23,Studio,LP
 Harold Budd,As Long as I Can Hold My Breath,Avalon Sutra,Ambient; New Age; Minimalism; Classical,2005,USA,320k,mp3,3:47,Studio,LP
-Harold Budd,As Long as I Can Hold My Breath,Avalon Sutra,Ambient; New Age; Minimalism; Classical,2005,USA,320k,mp3,69:28,Studio,LP
+Harold Budd,As Long as I Can Hold My Breath,Avalon Sutra,Ambient; New Age; Minimalism; Classical,2005,USA,320k,mp3,69:28:00,Studio,LP
 Julia Holter,Turn the Light On,Aviary,Progressive Pop; Art Pop; Experimental; Ambient Pop,2018,USA,909k,flac,4:16,Studio,LP
 Julia Holter,Whether,Aviary,Progressive Pop; Art Pop; Experimental; Ambient Pop,2018,USA,903k,flac,2:58,Studio,LP
 Julia Holter,Chaitius,Aviary,Progressive Pop; Art Pop; Experimental; Ambient Pop,2018,USA,741k,flac,8:10,Studio,LP
@@ -812,9 +812,9 @@ Sun Kil Moon,Richard Ramirez Died Today of Natural Causes (Live),Benji,Contempor
 Sun Kil Moon,I Love My Dad (Live),Benji,Contemporary Folk; Americana,2014,USA,320k,mp3,6:04,Studio,LP
 Sun Kil Moon,I Can't Live Without My Mother's Love (Live),Benji,Contemporary Folk; Americana,2014,USA,320k,mp3,4:18,Studio,LP
 Sun Kil Moon,Truck Driver (Live),Benji,Contemporary Folk; Americana,2014,USA,320k,mp3,4:09,Studio,LP
-Miles Davis,Great Expectations,Big Fun,Jazz Fusion; Avant-Garde Jazz,1974,USA,820k,flac,27:26,Studio,LP
+Miles Davis,Great Expectations,Big Fun,Jazz Fusion; Avant-Garde Jazz,1974,USA,820k,flac,27:26:00,Studio,LP
 Miles Davis,IFE,Big Fun,Jazz Fusion; Avant-Garde Jazz,1974,USA,820k,flac,21:35,Studio,LP
-Miles Davis,Go Ahead John,Big Fun,Jazz Fusion; Avant-Garde Jazz,1974,USA,801k,flac,28:27,Studio,LP
+Miles Davis,Go Ahead John,Big Fun,Jazz Fusion; Avant-Garde Jazz,1974,USA,801k,flac,28:27:00,Studio,LP
 Miles Davis,Lonely fire,Big Fun,Jazz Fusion; Avant-Garde Jazz,1974,USA,801k,flac,21:21,Studio,LP
 Björk,Moon,Biophilia,Art Pop; Electronic,2011,Iceland,699k,flac,5:45,Studio,LP
 Björk,Thunderbolt,Biophilia,Art Pop; Electronic,2011,Iceland,754k,flac,5:15,Studio,LP
@@ -845,8 +845,19 @@ Eiafuawn,On A Peoplemover,Birds In The Ground,Slacker Rock,2006,USA,216k VBR,mp3
 Eiafuawn,Two Thousand Twelve,Birds In The Ground,Slacker Rock,2006,USA,222k VBR,mp3,3:03,Studio,LP
 Eiafuawn,The Drunk Pilot And The Romantic Passenger,Birds In The Ground,Slacker Rock,2006,USA,258k VBR,mp3,2:00,Studio,LP
 Eiafuawn,Modulator Hustle?,Birds In The Ground,Slacker Rock,2006,USA,234k VBR,mp3,4:47,Studio,LP
+Miles Davis,Move,Birth Of The Cool,Cool Jazz; Bebop,1957,USA,625k,flac,2:34,Studio,Compilation
+Miles Davis,Jeru,Birth Of The Cool,Cool Jazz; Bebop,1957,USA,2608k,flac,3:13,Studio,Compilation
+Miles Davis,Moon Dreams,Birth Of The Cool,Cool Jazz; Bebop,1957,USA,4758k,flac,3:21,Studio,Compilation
+Miles Davis,Venus De Milo,Birth Of The Cool,Cool Jazz; Bebop,1957,USA,2572k,flac,3:12,Studio,Compilation
+Miles Davis,Budo,Birth Of The Cool,Cool Jazz; Bebop,1957,USA,5136k,flac,2:35,Studio,Compilation
+Miles Davis,Deception,Birth Of The Cool,Cool Jazz; Bebop,1957,USA,2581k,flac,2:48,Studio,Compilation
+Miles Davis,Godchild,Birth Of The Cool,Cool Jazz; Bebop,1957,USA,5010k,flac,3:10,Studio,Compilation
+Miles Davis,Boplicity,Birth Of The Cool,Cool Jazz; Bebop,1957,USA,2695k,flac,3:02,Studio,Compilation
+Miles Davis,Rocker,Birth Of The Cool,Cool Jazz; Bebop,1957,USA,5052k,flac,3:07,Studio,Compilation
+Miles Davis,Israel,Birth Of The Cool,Cool Jazz; Bebop,1957,USA,2609k,flac,2:18,Studio,Compilation
+Miles Davis,Rouge,Birth Of The Cool,Cool Jazz; Bebop,1957,USA,4956k,flac,3:16,Studio,Compilation
 Miles Davis,Pharaoh’s Dance,Bitches Brew,Jazz Fusion; Avant-Garde Jazz,1970,USA,2844k,flac,20:05,Studio,LP
-Miles Davis,Bitches Brew,Bitches Brew,Jazz Fusion; Avant-Garde Jazz,1970,USA,2876k,flac,26:57,Studio,LP
+Miles Davis,Bitches Brew,Bitches Brew,Jazz Fusion; Avant-Garde Jazz,1970,USA,2876k,flac,26:57:00,Studio,LP
 Miles Davis,Spanish Key,Bitches Brew,Jazz Fusion; Avant-Garde Jazz,1970,USA,3000k,flac,17:32,Studio,LP
 Miles Davis,John McLaughlin,Bitches Brew,Jazz Fusion; Avant-Garde Jazz,1970,USA,2975k,flac,4:23,Studio,LP
 Miles Davis,Miles Runs the Voodoo Down,Bitches Brew,Jazz Fusion; Avant-Garde Jazz,1970,USA,2949k,flac,14:01,Studio,LP
@@ -1458,13 +1469,13 @@ Can,Thief,Delay 1968,Krautrock; Psychedelic Rock,1981,Germany,320k,mp3,5:06,Stud
 Can,Man Named Joe,Delay 1968,Krautrock; Psychedelic Rock,1981,Germany,320k,mp3,3:54,Studio,LP
 Can,Uphill,Delay 1968,Krautrock; Psychedelic Rock,1981,Germany,320k,mp3,6:38,Studio,LP
 Can,Little Star Of Bethlehem,Delay 1968,Krautrock; Psychedelic Rock,1981,Germany,320k,mp3,7:07,Studio,LP
-Swans,The Knot,Deliquescence,Post-Rock; Experimental Rock,2017,USA,320k,mp3,45:37,Live,LP
+Swans,The Knot,Deliquescence,Post-Rock; Experimental Rock,2017,USA,320k,mp3,45:37:00,Live,LP
 Swans,Screen Shot,Deliquescence,Post-Rock; Experimental Rock,2017,USA,320k,mp3,7:51,Live,LP
 Swans,Cloud of Forgetting,Deliquescence,Post-Rock; Experimental Rock,2017,USA,320k,mp3,16:01,Live,LP
 Swans,Deliquescing,Deliquescence,Post-Rock; Experimental Rock,2017,USA,320k,mp3,10:09,Live,LP
-Swans,Cloud of Unknowing,Deliquescence,Post-Rock; Experimental Rock,2017,USA,320k,mp3,29:22,Live,LP
+Swans,Cloud of Unknowing,Deliquescence,Post-Rock; Experimental Rock,2017,USA,320k,mp3,29:22:00,Live,LP
 Swans,The Man Who Refused to Be Unhappy,Deliquescence,Post-Rock; Experimental Rock,2017,USA,320k,mp3,9:44,Live,LP
-Swans,The Glowing Man,Deliquescence,Post-Rock; Experimental Rock,2017,USA,320k,mp3,36:20,Live,LP
+Swans,The Glowing Man,Deliquescence,Post-Rock; Experimental Rock,2017,USA,320k,mp3,36:20:00,Live,LP
 King Crimson,Elephant Talk,Discipline,Art Rock; Progressive Rock; New Wave,1989,UK; England,128k,mp3,4:43,Studio,LP
 King Crimson,Frame by Frame,Discipline,Art Rock; Progressive Rock; New Wave,1989,UK; England,128k,mp3,5:09,Studio,LP
 King Crimson,Matte Kudasai,Discipline,Art Rock; Progressive Rock; New Wave,1989,UK; England,128k,mp3,3:47,Studio,LP
@@ -1472,7 +1483,7 @@ King Crimson,Indiscipline,Discipline,Art Rock; Progressive Rock; New Wave,1989,U
 King Crimson,Thela Hun Ginjeet,Discipline,Art Rock; Progressive Rock; New Wave,1989,UK; England,128k,mp3,6:25,Studio,LP
 King Crimson,The Sheltering Sky,Discipline,Art Rock; Progressive Rock; New Wave,1989,UK; England,128k,mp3,8:22,Studio,LP
 King Crimson,Discipline,Discipline,Art Rock; Progressive Rock; New Wave,1989,UK; England,128k,mp3,5:13,Studio,LP
-Brian Eno,Discreet Music,Discreet Music,Ambient; Modern Classical,1975,UK; England,192k,mp3,30:35,Studio,LP
+Brian Eno,Discreet Music,Discreet Music,Ambient; Modern Classical,1975,UK; England,192k,mp3,30:35:00,Studio,LP
 Brian Eno,Fullness of Wind,Discreet Music,Ambient; Modern Classical,1975,UK; England,192k,mp3,9:57,Studio,LP
 Brian Eno,French Catalogues,Discreet Music,Ambient; Modern Classical,1975,UK; England,192k,mp3,5:18,Studio,LP
 Brian Eno,Brutal Ardor,Discreet Music,Ambient; Modern Classical,1975,UK; England,192k,mp3,8:17,Studio,LP
@@ -1685,7 +1696,7 @@ Valium Aggelein,Car Crash in Slow Motion,Dweller on the Threshold,Slowcore,1997,
 Valium Aggelein,Excerpt From Mount Hamilton,Dweller on the Threshold,Slowcore,1997,USA,320k,mp3,0:41,Studio,LP
 Masayuki Takayanagi New Direction Unit,First Session I (Gradually Projection),Eclipse,Free Improvisation,1975,Japan,320k,mp3,10:55,Studio,LP
 Masayuki Takayanagi New Direction Unit,First Session II (Gradually Projection),Eclipse,Free Improvisation,1975,Japan,320k,mp3,9:07,Studio,LP
-Masayuki Takayanagi New Direction Unit,Second Session (Mass Projection),Eclipse,Free Improvisation,1975,Japan,320k,mp3,25:41,Studio,LP
+Masayuki Takayanagi New Direction Unit,Second Session (Mass Projection),Eclipse,Free Improvisation,1975,Japan,320k,mp3,25:41:00,Studio,LP
 Can,Pinch,Ege Bamyasi,Krautrock,1972,Germany,320k,mp3,9:29,Studio,LP
 Can,Sing Swan Song,Ege Bamyasi,Krautrock,1972,Germany,320k,mp3,4:47,Studio,LP
 Can,One More Night,Ege Bamyasi,Krautrock,1972,Germany,320k,mp3,5:35,Studio,LP
@@ -1782,12 +1793,12 @@ Autechre,c16 deep tread,elseq 1–5,Electronic; IDM; Glitch; Noise,2016,UK; Engl
 Autechre,13x0 step,elseq 1–5,Electronic; IDM; Glitch; Noise,2016,UK; England,792k,flac,8:57,Studio,LP
 Autechre,pendulu hv moda,elseq 1–5,Electronic; IDM; Glitch; Noise,2016,UK; England,833k,flac,12:15,Studio,LP
 Autechre,curvcaten,elseq 1–5,Electronic; IDM; Glitch; Noise,2016,UK; England,887k,flac,6:59,Studio,LP
-Autechre,elyc6 0nset,elseq 1–5,Electronic; IDM; Glitch; Noise,2016,UK; England,949k,flac,27:09,Studio,LP
+Autechre,elyc6 0nset,elseq 1–5,Electronic; IDM; Glitch; Noise,2016,UK; England,949k,flac,27:09:00,Studio,LP
 Autechre,chimer 1-5-1,elseq 1–5,Electronic; IDM; Glitch; Noise,2016,UK; England,792k,flac,5:03,Studio,LP
 Autechre,c7b2,elseq 1–5,Electronic; IDM; Glitch; Noise,2016,UK; England,903k,flac,13:22,Studio,LP
 Autechre,eastre,elseq 1–5,Electronic; IDM; Glitch; Noise,2016,UK; England,636k,flac,22:15,Studio,LP
 Autechre,TBM2,elseq 1–5,Electronic; IDM; Glitch; Noise,2016,UK; England,746k,flac,6:44,Studio,LP
-Autechre,mesh cinereaL,elseq 1–5,Electronic; IDM; Glitch; Noise,2016,UK; England,798k,flac,24:28,Studio,LP
+Autechre,mesh cinereaL,elseq 1–5,Electronic; IDM; Glitch; Noise,2016,UK; England,798k,flac,24:28:00,Studio,LP
 Autechre,acdwn2,elseq 1–5,Electronic; IDM; Glitch; Noise,2016,UK; England,705k,flac,11:52,Studio,LP
 Autechre,foldfree casual,elseq 1–5,Electronic; IDM; Glitch; Noise,2016,UK; England,913k,flac,9:49,Studio,LP
 Autechre,latentcall,elseq 1–5,Electronic; IDM; Glitch; Noise,2016,UK; England,826k,flac,14:31,Studio,LP
@@ -1878,7 +1889,7 @@ Fripp & Eno,Wind on Water,Evening Star,Ambient; Drone,1975,USA; UK,192k,mp3,5:34
 Fripp & Eno,Evening Star,Evening Star,Ambient; Drone,1975,USA; UK,192k,mp3,7:45,Studio,LP
 Fripp & Eno,Evensong,Evening Star,Ambient; Drone,1975,USA; UK,192k,mp3,2:50,Studio,LP
 Fripp & Eno,Wind on Wind,Evening Star,Ambient; Drone,1975,USA; UK,192k,mp3,3:08,Studio,LP
-Fripp & Eno,An Index of Metals,Evening Star,Ambient; Drone,1975,USA; UK,192k,mp3,28:39,Studio,LP
+Fripp & Eno,An Index of Metals,Evening Star,Ambient; Drone,1975,USA; UK,192k,mp3,28:39:00,Studio,LP
 Mogwai,Coolverine,Every Country's Sun,Post-Rock,2017,UK; Scotland,815k,flac,6:16,Studio,LP
 Mogwai,Party in the Dark,Every Country's Sun,Post-Rock,2017,UK; Scotland,982k,flac,4:02,Studio,LP
 Mogwai,Brain Sweeties,Every Country's Sun,Post-Rock,2017,UK; Scotland,925k,flac,4:43,Studio,LP
@@ -1968,7 +1979,7 @@ Autechre,deco Loc,Exai,IDM; Experimental,2013,UK; England,488k,flac,5:27,Studio,
 Autechre,recks on,Exai,IDM; Experimental,2013,UK; England,693k,flac,9:21,Studio,LP
 Autechre,YJY UX,Exai,IDM; Experimental,2013,UK; England,929k,flac,8:24,Studio,LP
 Fire! Orchestra,Exit! Part One,Exit!,Experimental Big Band,2013,Sweden,320k,mp3,19:29,Studio,LP
-Fire! Orchestra,Exit! Part Two,Exit!,Experimental Big Band,2013,Sweden,320k,mp3,24:54,Studio,LP
+Fire! Orchestra,Exit! Part Two,Exit!,Experimental Big Band,2013,Sweden,320k,mp3,24:54:00,Studio,LP
 Fela Kuti,Expensive Shit,Expensive Shit/He Miss Road,Afrobeat,1975,Nigeria,128k,wma,13:13,Studio,LP
 Fela Kuti,Water No Get Enemy,Expensive Shit/He Miss Road,Afrobeat,1975,Nigeria,128k,wma,11:00,Studio,LP
 Fela Kuti,He Miss Road,Expensive Shit/He Miss Road,Afrobeat,1975,Nigeria,128k,wma,10:47,Studio,LP
@@ -2005,7 +2016,7 @@ Polvo,Missing Receipts,Exploded Drawing,Indie Rock,1996,USA,553k,flac,1:47,Studi
 Polvo,When Will You Die for the Last Time in My Dreams,Exploded Drawing,Indie Rock,1996,USA,912k,flac,11:43,Studio,LP
 Godspeed You! Black Emperor,The Dead Flag Blues,F♯ A♯ ∞,Post-Rock,1997,Canada,520k,flac,16:27,Studio,LP
 Godspeed You! Black Emperor,East Hastings,F♯ A♯ ∞,Post-Rock,1997,Canada,649k,flac,17:58,Studio,LP
-Godspeed You! Black Emperor,Providence,F♯ A♯ ∞,Post-Rock,1997,Canada,596k,flac,29:02,Studio,LP
+Godspeed You! Black Emperor,Providence,F♯ A♯ ∞,Post-Rock,1997,Canada,596k,flac,29:02:00,Studio,LP
 Unwound,Dragnalus,Fake Train,Post-Hardcore; Noise Rock,1993,USA,320k,mp3,3:29,Studio,LP
 Unwound,Lucky Acid,Fake Train,Post-Hardcore; Noise Rock,1993,USA,320k,mp3,1:43,Studio,LP
 Unwound,Nervous Energy,Fake Train,Post-Hardcore; Noise Rock,1993,USA,320k,mp3,4:50,Studio,LP
@@ -2305,7 +2316,7 @@ Yes,Long Distance Runaround,Fragile,Progressive Rock,1972,UK; England,320k,mp3,3
 Yes,The Fish (Shindleria Praematurus),Fragile,Progressive Rock,1972,UK; England,320k,mp3,2:42,Studio,LP
 Yes,Mood for a Day,Fragile,Progressive Rock,1972,UK; England,320k,mp3,3:02,Studio,LP
 Yes,Heart of the Sunrise,Fragile,Progressive Rock,1972,UK; England,320k,mp3,11:24,Studio,LP
-Ornette Coleman,Free Jazz,Free Jazz: A Collective Improvisation,Free Jazz,1960,USA,320k,mp3,37:03,Studio,LP
+Ornette Coleman,Free Jazz,Free Jazz: A Collective Improvisation,Free Jazz,1960,USA,320k,mp3,37:03:00,Studio,LP
 Ornette Coleman,First Take,Free Jazz: A Collective Improvisation,Free Jazz,1960,USA,320k,mp3,17:03,Studio,LP
 Arcade Fire,Neighborhood #1 (Tunnels),Funeral,Indie,2004,Canada,219k VBR,mp3,4:48,Studio,LP
 Arcade Fire,Neighborhood #2 (Laïka),Funeral,Indie,2004,Canada,230k VBR,mp3,3:32,Studio,LP
@@ -2394,11 +2405,11 @@ Bôa,Older,Get There,Alternative Rock; Indie Rock,2005,UK; England,320k,mp3,3:17
 Bôa,Passport (C.W.B. always with me),Get There,Alternative Rock; Indie Rock,2005,UK; England,320k,mp3,5:09,Studio,LP
 Bôa,Standby,Get There,Alternative Rock; Indie Rock,2005,UK; England,320k,mp3,5:18,Studio,LP
 Bôa,On the Wall,Get There,Alternative Rock; Indie Rock,2005,UK; England,320k,mp3,3:08,Studio,LP
-Miles Davis,He Loved Him Madly,Get Up With It,Jazz Fusion; Jazz Funk; Avant-Garde Jazz,1974,USA,725k,flac,32:17,Studio,LP
+Miles Davis,He Loved Him Madly,Get Up With It,Jazz Fusion; Jazz Funk; Avant-Garde Jazz,1974,USA,725k,flac,32:17:00,Studio,LP
 Miles Davis,Maiysha,Get Up With It,Jazz Fusion; Jazz Funk; Avant-Garde Jazz,1974,USA,887k,flac,14:53,Studio,LP
 Miles Davis,Honky Tonk,Get Up With It,Jazz Fusion; Jazz Funk; Avant-Garde Jazz,1974,USA,773k,flac,5:55,Studio,LP
 Miles Davis,Rated X,Get Up With It,Jazz Fusion; Jazz Funk; Avant-Garde Jazz,1974,USA,996k,flac,6:51,Studio,LP
-Miles Davis,Calypso Frelimo,Get Up With It,Jazz Fusion; Jazz Funk; Avant-Garde Jazz,1974,USA,886k,flac,32:08,Studio,LP
+Miles Davis,Calypso Frelimo,Get Up With It,Jazz Fusion; Jazz Funk; Avant-Garde Jazz,1974,USA,886k,flac,32:08:00,Studio,LP
 Miles Davis,Red China Blues,Get Up With It,Jazz Fusion; Jazz Funk; Avant-Garde Jazz,1974,USA,946k,flac,4:09,Studio,LP
 Miles Davis,Mtume,Get Up With It,Jazz Fusion; Jazz Funk; Avant-Garde Jazz,1974,USA,933k,flac,15:11,Studio,LP
 Miles Davis,Billy Preston,Get Up With It,Jazz Fusion; Jazz Funk; Avant-Garde Jazz,1974,USA,967k,flac,12:36,Studio,LP
@@ -2413,6 +2424,13 @@ Geese,Au Pays du Cocaine,Getting Killed,Indie Rock; Art Rock,2025,USA,1576k,flac
 Geese,Bow Down,Getting Killed,Indie Rock; Art Rock,2025,USA,1677k,flac,3:28,Studio,LP
 Geese,Taxes,Getting Killed,Indie Rock; Art Rock,2025,USA,1652k,flac,3:17,Studio,LP
 Geese,Long Island City Here I Come,Getting Killed,Indie Rock; Art Rock,2025,USA,1681k,flac,6:37,Studio,LP
+Geese,Trinidad,Getting Killed: Live From The Basement,Indie rock; Art Rock,2025,USA,320k,mp3,4:50,Live,LP
+Geese,Husbands,Getting Killed: Live From The Basement,Indie rock; Art Rock,2025,USA,320k,mp3,4:55,Live,LP
+Geese,Islands Of Men,Getting Killed: Live From The Basement,Indie rock; Art Rock,2025,USA,320k,mp3,7:34,Live,LP
+Geese,Half Real,Getting Killed: Live From The Basement,Indie rock; Art Rock,2025,USA,320k,mp3,4:31,Live,LP
+Geese,100 Horses,Getting Killed: Live From The Basement,Indie rock; Art Rock,2025,USA,320k,mp3,3:47,Live,LP
+Geese,Au Pays du Cocaine,Getting Killed: Live From The Basement,Indie rock; Art Rock,2025,USA,320k,mp3,3:58,Live,LP
+Geese,Bow Down,Getting Killed: Live From The Basement,Indie rock; Art Rock,2025,USA,320k,mp3,4:37,Live,LP
 John Coltrane,Giant Steps,Giant Steps,Hard Bop,1960,USA,320k,mp3,4:46,Studio,LP
 John Coltrane,Cousin Mary,Giant Steps,Hard Bop,1960,USA,320k,mp3,5:49,Studio,LP
 John Coltrane,Countdown,Giant Steps,Hard Bop,1960,USA,320k,mp3,2:25,Studio,LP
@@ -2519,7 +2537,7 @@ Radiohead,I Will (Live),Hail to the Thief (Live Recordings 2003-2009),Art Rock; 
 Radiohead,Myxomatosis (Live),Hail to the Thief (Live Recordings 2003-2009),Art Rock; Alternative Rock,2025,UK; England,1146k,flac,4:04,Live,LP
 Radiohead,Scatterbrain (Live),Hail to the Thief (Live Recordings 2003-2009),Art Rock; Alternative Rock,2025,UK; England,915k,flac,3:25,Live,LP
 Radiohead,A Wolf At the Door (Live),Hail to the Thief (Live Recordings 2003-2009),Art Rock; Alternative Rock,2025,UK; England,1067k,flac,3:30,Live,LP
-The Necks,Hanging Gardens,Hanging Gardens,Avant-Garde Jazz,1999,Australia,869k,flac,60:30,Studio,LP
+The Necks,Hanging Gardens,Hanging Gardens,Avant-Garde Jazz,1999,Australia,869k,flac,60:30:00,Studio,LP
 Tim Buckley,Strange Feelin',Happy Sad,Psychedelic Folk,1969,USA,320k,mp3,7:41,Studio,LP
 Tim Buckley,Buzzin' Fly,Happy Sad,Psychedelic Folk,1969,USA,320k,mp3,6:03,Studio,LP
 Tim Buckley,Love From Room 109 At The Isla,Happy Sad,Psychedelic Folk,1969,USA,320k,mp3,10:49,Studio,LP
@@ -2881,6 +2899,18 @@ Lightning Bolt,Mohawk Windmill,Hypermagic Mountain,Brutal Prog,2005,USA,192k,mp3
 Lightning Bolt,Bizarro Bike,Hypermagic Mountain,Brutal Prog,2005,USA,192k,mp3,5:18,Studio,LP
 Lightning Bolt,Infinity Farm,Hypermagic Mountain,Brutal Prog,2005,USA,192k,mp3,2:46,Studio,LP
 Lightning Bolt,No Rest for the Obsessed,Hypermagic Mountain,Brutal Prog,2005,USA,192k,mp3,2:10,Studio,LP
+Xinlisupreme,Seaside Voice Guitar,I Am Not Shinzo Abe,Indie Rock,2018,Japan,128k,mp3,7:21,Studio,Compilation
+Xinlisupreme,The First Train,I Am Not Shinzo Abe,Indie Rock,2018,Japan,128k,mp3,4:24,Studio,Compilation
+Xinlisupreme,I Am Not Shinzo Abe,I Am Not Shinzo Abe,Indie Rock,2018,Japan,128k,mp3,2:23,Studio,Compilation
+Xinlisupreme,Nobi Nobi,I Am Not Shinzo Abe,Indie Rock,2018,Japan,128k,mp3,3:37,Studio,Compilation
+Xinlisupreme,Soprano Meditation,I Am Not Shinzo Abe,Indie Rock,2018,Japan,128k,mp3,6:36,Studio,Compilation
+Xinlisupreme,Zouave’s Blue,I Am Not Shinzo Abe,Indie Rock,2018,Japan,128k,mp3,3:33,Studio,Compilation
+Xinlisupreme,Oh Yeah,I Am Not Shinzo Abe,Indie Rock,2018,Japan,128k,mp3,4:01,Studio,Compilation
+Xinlisupreme,Act 2,I Am Not Shinzo Abe,Indie Rock,2018,Japan,128k,mp3,3:21,Studio,Compilation
+Xinlisupreme,Nocturne,I Am Not Shinzo Abe,Indie Rock,2018,Japan,128k,mp3,1:45,Studio,Compilation
+Xinlisupreme,New Christ,I Am Not Shinzo Abe,Indie Rock,2018,Japan,128k,mp3,5:38,Studio,Compilation
+Xinlisupreme,I Am Not Shinzo Abe Children,I Am Not Shinzo Abe,Indie Rock,2018,Japan,128k,mp3,2:23,Studio,Compilation
+Xinlisupreme,Seaside Voice Guitar AD,I Am Not Shinzo Abe,Indie Rock,2018,Japan,128k,mp3,5:24,Studio,Compilation
 Talk Talk,I Believe in You,I Believe in You,Alternative Rock,1988,UK; England,320k,mp3,6:02,Studio,Single
 Talk Talk,John Cope,I Believe in You,Alternative Rock,1988,UK; England,320k,mp3,4:43,Studio,Single
 Talk Talk,Eden (edited version),I Believe in You,Alternative Rock,1988,UK; England,320k,mp3,4:23,Studio,Single
@@ -3172,13 +3202,13 @@ The Microphones,The Breeze,"It Was Hot, We Stayed In The Water",Psychedelic Folk
 The Microphones,(Something) Ver.2,"It Was Hot, We Stayed In The Water",Psychedelic Folk; Indie Folk; Slacker Rock,2000,USA,252k VBR,mp3,4:34,Studio,LP
 The Microphones,Between Your Ear and the Other Ear,"It Was Hot, We Stayed In The Water",Psychedelic Folk; Indie Folk; Slacker Rock,2000,USA,262k VBR,mp3,3:13,Studio,LP
 The Microphones,Organs,"It Was Hot, We Stayed In The Water",Psychedelic Folk; Indie Folk; Slacker Rock,2000,USA,205k VBR,mp3,3:30,Studio,LP
-James Ferraro,Jarvid 9: Gecko Disc One Part One,Jarvid 9: Gecko,Hypnagogic Pop; Tribal Ambient; Drone; Sound Collage,2009,USA,149k VBR,mp3,29:04,Studio,LP
+James Ferraro,Jarvid 9: Gecko Disc One Part One,Jarvid 9: Gecko,Hypnagogic Pop; Tribal Ambient; Drone; Sound Collage,2009,USA,149k VBR,mp3,29:04:00,Studio,LP
 James Ferraro,Jarvid 9: Gecko Disc One Part Two,Jarvid 9: Gecko,Hypnagogic Pop; Tribal Ambient; Drone; Sound Collage,2009,USA,155k VBR,mp3,20:01,Studio,LP
 James Ferraro,Jarvid 9: Gecko Disc One Part Three,Jarvid 9: Gecko,Hypnagogic Pop; Tribal Ambient; Drone; Sound Collage,2009,USA,143k VBR,mp3,11:32,Studio,LP
 James Ferraro,Jarvid 9: Gecko Disc One Part Four,Jarvid 9: Gecko,Hypnagogic Pop; Tribal Ambient; Drone; Sound Collage,2009,USA,127k VBR,mp3,18:44,Studio,LP
 James Ferraro,Jarvid 9: Gecko Disc Two Part One,Jarvid 9: Gecko,Hypnagogic Pop; Tribal Ambient; Drone; Sound Collage,2009,USA,142k VBR,mp3,16:20,Studio,LP
-James Ferraro,Jarvid 9: Gecko Disc Two Part Two,Jarvid 9: Gecko,Hypnagogic Pop; Tribal Ambient; Drone; Sound Collage,2009,USA,141k VBR,mp3,30:08,Studio,LP
-James Ferraro,Jarvid 9: Gecko Disc Two Part Three,Jarvid 9: Gecko,Hypnagogic Pop; Tribal Ambient; Drone; Sound Collage,2009,USA,130k VBR,mp3,33:15,Studio,LP
+James Ferraro,Jarvid 9: Gecko Disc Two Part Two,Jarvid 9: Gecko,Hypnagogic Pop; Tribal Ambient; Drone; Sound Collage,2009,USA,141k VBR,mp3,30:08:00,Studio,LP
+James Ferraro,Jarvid 9: Gecko Disc Two Part Three,Jarvid 9: Gecko,Hypnagogic Pop; Tribal Ambient; Drone; Sound Collage,2009,USA,130k VBR,mp3,33:15:00,Studio,LP
 K.R.T. Wasitodipuro,Ketawang: Puspåwårnå,"Javanese Court Gamelan From The Pura Paku Alaman, Jogyakarta",Gamelan,1971,Indonesia,189k VBR,mp3,4:48,Studio,LP
 K.R.T. Wasitodipuro,Gending: Tedjånåtå; Ladrang Sembawa; Ladrang Playon,"Javanese Court Gamelan From The Pura Paku Alaman, Jogyakarta",Gamelan,1971,Indonesia,192k VBR,mp3,18:34,Studio,LP
 K.R.T. Wasitodipuro,Gending: Mandalpati; Ladrang Agun-Agun,"Javanese Court Gamelan From The Pura Paku Alaman, Jogyakarta",Gamelan,1971,Indonesia,187k VBR,mp3,19:37,Studio,LP
@@ -3194,7 +3224,7 @@ Sufjan Stevens,Javelin (To Have and to Hold),Javelin,Indie,2023,USA,778k,flac,1:
 Sufjan Stevens,Shit Talk,Javelin,Indie,2023,USA,794k,flac,8:31,Studio,LP
 Sufjan Stevens,There's a World,Javelin,Indie,2023,USA,724k,flac,2:29,Studio,LP
 Pharoah Sanders,Hum-Allah-Hum-Allah-Hum Allah,Jewels of Thought,Spiritual Jazz; Avant-Garde Jazz,1969,USA,320k,mp3,15:10,Studio,LP
-Pharoah Sanders,Sun in Aquarius,Jewels of Thought,Spiritual Jazz; Avant-Garde Jazz,1969,USA,320k,mp3,27:51,Studio,LP
+Pharoah Sanders,Sun in Aquarius,Jewels of Thought,Spiritual Jazz; Avant-Garde Jazz,1969,USA,320k,mp3,27:51:00,Studio,LP
 Alice Coltrane,Journey in Satchidananda,Journey in Satchidananda,Spiritual Jazz; Indo Jazz,1970,USA,320k,mp3,6:40,Studio,LP
 Alice Coltrane,Shiva-Loka,Journey in Satchidananda,Spiritual Jazz; Indo Jazz,1970,USA,320k,mp3,6:37,Studio,LP
 Alice Coltrane,Stopover Bombay,Journey in Satchidananda,Spiritual Jazz; Indo Jazz,1970,USA,320k,mp3,2:54,Studio,LP
@@ -3250,7 +3280,7 @@ Various Artists,Loom,"Kankyō Ongaku: Japanese Ambient, Environmental & New Age 
 Various Artists,A Dream Sails Out to Sea - Scene 3,"Kankyō Ongaku: Japanese Ambient, Environmental & New Age Music 1980–1990",Ambient,2019,Japan,632k,flac,6:47,Studio,LP
 Various Artists,Umi no Sunatsubu,"Kankyō Ongaku: Japanese Ambient, Environmental & New Age Music 1980–1990",Ambient,2019,Japan,513k,flac,1:12,Studio,LP
 Various Artists,Original BGM,"Kankyō Ongaku: Japanese Ambient, Environmental & New Age Music 1980–1990",Ambient,2019,Japan,447k,flac,15:55,Studio,LP
-Pharoah Sanders,The Creator Has a Master Plan,Karma,Spiritual Jazz; Avant-Garde Jazz,1969,USA,969k,flac,32:47,Studio,LP
+Pharoah Sanders,The Creator Has a Master Plan,Karma,Spiritual Jazz; Avant-Garde Jazz,1969,USA,969k,flac,32:47:00,Studio,LP
 Pharoah Sanders,Colors,Karma,Spiritual Jazz; Avant-Garde Jazz,1969,USA,900k,flac,5:37,Studio,LP
 Preoccupations,Key,Key / Off Duty Trip,Post-Punk,2016,USA,256k,mp3,4:33,Studio,Single
 Preoccupations,Off Duty Trip,Key / Off Duty Trip,Post-Punk,2016,USA,256k,mp3,3:33,Studio,Single
@@ -3580,12 +3610,12 @@ Radiohead,Exit Music (For A Film),Live In Berlin,Art Rock; Alternative Rock,2000
 Radiohead,Knives Out,Live In Berlin,Art Rock; Alternative Rock,2000,UK; England,774k,flac,4:58,Bootleg,LP
 Radiohead,Nude (tease),Live In Berlin,Art Rock; Alternative Rock,2000,UK; England,635k,flac,0:51,Bootleg,LP
 Radiohead,(Nice Dream),Live In Berlin,Art Rock; Alternative Rock,2000,UK; England,817k,flac,5:30,Bootleg,LP
-John Coltrane,Afro Blue,Live In Japan,Free Jazz; Spiritual Jazz,1966,USA,719k,flac,38:47,Live,LP
-John Coltrane,Peace On Earth,Live In Japan,Free Jazz; Spiritual Jazz,1966,USA,669k,flac,26:25,Live,LP
-John Coltrane,Crescent,Live In Japan,Free Jazz; Spiritual Jazz,1966,USA,650k,flac,54:33,Live,LP
-John Coltrane,Peace On Earth,Live In Japan,Free Jazz; Spiritual Jazz,1966,USA,673k,flac,25:05,Live,LP
-John Coltrane,Leo,Live In Japan,Free Jazz; Spiritual Jazz,1966,USA,739k,flac,44:49,Live,LP
-John Coltrane,My Favorite Things,Live In Japan,Free Jazz; Spiritual Jazz,1966,USA,644k,flac,57:19,Live,LP
+John Coltrane,Afro Blue,Live In Japan,Free Jazz; Spiritual Jazz,1966,USA,719k,flac,38:47:00,Live,LP
+John Coltrane,Peace On Earth,Live In Japan,Free Jazz; Spiritual Jazz,1966,USA,669k,flac,26:25:00,Live,LP
+John Coltrane,Crescent,Live In Japan,Free Jazz; Spiritual Jazz,1966,USA,650k,flac,54:33:00,Live,LP
+John Coltrane,Peace On Earth,Live In Japan,Free Jazz; Spiritual Jazz,1966,USA,673k,flac,25:05:00,Live,LP
+John Coltrane,Leo,Live In Japan,Free Jazz; Spiritual Jazz,1966,USA,739k,flac,44:49:00,Live,LP
+John Coltrane,My Favorite Things,Live In Japan,Free Jazz; Spiritual Jazz,1966,USA,644k,flac,57:19:00,Live,LP
 Duster,The Twins / Romantica,Live in San Francisco,Slowcore,1999,USA,320k,mp3,3:26,Live,EP
 Duster,August Relativity,Live in San Francisco,Slowcore,1999,USA,320k,mp3,2:30,Live,EP
 Duster,Diamond,Live in San Francisco,Slowcore,1999,USA,320k,mp3,2:36,Live,EP
@@ -3607,10 +3637,10 @@ The Coma Lillies,Penis Envy,Live on KAXL,Noise Rock,2020,USA,128k,mp3,9:06,Live,
 The Coma Lillies,High Noon (DJ Shadow),Live on KAXL,Noise Rock,2020,USA,128k,mp3,3:28,Live,LP
 The Coma Lillies,The Red Phone,Live on KAXL,Noise Rock,2020,USA,128k,mp3,1:19,Live,LP
 The Coma Lillies,The Hemoclysm,Live on KAXL,Noise Rock,2020,USA,128k,mp3,18:09,Live,LP
-Swans,Rope/Beggar,Live Rope,Experimental Rock; Post-Rock; Drone,2024,USA,193k VBR,mp3,86:09,Live,LP
+Swans,Rope/Beggar,Live Rope,Experimental Rock; Post-Rock; Drone,2024,USA,193k VBR,mp3,86:09:00,Live,LP
 Swans,The Hanging Man,Live Rope,Experimental Rock; Post-Rock; Drone,2024,USA,320k,mp3,12:48,Live,LP
 Swans,Away,Live Rope,Experimental Rock; Post-Rock; Drone,2024,USA,320k,mp3,7:51,Live,LP
-Swans,Birthing,Live Rope,Experimental Rock; Post-Rock; Drone,2024,USA,320k,mp3,37:07,Live,LP
+Swans,Birthing,Live Rope,Experimental Rock; Post-Rock; Drone,2024,USA,320k,mp3,37:07:00,Live,LP
 Swans,The Memorious,Live Rope,Experimental Rock; Post-Rock; Drone,2024,USA,320k,mp3,14:06,Live,LP
 Swans,Cathedrals of Heaven,Live Rope,Experimental Rock; Post-Rock; Drone,2024,USA,320k,mp3,11:14,Live,LP
 Swans,Leaving Meaning,Live Rope,Experimental Rock; Post-Rock; Drone,2024,USA,320k,mp3,13:33,Live,LP
@@ -4112,6 +4142,15 @@ Miles Davis,Footprints,Miles Smiles,Modal Jazz; Post-Bop,1967,USA,128k,mp3,9:47,
 Miles Davis,Dolores,Miles Smiles,Modal Jazz; Post-Bop,1967,USA,128k,mp3,6:21,Studio,LP
 Miles Davis,Freedom Jazz Dance,Miles Smiles,Modal Jazz; Post-Bop,1967,USA,128k,mp3,7:15,Studio,LP
 Miles Davis,Gingerbread Boy,Miles Smiles,Modal Jazz; Post-Bop,1967,USA,128k,mp3,7:43,Studio,LP
+Miles Davis,Dr. Jackle,Milestones,Hard Bop; Modal Jazz,1958,USA,1348k,flac,5:54,Studio,LP
+Miles Davis,Sid's Ahead,Milestones,Hard Bop; Modal Jazz,1958,USA,1322k,flac,13:12,Studio,LP
+Miles Davis,Two Bass Hit,Milestones,Hard Bop; Modal Jazz,1958,USA,1032k,flac,5:10,Studio,LP
+Miles Davis,Milestones,Milestones,Hard Bop; Modal Jazz,1958,USA,1695k,flac,5:42,Studio,LP
+Miles Davis,Billy Boy,Milestones,Hard Bop; Modal Jazz,1958,USA,974k,flac,7:10,Studio,LP
+Miles Davis,"Straight, No Chaser",Milestones,Hard Bop; Modal Jazz,1958,USA,965k,flac,10:35,Studio,LP
+Miles Davis,Two Bass Hit (alternate take),Milestones,Hard Bop; Modal Jazz,1958,USA,998k,flac,4:29,Studio,LP
+Miles Davis,Milestones (alternate take),Milestones,Hard Bop; Modal Jazz,1958,USA,978k,flac,5:58,Studio,LP
+Miles Davis,"Straight, No Chaser (alternate take)",Milestones,Hard Bop; Modal Jazz,1958,USA,960k,flac,10:28,Studio,LP
 Tortoise,Djed,Millions Now Living Will Never Die,Post-Rock; Jazz Rock; Krautrock,1996,USA,320k,mp3,20:57,Studio,LP
 Tortoise,Glass Museum,Millions Now Living Will Never Die,Post-Rock; Jazz Rock; Krautrock,1996,USA,320k,mp3,5:27,Studio,LP
 Tortoise,A Survey,Millions Now Living Will Never Die,Post-Rock; Jazz Rock; Krautrock,1996,USA,320k,mp3,2:52,Studio,LP
@@ -4354,8 +4393,8 @@ John Zorn,Den of Sins,Naked City,Avant-Garde Jazz; Jazz Rock,1990,USA,320k,mp3,1
 John Zorn,Contempt,Naked City,Avant-Garde Jazz; Jazz Rock,1990,USA,320k,mp3,2:53,Studio,LP
 John Zorn,Graveyard Shift,Naked City,Avant-Garde Jazz; Jazz Rock,1990,USA,320k,mp3,3:32,Studio,LP
 John Zorn,Inside Straight,Naked City,Avant-Garde Jazz; Jazz Rock,1990,USA,320k,mp3,4:17,Studio,LP
-Itoh Masyitoh & Rineka Swara,"Muka 1: 1. Naon Margina - ASDAR, 2. Malati Dina Imutna - DADI/ASKIN, 3. Bulan Ngeunteung - BRS, 4. Cipanon Ngembeng - NANDANG B",Naon Margina,Jaipongan,1980,Indonesia,320k,mp3,29:40,Studio,LP
-Itoh Masyitoh & Rineka Swara,"Muka 2: 1. Cahya Sumirat Naek Banjaran, 2. Imut Sapasi - BSR, 3. Layung Kamari - ASDAR, 4. Bibit Asih - DADI/WH",Naon Margina,Jaipongan,1980,Indonesia,320k,mp3,28:53,Studio,LP
+Itoh Masyitoh & Rineka Swara,"Muka 1: 1. Naon Margina - ASDAR, 2. Malati Dina Imutna - DADI/ASKIN, 3. Bulan Ngeunteung - BRS, 4. Cipanon Ngembeng - NANDANG B",Naon Margina,Jaipongan,1980,Indonesia,320k,mp3,29:40:00,Studio,LP
+Itoh Masyitoh & Rineka Swara,"Muka 2: 1. Cahya Sumirat Naek Banjaran, 2. Imut Sapasi - BSR, 3. Layung Kamari - ASDAR, 4. Bibit Asih - DADI/WH",Naon Margina,Jaipongan,1980,Indonesia,320k,mp3,28:53:00,Studio,LP
 Neu!,Hallogallo,NEU!,Krautrock,1972,Germany,320k,mp3,10:07,Studio,LP
 Neu!,Sonderangebot,NEU!,Krautrock,1972,Germany,320k,mp3,4:51,Studio,LP
 Neu!,Weissensee,NEU!,Krautrock,1972,Germany,320k,mp3,6:46,Studio,LP
@@ -4530,8 +4569,8 @@ Autechre,icari,NTS Sessions 1–4,IDM; Experimental,2018,UK; England,640k,flac,1
 Autechre,frane casual,NTS Sessions 1–4,IDM; Experimental,2018,UK; England,728k,flac,13:42,Studio,LP
 Autechre,mirrage,NTS Sessions 1–4,IDM; Experimental,2018,UK; England,454k,flac,6:21,Studio,LP
 Autechre,column thirteen,NTS Sessions 1–4,IDM; Experimental,2018,UK; England,662k,flac,17:02,Studio,LP
-Autechre,shimripl casual,NTS Sessions 1–4,IDM; Experimental,2018,UK; England,590k,flac,24:32,Studio,LP
-Autechre,all end,NTS Sessions 1–4,IDM; Experimental,2018,UK; England,662k,flac,58:21,Studio,LP
+Autechre,shimripl casual,NTS Sessions 1–4,IDM; Experimental,2018,UK; England,590k,flac,24:32:00,Studio,LP
+Autechre,all end,NTS Sessions 1–4,IDM; Experimental,2018,UK; England,662k,flac,58:21:00,Studio,LP
 Sonic Youth,Free City Rhymes,NYC Ghosts & Flowers,Noise Rock,2000,USA,320k,mp3,7:32,Studio,LP
 Sonic Youth,Renegade Princess,NYC Ghosts & Flowers,Noise Rock,2000,USA,320k,mp3,5:49,Studio,LP
 Sonic Youth,Nevermind (What Was It Anyway),NYC Ghosts & Flowers,Noise Rock,2000,USA,320k,mp3,5:37,Studio,LP
@@ -4719,7 +4758,7 @@ Coldplay,Careful Where You Stand,Parachutes,Post-Britpop; Pop Rock,2000,UK; Engl
 不失者 [Fushitsusha],1,Pathétique,Noise Rock; Noise; Psychedelic Rock; Free Improvisation,1994,Japan,224k,mp3,5:00,Studio,LP
 不失者 [Fushitsusha],2,Pathétique,Noise Rock; Noise; Psychedelic Rock; Free Improvisation,1994,Japan,224k,mp3,9:34,Studio,LP
 不失者 [Fushitsusha],3,Pathétique,Noise Rock; Noise; Psychedelic Rock; Free Improvisation,1994,Japan,224k,mp3,15:58,Studio,LP
-不失者 [Fushitsusha],4,Pathétique,Noise Rock; Noise; Psychedelic Rock; Free Improvisation,1994,Japan,224k,mp3,44:23,Studio,LP
+不失者 [Fushitsusha],4,Pathétique,Noise Rock; Noise; Psychedelic Rock; Free Improvisation,1994,Japan,224k,mp3,44:23:00,Studio,LP
 Built to Spill,Randy Described Eternity,Perfect From Now On,Alternative Rock,1997,USA,251k VBR,mp3,6:05,Studio,LP
 Built to Spill,I Would Hurt a Fly,Perfect From Now On,Alternative Rock,1997,USA,242k VBR,mp3,6:15,Studio,LP
 Built to Spill,Stop the Show,Perfect From Now On,Alternative Rock,1997,USA,244k VBR,mp3,6:26,Studio,LP
@@ -5379,7 +5418,7 @@ Palm,Two Toes,Shadow Expert,Experimental Rock; Math Rock,2017,USA,128k,mp3,3:29,
 Palm,Walnut,Shadow Expert,Experimental Rock; Math Rock,2017,USA,128k,mp3,3:05,Studio,EP
 Palm,Trying,Shadow Expert,Experimental Rock; Math Rock,2017,USA,128k,mp3,2:30,Studio,EP
 Palm,Sign To Signal,Shadow Expert,Experimental Rock; Math Rock,2017,USA,128k,mp3,3:15,Studio,EP
-Natural Snow Buildings,The Fall of Shadow Kingdom,Shadow Kingdom,Drone,2009,France,247k VBR,mp3,24:45,Studio,LP
+Natural Snow Buildings,The Fall of Shadow Kingdom,Shadow Kingdom,Drone,2009,France,247k VBR,mp3,24:45:00,Studio,LP
 Natural Snow Buildings,Gorgon,Shadow Kingdom,Drone,2009,France,301k VBR,mp3,2:37,Studio,LP
 Natural Snow Buildings,For Fear They May Come Back / Childrens of the Seventh Circle / The Dark Road,Shadow Kingdom,Drone,2009,France,210k VBR,mp3,8:21,Studio,LP
 Natural Snow Buildings,Cauled Ones and Birth Rugs,Shadow Kingdom,Drone,2009,France,227k VBR,mp3,5:35,Studio,LP
@@ -5393,7 +5432,7 @@ Natural Snow Buildings,Chthonian Odyssey / Hell's Foundations / A Birth Mark Lik
 Natural Snow Buildings,From Their Body at Will,Shadow Kingdom,Drone,2009,France,263k VBR,mp3,7:10,Studio,LP
 Natural Snow Buildings,The Desolated / Vampires Introduced to Fear / Slayer March,Shadow Kingdom,Drone,2009,France,228k VBR,mp3,12:47,Studio,LP
 Natural Snow Buildings,The Vein Of Invisibilty,Shadow Kingdom,Drone,2009,France,219k VBR,mp3,3:30,Studio,LP
-Natural Snow Buildings,Porridge Stick Into the Fire and Dust in the Direction of the Sun,Shadow Kingdom,Drone,2009,France,229k VBR,mp3,24:11,Studio,LP
+Natural Snow Buildings,Porridge Stick Into the Fire and Dust in the Direction of the Sun,Shadow Kingdom,Drone,2009,France,229k VBR,mp3,24:11:00,Studio,LP
 Natural Snow Buildings,A Burial at Sea,Shadow Kingdom,Drone,2009,France,247k VBR,mp3,5:55,Studio,LP
 Grizzly Bear,Sleeping Ute,Shields,Indie Rock; Indie Folk,2012,USA,320k,mp3,4:35,Studio,LP
 Grizzly Bear,Speak In Rounds,Shields,Indie Rock; Indie Folk,2012,USA,320k,mp3,4:24,Studio,LP
@@ -5510,6 +5549,12 @@ Faust,I've Got My Car and My TV,So Far,Krautrock,1972,Germany,256k,mp3,3:51,Stud
 Faust,"Picnic on a Frozen River, Deuxieme Tableux",So Far,Krautrock,1972,Germany,192k,mp3,0:43,Studio,LP
 Faust,Me Lack Space...,So Far,Krautrock,1972,Germany,192k,mp3,0:41,Studio,LP
 Faust,... In the Spirit,So Far,Krautrock,1972,Germany,192k,mp3,2:17,Studio,LP
+Cannonball Adderley,Autumn Leaves,Somethin' Else,Hard Bop; Cool Jazz,1958,USA,2597k,flac,10:58,Studio,LP
+Cannonball Adderley,Love For Sale,Somethin' Else,Hard Bop; Cool Jazz,1958,USA,2607k,flac,7:07,Studio,LP
+Cannonball Adderley,Somethin' Else,Somethin' Else,Hard Bop; Cool Jazz,1958,USA,2787k,flac,8:06,Studio,LP
+Cannonball Adderley,One For Daddy-O,Somethin' Else,Hard Bop; Cool Jazz,1958,USA,2624k,flac,8:22,Studio,LP
+Cannonball Adderley,Dancing In The Dark,Somethin' Else,Hard Bop; Cool Jazz,1958,USA,4877k,flac,4:08,Studio,LP
+Cannonball Adderley,Bangoon (aka Alison's Uncle),Somethin' Else,Hard Bop; Cool Jazz,1958,USA,1070k,flac,5:09,Studio,LP
 Julia Holter,Sun Girl,Something in the Room She Moves,Art Pop; Ambient Pop; Progressive Pop,2024,USA,843k,flac,5:52,Studio,LP
 Julia Holter,These Morning,Something in the Room She Moves,Art Pop; Ambient Pop; Progressive Pop,2024,USA,798k,flac,3:49,Studio,LP
 Julia Holter,Something in the Room She Moves,Something in the Room She Moves,Art Pop; Ambient Pop; Progressive Pop,2024,USA,762k,flac,6:18,Studio,LP
@@ -5743,7 +5788,7 @@ Kepler Quartet,String Quartet no. 6,"String Quartets nos. 6, 7, & 8",Microtonal 
 Kepler Quartet,Quietness (in memory of Salvatore Martirano),"String Quartets nos. 6, 7, & 8",Microtonal Classical; Classical; Chamber Music,2016,USA,320k,mp3,2:17,Studio,LP
 Steve Roach,Reflections in Suspension,Structures from Silence,Ambient; Space Ambient; Progressive Electronic,1984,USA,623k,flac,16:46,Studio,LP
 Steve Roach,Quiet Friend,Structures from Silence,Ambient; Space Ambient; Progressive Electronic,1984,USA,516k,flac,13:23,Studio,LP
-Steve Roach,Structures from Silence,Structures from Silence,Ambient; Space Ambient; Progressive Electronic,1984,USA,513k,flac,28:33,Studio,LP
+Steve Roach,Structures from Silence,Structures from Silence,Ambient; Space Ambient; Progressive Electronic,1984,USA,513k,flac,28:33:00,Studio,LP
 Biosphere,As the Sun Kissed the Horizon,Substrata,Ambient,1997,Norway,538k,flac,1:47,Studio,LP
 Biosphere,Poa Alpina,Substrata,Ambient,1997,Norway,574k,flac,4:10,Studio,LP
 Biosphere,Chukhung,Substrata,Ambient,1997,Norway,590k,flac,7:34,Studio,LP
@@ -5803,11 +5848,11 @@ Boredoms,Ant 10/Estereo 10 (Remix by ALTZ),Super Roots 10,Electronic,2009,Japan,
 Boredoms,Ant 10 (Remix by DJ Finger Hat),Super Roots 10,Electronic,2009,Japan,320k,mp3,5:24,Studio,EP
 Boredoms,Ant 10 (Remix by Lindstrøm),Super Roots 10,Electronic,2009,Japan,320k,mp3,10:45,Studio,EP
 Boredoms,Ant 10/Mineral Dub Break (Remix by ALTZ),Super Roots 10,Electronic,2009,Japan,320k,mp3,10:21,Studio,EP
-Boredoms,GO!!!!!,Super Roots 5,Noise,1995,Japan,192k,mp3,64:19,Studio,EP
+Boredoms,GO!!!!!,Super Roots 5,Noise,1995,Japan,192k,mp3,64:19:00,Studio,EP
 Boredoms,7〜(EWE Remix),Super Roots 7,Noise Rock,1998,Japan,320k,mp3,4:04,Studio,EP
 Boredoms,7→(Boriginal),Super Roots 7,Noise Rock,1998,Japan,320k,mp3,20:55,Studio,EP
 Boredoms,7＋(EYE Remix),Super Roots 7,Noise Rock,1998,Japan,320k,mp3,8:12,Studio,EP
-Boredoms,Livwe!!,Super Roots 9,Electronic,2007,Japan,320k,mp3,40:29,Studio,EP
+Boredoms,Livwe!!,Super Roots 9,Electronic,2007,Japan,320k,mp3,40:29:00,Studio,EP
 Radiohead,Supercollider,Supercollider / The Butcher,Electronic; Glitch Pop; Ambient Pop,2011,UK; England,320k,mp3,7:02,Studio,Single
 Radiohead,The Butcher,Supercollider / The Butcher,Electronic; Glitch Pop; Ambient Pop,2011,UK; England,320k,mp3,4:40,Studio,Single
 Pixies,Bone Machine,Surfer Rosa,Indie Rock; Alternative Rock,1988,USA,1099k,flac,3:03,Studio,LP
@@ -5840,6 +5885,14 @@ Suuk,Suuk Maciej Chlemicki läheb partei vojevoodkonna sekretäri Stefan Szezuka
 Suuk,Kulisside taga,Suuk 1976,Psychedelic Rock; Progressive Rock,2000,Estonia,192k,mp3,2:08,Studio,LP
 Suuk,Krystyna loeb Maciej kirja,Suuk 1976,Psychedelic Rock; Progressive Rock,2000,Estonia,192k,mp3,1:45,Studio,LP
 Suuk,Peer Gynt,Suuk 1976,Psychedelic Rock; Progressive Rock,2000,Estonia,192k,mp3,12:43,Studio,LP
+Whirr,Press,Sway,Shoegaze,2014,Whirr,994k,flac,3:31,Studio,LP
+Whirr,Mumble,Sway,Shoegaze,2014,Whirr,1005k,flac,2:34,Studio,LP
+Whirr,Dry,Sway,Shoegaze,2014,Whirr,920k,flac,5:01,Studio,LP
+Whirr,Clear,Sway,Shoegaze,2014,Whirr,910k,flac,6:10,Studio,LP
+Whirr,Heavy,Sway,Shoegaze,2014,Whirr,1014k,flac,4:14,Studio,LP
+Whirr,Sway,Sway,Shoegaze,2014,Whirr,814k,flac,6:38,Studio,LP
+Whirr,Lines,Sway,Shoegaze,2014,Whirr,970k,flac,4:24,Studio,LP
+Whirr,Feel,Sway,Shoegaze,2014,Whirr,1006k,flac,3:24,Studio,LP
 Aphex Twin,minipops 67 (source field mix),Syro,IDM,2014,UK; England,831k,flac,4:47,Studio,LP
 Aphex Twin,XMAS_EVET10 (thanaton3 mix),Syro,IDM,2014,UK; England,725k,flac,10:31,Studio,LP
 Aphex Twin,produk 29,Syro,IDM,2014,UK; England,820k,flac,5:03,Studio,LP
@@ -5926,8 +5979,8 @@ Broadcast,Minus 3,Tender Buttons,Indietronica; Ambient Pop,2005,UK; England,382k
 Broadcast,Goodbye Girls,Tender Buttons,Indietronica; Ambient Pop,2005,UK; England,832k,flac,3:08,Studio,LP
 Broadcast,You and Me in Time,Tender Buttons,Indietronica; Ambient Pop,2005,UK; England,669k,flac,1:24,Studio,LP
 Broadcast,I Found the End,Tender Buttons,Indietronica; Ambient Pop,2005,UK; England,443k,flac,2:05,Studio,LP
-Ali Akbar Khan,Alap (Solo),The 80 Minute Râga,Hindustani Classical Music,1969,India,320k,mp3,40:41,Studio,LP
-Ali Akbar Khan,Gat (Tabla Accompaniment),The 80 Minute Râga,Hindustani Classical Music,1969,India,320k,mp3,40:50,Studio,LP
+Ali Akbar Khan,Alap (Solo),The 80 Minute Râga,Hindustani Classical Music,1969,India,320k,mp3,40:41:00,Studio,LP
+Ali Akbar Khan,Gat (Tabla Accompaniment),The 80 Minute Râga,Hindustani Classical Music,1969,India,320k,mp3,40:50:00,Studio,LP
 Sufjan Stevens,Futile Devices,The Age of Adz,Art Pop; Indietronica,2010,USA,232k VBR,mp3,2:11,Studio,LP
 Sufjan Stevens,Too Much,The Age of Adz,Art Pop; Indietronica,2010,USA,264k VBR,mp3,6:43,Studio,LP
 Sufjan Stevens,Age of Adz,The Age of Adz,Art Pop; Indietronica,2010,USA,246k VBR,mp3,7:59,Studio,LP
@@ -5938,7 +5991,7 @@ Sufjan Stevens,Bad Communication,The Age of Adz,Art Pop; Indietronica,2010,USA,2
 Sufjan Stevens,Vesuvius,The Age of Adz,Art Pop; Indietronica,2010,USA,237k VBR,mp3,5:26,Studio,LP
 Sufjan Stevens,All for Myself,The Age of Adz,Art Pop; Indietronica,2010,USA,232k VBR,mp3,2:55,Studio,LP
 Sufjan Stevens,I Want to Be Well,The Age of Adz,Art Pop; Indietronica,2010,USA,253k VBR,mp3,6:26,Studio,LP
-Sufjan Stevens,Impossible Soul,The Age of Adz,Art Pop; Indietronica,2010,USA,248k VBR,mp3,25:34,Studio,LP
+Sufjan Stevens,Impossible Soul,The Age of Adz,Art Pop; Indietronica,2010,USA,248k VBR,mp3,25:34:00,Studio,LP
 Coil,Fire Of The Mind,The Ape Of Naples,Post-Industrial; Darkwave,2005,UK; England,189k VBR,mp3,5:14,Studio,LP
 Coil,The Last Amethyst Deceiver,The Ape Of Naples,Post-Industrial; Darkwave,2005,UK; England,184k VBR,mp3,10:11,Studio,LP
 Coil,Tattooed Man,The Ape Of Naples,Post-Industrial; Darkwave,2005,UK; England,173k VBR,mp3,6:33,Studio,LP
@@ -6037,7 +6090,7 @@ Swans,The Beggar,The Beggar,Post-Rock; Experimental Rock,2023,USA,786k,flac,10:1
 Swans,No More of This,The Beggar,Post-Rock; Experimental Rock,2023,USA,763k,flac,6:55,Studio,LP
 Swans,Ebbing,The Beggar,Post-Rock; Experimental Rock,2023,USA,865k,flac,11:04,Studio,LP
 Swans,Why Can't I Have What I Want Any Time That I Want?,The Beggar,Post-Rock; Experimental Rock,2023,USA,770k,flac,7:38,Studio,LP
-Swans,The Beggar Lover (Three),The Beggar,Post-Rock; Experimental Rock,2023,USA,837k,flac,43:51,Studio,LP
+Swans,The Beggar Lover (Three),The Beggar,Post-Rock; Experimental Rock,2023,USA,837k,flac,43:51:00,Studio,LP
 Swans,The Memorious,The Beggar,Post-Rock; Experimental Rock,2023,USA,932k,flac,8:38,Studio,LP
 Radiohead,Planet Telex,The Bends,Alternative Rock,1995,UK; England,320k VBR,m4a,4:19,Studio,LP
 Radiohead,The Bends,The Bends,Alternative Rock,1995,UK; England,320k VBR,m4a,4:06,Studio,LP
@@ -6097,9 +6150,24 @@ toe,music for you,the book about my idle plot on a vague anxiety,Math Rock; Post
 toe,i do still wrong,the book about my idle plot on a vague anxiety,Math Rock; Post-Rock,2005,Japan,269k VBR,mp3,3:00,Studio,LP
 toe,メトロノーム,the book about my idle plot on a vague anxiety,Math Rock; Post-Rock,2005,Japan,262k VBR,mp3,3:37,Studio,LP
 toe,everything means nothing,the book about my idle plot on a vague anxiety,Math Rock; Post-Rock,2005,Japan,262k VBR,mp3,3:14,Studio,LP
+Boards of Canada,Into The Rainbow Vein,The Campfire Headphase,Downtempo; Folktronica; Neo-Psychedelia,2005,UK; Scotland,407k,flac,0:44,Studio,LP
+Boards of Canada,Chromakey Dreamcoat,The Campfire Headphase,Downtempo; Folktronica; Neo-Psychedelia,2005,UK; Scotland,865k,flac,5:47,Studio,LP
+Boards of Canada,Satellite Anthem Icarus,The Campfire Headphase,Downtempo; Folktronica; Neo-Psychedelia,2005,UK; Scotland,846k,flac,6:04,Studio,LP
+Boards of Canada,Peacock Tail,The Campfire Headphase,Downtempo; Folktronica; Neo-Psychedelia,2005,UK; Scotland,836k,flac,5:24,Studio,LP
+Boards of Canada,Dayvan Cowboy,The Campfire Headphase,Downtempo; Folktronica; Neo-Psychedelia,2005,UK; Scotland,864k,flac,5:00,Studio,LP
+Boards of Canada,A Moment Of Clarity,The Campfire Headphase,Downtempo; Folktronica; Neo-Psychedelia,2005,UK; Scotland,433k,flac,0:51,Studio,LP
+Boards of Canada,84 Pontiac Dream,The Campfire Headphase,Downtempo; Folktronica; Neo-Psychedelia,2005,UK; Scotland,791k,flac,3:49,Studio,LP
+Boards of Canada,Sherbet Head,The Campfire Headphase,Downtempo; Folktronica; Neo-Psychedelia,2005,UK; Scotland,753k,flac,2:41,Studio,LP
+Boards of Canada,Oscar See Through Red Eye,The Campfire Headphase,Downtempo; Folktronica; Neo-Psychedelia,2005,UK; Scotland,840k,flac,5:08,Studio,LP
+Boards of Canada,Ataronchronon,The Campfire Headphase,Downtempo; Folktronica; Neo-Psychedelia,2005,UK; Scotland,472k,flac,1:14,Studio,LP
+Boards of Canada,Hey Saturday Sun,The Campfire Headphase,Downtempo; Folktronica; Neo-Psychedelia,2005,UK; Scotland,735k,flac,4:56,Studio,LP
+Boards of Canada,Constants Are Changing,The Campfire Headphase,Downtempo; Folktronica; Neo-Psychedelia,2005,UK; Scotland,542k,flac,1:42,Studio,LP
+Boards of Canada,Slow This Bird Down,The Campfire Headphase,Downtempo; Folktronica; Neo-Psychedelia,2005,UK; Scotland,730k,flac,6:09,Studio,LP
+Boards of Canada,Tears From The Compound Eye,The Campfire Headphase,Downtempo; Folktronica; Neo-Psychedelia,2005,UK; Scotland,407k,flac,4:03,Studio,LP
+Boards of Canada,Farewell Fire,The Campfire Headphase,Downtempo; Folktronica; Neo-Psychedelia,2005,UK; Scotland,263k,flac,8:26,Studio,LP
 Alice Coltrane,Journey In Satchidananda (Live),The Carnegie Hall Concert (Live),Spiritual Jazz; Avant-Garde Jazz,2024,USA,3052k,flac,15:02,Live,LP
 Alice Coltrane,Shiva-Loka (Live),The Carnegie Hall Concert (Live),Spiritual Jazz; Avant-Garde Jazz,2024,USA,3096k,flac,14:40,Live,LP
-Alice Coltrane,Africa (Live),The Carnegie Hall Concert (Live),Spiritual Jazz; Avant-Garde Jazz,2024,USA,3181k,flac,28:09,Live,LP
+Alice Coltrane,Africa (Live),The Carnegie Hall Concert (Live),Spiritual Jazz; Avant-Garde Jazz,2024,USA,3181k,flac,28:09:00,Live,LP
 Alice Coltrane,Leo (Live),The Carnegie Hall Concert (Live),Spiritual Jazz; Avant-Garde Jazz,2024,USA,3205k,flac,21:34,Live,LP
 Talk Talk,Happiness Is Easy,The Colour of Spring,Art Pop,1986,UK; England,320k,mp3,6:30,Studio,LP
 Talk Talk,I Don’t Believe in You,The Colour of Spring,Art Pop,1986,UK; England,320k,mp3,5:03,Studio,LP
@@ -6115,7 +6183,7 @@ Horse Lords,The Radiant City,The Common Task,Totalism; Math Rock; Krautrock; Exp
 Horse Lords,People's Park,The Common Task,Totalism; Math Rock; Krautrock; Experimental Rock,2020,USA,913k,flac,4:20,Studio,LP
 Horse Lords,Integral Accident,The Common Task,Totalism; Math Rock; Krautrock; Experimental Rock,2020,USA,875k,flac,18:38,Studio,LP
 Miles Davis,Pharaoh's Dance,The Complete Bitches Brew Sessions,Jazz Fusion; Avant-Garde Jazz,1998,USA,2844k,flac,20:05,Studio,LP
-Miles Davis,Bitches Brew,The Complete Bitches Brew Sessions,Jazz Fusion; Avant-Garde Jazz,1998,USA,2876k,flac,26:57,Studio,LP
+Miles Davis,Bitches Brew,The Complete Bitches Brew Sessions,Jazz Fusion; Avant-Garde Jazz,1998,USA,2876k,flac,26:57:00,Studio,LP
 Miles Davis,Spanish Key,The Complete Bitches Brew Sessions,Jazz Fusion; Avant-Garde Jazz,1998,USA,3000k,flac,17:32,Studio,LP
 Miles Davis,John McLaughlin,The Complete Bitches Brew Sessions,Jazz Fusion; Avant-Garde Jazz,1998,USA,2975k,flac,4:23,Studio,LP
 Miles Davis,Miles Runs the Voodoo Down,The Complete Bitches Brew Sessions,Jazz Fusion; Avant-Garde Jazz,1998,USA,2949k,flac,14:01,Studio,LP
@@ -6148,7 +6216,7 @@ Miles Davis,Shhh/Peaceful,The Complete in a Silent Way Sessions,Jazz Fusion; Mod
 Miles Davis,In a Silent Way (Rehearsal),The Complete in a Silent Way Sessions,Jazz Fusion; Modal Jazz,2001,USA,643k,flac,5:26,Studio,LP
 Miles Davis,In a Silent Way,The Complete in a Silent Way Sessions,Jazz Fusion; Modal Jazz,2001,USA,579k,flac,4:18,Studio,LP
 Miles Davis,It's About That Time,The Complete in a Silent Way Sessions,Jazz Fusion; Modal Jazz,2001,USA,643k,flac,11:27,Studio,LP
-Miles Davis,The Ghetto Walk,The Complete in a Silent Way Sessions,Jazz Fusion; Modal Jazz,2001,USA,730k,flac,26:49,Studio,LP
+Miles Davis,The Ghetto Walk,The Complete in a Silent Way Sessions,Jazz Fusion; Modal Jazz,2001,USA,730k,flac,26:49:00,Studio,LP
 Miles Davis,Early Minor,The Complete in a Silent Way Sessions,Jazz Fusion; Modal Jazz,2001,USA,650k,flac,6:58,Studio,LP
 Miles Davis,Shhh / Peaceful,The Complete in a Silent Way Sessions,Jazz Fusion; Modal Jazz,2001,USA,795k,flac,18:18,Studio,LP
 Miles Davis,In a Silent Way / It's About That Time,The Complete in a Silent Way Sessions,Jazz Fusion; Modal Jazz,2001,USA,736k,flac,19:52,Studio,LP
@@ -6158,17 +6226,17 @@ Natural Snow Buildings,Interstate Roads,The Dance of the Moon and the Sun,Drone;
 Natural Snow Buildings,Wisconsin,The Dance of the Moon and the Sun,Drone; Psychedelic Folk; Avant-Folk,2006,France,320k,mp3,11:57,Studio,LP
 Natural Snow Buildings,Rain Serenade,The Dance of the Moon and the Sun,Drone; Psychedelic Folk; Avant-Folk,2006,France,320k,mp3,3:20,Studio,LP
 Natural Snow Buildings,Dance of the Moon & the Sun,The Dance of the Moon and the Sun,Drone; Psychedelic Folk; Avant-Folk,2006,France,320k,mp3,6:26,Studio,LP
-Natural Snow Buildings,"Felt Presence, Ghostly Humming",The Dance of the Moon and the Sun,Drone; Psychedelic Folk; Avant-Folk,2006,France,320k,mp3,25:14,Studio,LP
+Natural Snow Buildings,"Felt Presence, Ghostly Humming",The Dance of the Moon and the Sun,Drone; Psychedelic Folk; Avant-Folk,2006,France,320k,mp3,25:14:00,Studio,LP
 Natural Snow Buildings,Breaking Waters,The Dance of the Moon and the Sun,Drone; Psychedelic Folk; Avant-Folk,2006,France,320k,mp3,2:45,Studio,LP
 Natural Snow Buildings,"Eu un miroir, obscurement",The Dance of the Moon and the Sun,Drone; Psychedelic Folk; Avant-Folk,2006,France,320k,mp3,4:38,Studio,LP
 Natural Snow Buildings,The Cover-Up,The Dance of the Moon and the Sun,Drone; Psychedelic Folk; Avant-Folk,2006,France,320k,mp3,5:09,Studio,LP
-William Basinski,dlp 1.1,The Disintegration Loops,Tape Music; Ambient; Minimalism,2002,USA,320k,mp3,63:35,Studio,LP
+William Basinski,dlp 1.1,The Disintegration Loops,Tape Music; Ambient; Minimalism,2002,USA,320k,mp3,63:35:00,Studio,LP
 William Basinski,dlp 2.1,The Disintegration Loops,Tape Music; Ambient; Minimalism,2002,USA,320k,mp3,10:50,Studio,LP
-William Basinski,d|p 2.2,The Disintegration Loops,Tape Music; Ambient; Minimalism,2003,USA,320k,mp3,32:40,Studio,LP
-William Basinski,d|p 3,The Disintegration Loops,Tape Music; Ambient; Minimalism,2003,USA,320k,mp3,41:50,Studio,LP
+William Basinski,d|p 2.2,The Disintegration Loops,Tape Music; Ambient; Minimalism,2003,USA,320k,mp3,32:40:00,Studio,LP
+William Basinski,d|p 3,The Disintegration Loops,Tape Music; Ambient; Minimalism,2003,USA,320k,mp3,41:50:00,Studio,LP
 William Basinski,dlp 4,The Disintegration Loops,Tape Music; Ambient; Minimalism,2003,USA,320k,mp3,20:11,Studio,LP
-William Basinski,dlp 5,The Disintegration Loops,Tape Music; Ambient; Minimalism,2003,USA,320k,mp3,52:20,Studio,LP
-William Basinski,dlp 6,The Disintegration Loops,Tape Music; Ambient; Minimalism,2002,USA,320k,mp3,40:37,Studio,LP
+William Basinski,dlp 5,The Disintegration Loops,Tape Music; Ambient; Minimalism,2003,USA,320k,mp3,52:20:00,Studio,LP
+William Basinski,dlp 6,The Disintegration Loops,Tape Music; Ambient; Minimalism,2002,USA,320k,mp3,40:37:00,Studio,LP
 William Basinski,dlp 1.2,The Disintegration Loops,Tape Music; Ambient; Minimalism,2002,USA,320k,mp3,21:44,Studio,LP
 William Basinski,dlp 1.3,The Disintegration Loops,Tape Music; Ambient; Minimalism,2002,USA,320k,mp3,11:57,Studio,LP
 The Doors,Break On Through (To The Other Side),The Doors,Psychedelic Rock,1967,USA,320k,mp3,2:29,Studio,LP
@@ -6187,7 +6255,7 @@ Explosions in the Sky,The Only Moment We Were Alone,The Earth Is Not a Cold Dead
 Explosions in the Sky,Six Days At The Bottom Of The Ocean,The Earth Is Not a Cold Dead Place,Post-Rock,2003,USA,254k VBR,mp3,8:43,Studio,LP
 Explosions in the Sky,Memorial,The Earth Is Not a Cold Dead Place,Post-Rock,2003,USA,261k VBR,mp3,8:50,Studio,LP
 Explosions in the Sky,Your Hand In Mine,The Earth Is Not a Cold Dead Place,Post-Rock,2003,USA,252k VBR,mp3,8:17,Studio,LP
-Steve Reich,Pulse - Sections I-X - Pulse,The ECM Recordings,Minimalism; Modern Classical,2016,USA,659k,flac,56:31,Studio,LP
+Steve Reich,Pulse - Sections I-X - Pulse,The ECM Recordings,Minimalism; Modern Classical,2016,USA,659k,flac,56:31:00,Studio,LP
 Steve Reich,Music for a Large Ensemble,The ECM Recordings,Minimalism; Modern Classical,2016,USA,724k,flac,15:38,Studio,LP
 Steve Reich,Violin Phase,The ECM Recordings,Minimalism; Modern Classical,2016,USA,728k,flac,15:19,Studio,LP
 Steve Reich,Octet,The ECM Recordings,Minimalism; Modern Classical,2016,USA,733k,flac,17:29,Studio,LP
@@ -6294,12 +6362,12 @@ The Microphones,I Felt Your Shape,The Glow Pt. 2,Indie Folk; Psychedelic Folk; S
 The Microphones,Samurai Sword,The Glow Pt. 2,Indie Folk; Psychedelic Folk; Slacker Rock,2001,USA,965k,flac,4:07,Studio,LP
 The Microphones,My Warm Blood,The Glow Pt. 2,Indie Folk; Psychedelic Folk; Slacker Rock,2001,USA,639k,flac,9:28,Studio,LP
 Swans,Cloud Of Forgetting,The Glowing Man,Post-Rock; Experimental Rock,2016,USA,320k,mp3,12:43,Studio,LP
-Swans,Cloud Of Unknowing,The Glowing Man,Post-Rock; Experimental Rock,2016,USA,320k,mp3,25:12,Studio,LP
+Swans,Cloud Of Unknowing,The Glowing Man,Post-Rock; Experimental Rock,2016,USA,320k,mp3,25:12:00,Studio,LP
 Swans,The World Looks Red / The World Looks Black,The Glowing Man,Post-Rock; Experimental Rock,2016,USA,320k,mp3,14:27,Studio,LP
 Swans,People Like Us,The Glowing Man,Post-Rock; Experimental Rock,2016,USA,320k,mp3,4:32,Studio,LP
 Swans,Frankie M,The Glowing Man,Post-Rock; Experimental Rock,2016,USA,320k,mp3,20:58,Studio,LP
 Swans,When Will I Return?,The Glowing Man,Post-Rock; Experimental Rock,2016,USA,320k,mp3,5:26,Studio,LP
-Swans,The Glowing Man,The Glowing Man,Post-Rock; Experimental Rock,2016,USA,320k,mp3,28:50,Studio,LP
+Swans,The Glowing Man,The Glowing Man,Post-Rock; Experimental Rock,2016,USA,320k,mp3,28:50:00,Studio,LP
 Swans,"Finally, Peace",The Glowing Man,Post-Rock; Experimental Rock,2016,USA,320k,mp3,6:15,Studio,LP
 Swans,In,The Great Annihilator,Post-Punk; Experimental Rock; Gothic Rock,1995,USA,248k VBR,mp3,2:27,Studio,LP
 Swans,I Am The Sun,The Great Annihilator,Post-Punk; Experimental Rock; Gothic Rock,1995,USA,248k VBR,mp3,3:23,Studio,LP
@@ -6419,11 +6487,11 @@ Radiohead,Supercollider (Bonus Track),The King of Limbs: Live from the Basement,
 Sprain,"Man Proposes, God Disposes",The Lamb As Effigy,Experimental Rock; Noise Rock; Post-Rock,2023,USA,966k,flac,7:09,Studio,LP
 Sprain,Reiterations,The Lamb As Effigy,Experimental Rock; Noise Rock; Post-Rock,2023,USA,980k,flac,6:42,Studio,LP
 Sprain,Privilege of Being,The Lamb As Effigy,Experimental Rock; Noise Rock; Post-Rock,2023,USA,847k,flac,5:28,Studio,LP
-Sprain,Margin for Error,The Lamb As Effigy,Experimental Rock; Noise Rock; Post-Rock,2023,USA,963k,flac,24:36,Studio,LP
+Sprain,Margin for Error,The Lamb As Effigy,Experimental Rock; Noise Rock; Post-Rock,2023,USA,963k,flac,24:36:00,Studio,LP
 Sprain,The Commercial Nude,The Lamb As Effigy,Experimental Rock; Noise Rock; Post-Rock,2023,USA,803k,flac,10:54,Studio,LP
 Sprain,The Reclining Nude,The Lamb As Effigy,Experimental Rock; Noise Rock; Post-Rock,2023,USA,702k,flac,12:56,Studio,LP
 Sprain,We Think So Ill of You,The Lamb As Effigy,Experimental Rock; Noise Rock; Post-Rock,2023,USA,986k,flac,4:15,Studio,LP
-Sprain,"God, or Whatever You Call It",The Lamb As Effigy,Experimental Rock; Noise Rock; Post-Rock,2023,USA,669k,flac,24:38,Studio,LP
+Sprain,"God, or Whatever You Call It",The Lamb As Effigy,Experimental Rock; Noise Rock; Post-Rock,2023,USA,669k,flac,24:38:00,Studio,LP
 The Books,The Lemon of Pink,The Lemon of Pink,Alternative Rock,2003,USA; Netherlands,320k,mp3,4:40,Studio,LP
 The Books,The Lemon of Pink,The Lemon of Pink,Alternative Rock,2003,USA; Netherlands,320k,mp3,1:35,Studio,LP
 The Books,Tokyo,The Lemon of Pink,Alternative Rock,2003,USA; Netherlands,320k,mp3,3:43,Studio,LP
@@ -6560,8 +6628,8 @@ Geordie Greep,As if Waltz,The New Sound,Jazz Rock; Progressive Rock; Art Rock,20
 Geordie Greep,The Magician,The New Sound,Jazz Rock; Progressive Rock; Art Rock,2024,UK; England,920k,flac,12:20,Studio,LP
 Geordie Greep,If You Are But a Dream,The New Sound,Jazz Rock; Progressive Rock; Art Rock,2024,UK; England,682k,flac,3:07,Studio,LP
 John Coltrane,Introduction,The Olatunji Concert: The Last Live Recording,Free Jazz,2001,USA,236k VBR,mp3,0:32,Live,LP
-John Coltrane,Ogunde,The Olatunji Concert: The Last Live Recording,Free Jazz,2001,USA,302k VBR,mp3,28:35,Live,LP
-John Coltrane,My Favorite Things,The Olatunji Concert: The Last Live Recording,Free Jazz,2001,USA,278k VBR,mp3,34:36,Live,LP
+John Coltrane,Ogunde,The Olatunji Concert: The Last Live Recording,Free Jazz,2001,USA,302k VBR,mp3,28:35:00,Live,LP
+John Coltrane,My Favorite Things,The Olatunji Concert: The Last Live Recording,Free Jazz,2001,USA,278k VBR,mp3,34:36:00,Live,LP
 Sigur Rós,Untitled,The Peel Sessions (26-09-2000),Post-Rock,2000,Iceland,128k,mp3,9:17,Live,EP
 Sigur Rós,Untitled,The Peel Sessions (26-09-2000),Post-Rock,2000,Iceland,128k,mp3,5:33,Live,EP
 Sigur Rós,Cold,The Peel Sessions (26-09-2000),Post-Rock,2000,Iceland,128k,mp3,5:59,Live,EP
@@ -6651,7 +6719,7 @@ The Rolling Stones,Mozart: Sonata In C Major-1st Movement,The Rolling Stones Roc
 Swans,Lunacy (feat. Alan Sparhawk & Mimi Parker),The Seer,Experimental Rock; Post-Rock,2012,USA,320k,mp3,6:09,Studio,LP
 Swans,Mother of the World,The Seer,Experimental Rock; Post-Rock,2012,USA,320k,mp3,9:57,Studio,LP
 Swans,The Wolf,The Seer,Experimental Rock; Post-Rock,2012,USA,320k,mp3,1:35,Studio,LP
-Swans,The Seer,The Seer,Experimental Rock; Post-Rock,2012,USA,320k,mp3,32:14,Studio,LP
+Swans,The Seer,The Seer,Experimental Rock; Post-Rock,2012,USA,320k,mp3,32:14:00,Studio,LP
 Swans,The Seer Returns (feat. Jarboe),The Seer,Experimental Rock; Post-Rock,2012,USA,320k,mp3,6:17,Studio,LP
 Swans,93 Ave. B Blues,The Seer,Experimental Rock; Post-Rock,2012,USA,320k,mp3,5:21,Studio,LP
 Swans,The Daughter Brings the Water,The Seer,Experimental Rock; Post-Rock,2012,USA,320k,mp3,2:40,Studio,LP
@@ -6921,7 +6989,7 @@ Current 93,Thunder Perfect Mind II,Thunder Perfect Mind,Neofolk; Wyrd Folk,1992,
 Current 93,Hitler as Kalki,Thunder Perfect Mind,Neofolk; Wyrd Folk,1992,UK; England,894k,flac,16:28,Studio,LP
 Current 93,A Sad Sadness Song,Thunder Perfect Mind,Neofolk; Wyrd Folk,1992,UK; England,746k,flac,4:40,Studio,LP
 Current 93,An Ending,Thunder Perfect Mind,Neofolk; Wyrd Folk,1992,UK; England,465k,flac,2:21,Studio,LP
-Brian Eno,Thursday Afternoon,Thursday Afternoon,Ambient; Drone,1985,UK; England,320k,mp3,60:53,Studio,LP
+Brian Eno,Thursday Afternoon,Thursday Afternoon,Ambient; Drone,1985,UK; England,320k,mp3,60:53:00,Studio,LP
 Tortoise,TNT,TNT,Post-Rock; Experimental Rock,1998,USA,240k VBR,mp3,7:33,Studio,LP
 Tortoise,Swung From The Gutters,TNT,Post-Rock; Experimental Rock,1998,USA,211k VBR,mp3,5:52,Studio,LP
 Tortoise,Ten-Day Interval,TNT,Post-Rock; Experimental Rock,1998,USA,221k VBR,mp3,4:44,Studio,LP
@@ -6937,7 +7005,7 @@ Tortoise,Everglade,TNT,Post-Rock; Experimental Rock,1998,USA,226k VBR,mp3,4:21,S
 Swans,Screen Shot,To Be Kind,Experimental Rock; Post-Rock,2014,USA,320k,mp3,8:04,Studio,LP
 Swans,Just a Little Boy (for Chester Burnett),To Be Kind,Experimental Rock; Post-Rock,2014,USA,320k,mp3,12:39,Studio,LP
 Swans,A Little God in My Hands,To Be Kind,Experimental Rock; Post-Rock,2014,USA,320k,mp3,7:08,Studio,LP
-Swans,Bring The Sun / Toussaint L'Ouverture,To Be Kind,Experimental Rock; Post-Rock,2014,USA,320k,mp3,34:05,Studio,LP
+Swans,Bring The Sun / Toussaint L'Ouverture,To Be Kind,Experimental Rock; Post-Rock,2014,USA,320k,mp3,34:05:00,Studio,LP
 Swans,Some Things We Do,To Be Kind,Experimental Rock; Post-Rock,2014,USA,320k,mp3,5:09,Studio,LP
 Swans,She Loves Us,To Be Kind,Experimental Rock; Post-Rock,2014,USA,320k,mp3,17:00,Studio,LP
 Swans,Kirsten Supine,To Be Kind,Experimental Rock; Post-Rock,2014,USA,320k,mp3,10:32,Studio,LP
@@ -7126,6 +7194,18 @@ Big Thief,Not,Two Hands,Indie Rock; Indie Folk,2019,USA,320k,mp3,6:07,Studio,LP
 Big Thief,Wolf,Two Hands,Indie Rock; Indie Folk,2019,USA,320k,mp3,4:42,Studio,LP
 Big Thief,Replaced,Two Hands,Indie Rock; Indie Folk,2019,USA,320k,mp3,4:54,Studio,LP
 Big Thief,Cut My Hair,Two Hands,Indie Rock; Indie Folk,2019,USA,320k,mp3,3:36,Studio,LP
+The Voidz,Take Me in Your Army,Tyranny,Neo-Psychedelia; Synth Punk; Experimental Rock,2014,USA,822k,flac,4:20,Studio,LP
+The Voidz,Crunch Punch,Tyranny,Neo-Psychedelia; Synth Punk; Experimental Rock,2014,USA,983k,flac,4:50,Studio,LP
+The Voidz,M.utually A.ssured D.estruction,Tyranny,Neo-Psychedelia; Synth Punk; Experimental Rock,2014,USA,1024k,flac,2:32,Studio,LP
+The Voidz,Human Sadness,Tyranny,Neo-Psychedelia; Synth Punk; Experimental Rock,2014,USA,913k,flac,10:56,Studio,LP
+The Voidz,Where No Eagles Fly,Tyranny,Neo-Psychedelia; Synth Punk; Experimental Rock,2014,USA,1042k,flac,3:44,Studio,LP
+The Voidz,Father Electricity,Tyranny,Neo-Psychedelia; Synth Punk; Experimental Rock,2014,USA,913k,flac,7:23,Studio,LP
+The Voidz,Johan Von Bronx,Tyranny,Neo-Psychedelia; Synth Punk; Experimental Rock,2014,USA,1002k,flac,6:01,Studio,LP
+The Voidz,Business Dog,Tyranny,Neo-Psychedelia; Synth Punk; Experimental Rock,2014,USA,1041k,flac,2:35,Studio,LP
+The Voidz,Xerox,Tyranny,Neo-Psychedelia; Synth Punk; Experimental Rock,2014,USA,955k,flac,5:05,Studio,LP
+The Voidz,Dare I Care,Tyranny,Neo-Psychedelia; Synth Punk; Experimental Rock,2014,USA,1006k,flac,6:25,Studio,LP
+The Voidz,Nintendo Blood,Tyranny,Neo-Psychedelia; Synth Punk; Experimental Rock,2014,USA,1013k,flac,5:54,Studio,LP
+The Voidz,Off to War,Tyranny,Neo-Psychedelia; Synth Punk; Experimental Rock,2014,USA,753k,flac,3:17,Studio,LP
 Big Thief,Contact,U.F.O.F.,Indie Folk,2019,USA,320k,mp3,3:54,Studio,LP
 Big Thief,UFOF,U.F.O.F.,Indie Folk,2019,USA,320k,mp3,3:08,Studio,LP
 Big Thief,Cattails,U.F.O.F.,Indie Folk,2019,USA,320k,mp3,4:05,Studio,LP
@@ -7193,7 +7273,7 @@ The Mothers of Invention,A Pound for a Brown on the Bus,Uncle Meat,Alternative R
 The Mothers of Invention,Ian Underwood Whips It Out (live on Stage in Copenhagen),Uncle Meat,Alternative Rock,1969,USA,320k VBR,mp3,5:07,Studio,LP
 The Mothers of Invention,Mr. Green Genes,Uncle Meat,Alternative Rock,1969,USA,320k VBR,mp3,3:12,Studio,LP
 The Mothers of Invention,We Can Shoot You,Uncle Meat,Alternative Rock,1969,USA,320k VBR,mp3,2:03,Studio,LP
-The Mothers of Invention,If We'd All Been Living in California.... ,Uncle Meat,Alternative Rock,1969,USA,320k VBR,mp3,1:13,Studio,LP
+The Mothers of Invention,If We'd All Been Living in California....,Uncle Meat,Alternative Rock,1969,USA,320k VBR,mp3,1:13,Studio,LP
 The Mothers of Invention,The Air,Uncle Meat,Alternative Rock,1969,USA,320k VBR,mp3,2:57,Studio,LP
 The Mothers of Invention,Project X,Uncle Meat,Alternative Rock,1969,USA,320k VBR,mp3,4:48,Studio,LP
 The Mothers of Invention,Cruising for Burgers,Uncle Meat,Alternative Rock,1969,USA,320k VBR,mp3,2:17,Studio,LP
@@ -7430,9 +7510,9 @@ Boredoms,↑,Vision Creation Newsun,Experimental Rock; Neo-Psychedelia; Psychede
 Boredoms,Ω,Vision Creation Newsun,Experimental Rock; Neo-Psychedelia; Psychedelic Rock; Krautrock,1999,Japan,862k,flac,7:45,Studio,LP
 Boredoms,ずっと,Vision Creation Newsun,Experimental Rock; Neo-Psychedelia; Psychedelic Rock; Krautrock,1999,Japan,691k,flac,7:21,Studio,LP
 Boredoms,☉,Vision Creation Newsun Boxset,Electronic,1999,Japan,320k,mp3,1:40,Studio,LP
-Boredoms,⧖,Vision Creation Newsun Boxset,Electronic,1999,Japan,320k,mp3,35:38,Studio,LP
+Boredoms,⧖,Vision Creation Newsun Boxset,Electronic,1999,Japan,320k,mp3,35:38:00,Studio,LP
 Boredoms,◌,Vision Creation Newsun Boxset,Electronic,1999,Japan,320k,mp3,5:35,Studio,LP
-Boredoms,Sunsidal Cendencies (Vision△Creation△Newsun△),Vision△Creation△Newsun△,Electronic,1999,Japan,320k,mp3,24:37,Studio,LP
+Boredoms,Sunsidal Cendencies (Vision△Creation△Newsun△),Vision△Creation△Newsun△,Electronic,1999,Japan,320k,mp3,24:37:00,Studio,LP
 Boredoms,Moonsidal Cendencies (Moochy Remix),Vision△Creation△Newsun△,Electronic,1999,Japan,320k,mp3,9:00,Studio,LP
 Boredoms,11 Aug ’99 Live (Total Eclipse + Grand Cross),Vision△Creation△Newsun△,Electronic,1999,Japan,320k,mp3,10:12,Studio,LP
 Björk,Earth Intruders,Volta,Art Pop,2007,Iceland,320k,mp3,6:13,Studio,LP
@@ -7571,7 +7651,7 @@ Sonic Youth,The Diamond Sea,Washing Machine,Noise Rock,1995,USA,320k,mp3,19:35,S
 Haruomi Hosono,Talking,Watering a Flower,Ambient; Minimalism,1984,Japan,320k,mp3,15:27,Studio,LP
 Haruomi Hosono,Growth,Watering a Flower,Ambient; Minimalism,1984,Japan,320k,mp3,14:53,Studio,LP
 Haruomi Hosono,Muji Original BGM,Watering a Flower,Ambient; Minimalism,1984,Japan,320k,mp3,15:52,Studio,LP
-William Basinski,Watermusic II,Watermusic II,Ambient,2003,USA,320k,mp3,66:37,Studio,LP
+William Basinski,Watermusic II,Watermusic II,Ambient,2003,USA,320k,mp3,66:37:00,Studio,LP
 Weezer,My Name Is Jonas,Weezer [The Blue Album],Power Pop; Alternative Rock,1994,USA,320k,mp3,3:25,Studio,LP
 Weezer,No One Else,Weezer [The Blue Album],Power Pop; Alternative Rock,1994,USA,320k,mp3,3:04,Studio,LP
 Weezer,The World Has Turned And Left Me Here,Weezer [The Blue Album],Power Pop; Alternative Rock,1994,USA,320k,mp3,4:19,Studio,LP
@@ -7906,8 +7986,8 @@ Fela Kuti,Zombie,Zombie,Afrobeat,1977,Nigeria,224k,mp3,12:26,Studio,LP
 Fela Kuti,Mister Follow Follow,Zombie,Afrobeat,1977,Nigeria,224k,mp3,12:57,Studio,LP
 Fela Kuti,Observation Is No Crime,Zombie,Afrobeat,1977,Nigeria,224k,mp3,13:25,Studio,LP
 Fela Kuti,Mistake,Zombie,Afrobeat,1977,Nigeria,224k,mp3,14:46,Studio,LP
-คณะ รุ่งทวี,แห่สดดนตรีพื้นบ้านหนองโก ชุดที่ 8,แห่สดดนตรีพื้นบ้านหนองโก ชุดที่ 8 + 9,Molam sing,2000,Thailand,152k VBR,mp3,26:49,Studio,LP
-คณะ รุ่งทวี,แห่สดดนตรีพื้นบ้านหนองโก ชุดที่ 9,แห่สดดนตรีพื้นบ้านหนองโก ชุดที่ 8 + 9,Molam sing,2000,Thailand,156k VBR,mp3,28:37,Studio,LP
+คณะ รุ่งทวี,แห่สดดนตรีพื้นบ้านหนองโก ชุดที่ 8,แห่สดดนตรีพื้นบ้านหนองโก ชุดที่ 8 + 9,Molam sing,2000,Thailand,152k VBR,mp3,26:49:00,Studio,LP
+คณะ รุ่งทวี,แห่สดดนตรีพื้นบ้านหนองโก ชุดที่ 9,แห่สดดนตรีพื้นบ้านหนองโก ชุดที่ 8 + 9,Molam sing,2000,Thailand,156k VBR,mp3,28:37:00,Studio,LP
 ၼၢင်းၼၢင်း [Nang Nang],ၸႂ်ထိုင်ပီႈၸႆၢးမီးယူႇလႂ် (Aue tueng pi aay mi yu laue),လက်ရွေးစဉ် တေးများ (Le' ywei sin tei mya),Burmese Stereo,1978,Myanmar,191k VBR,mp3,3:36,Studio,LP
 ၼၢင်းၼၢင်း [Nang Nang],ၼမ်ႉၶူင်းဢိူၺ်မၼ်းမီးလႂ် (Nam khong ue man mi laue),လက်ရွေးစဉ် တေးများ (Le' ywei sin tei mya),Burmese Stereo,1978,Myanmar,190k VBR,mp3,3:37,Studio,LP
 ၼၢင်းၼၢင်း [Nang Nang],ပီႈၸႆၢးၼွင်ႉတေၵႂႃႇယဝ်ႉ (Pi aay nong te kwaa yaw),လက်ရွေးစဉ် တေးများ (Le' ywei sin tei mya),Burmese Stereo,1978,Myanmar,188k VBR,mp3,4:26,Studio,LP
