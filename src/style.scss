@@ -1688,6 +1688,11 @@ b {
   gap: 16px;
 }
 
+.modal-window-content--links {
+  max-height: min(82vh, 760px);
+  overflow: auto;
+}
+
 .links-modal-intro {
   margin: 0;
   color: rgba(78, 71, 56, 0.8);
@@ -1788,7 +1793,7 @@ b {
 
 .links-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
 }
 
@@ -1862,6 +1867,18 @@ b {
   line-height: 1.2;
   color: rgba(78, 71, 56, 0.74);
   word-break: break-word;
+}
+
+@media (max-width: 1040px) {
+  .links-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .links-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .info-room-image {
