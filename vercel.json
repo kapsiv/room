@@ -2,6 +2,17 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
     {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "header",
+          "key": "host",
+          "value": "hide.kapsiv.com"
+        }
+      ],
+      "destination": "/hide/index.html"
+    },
+    {
       "source": "/albums",
       "destination": "/albums/index.html"
     }
