@@ -9,7 +9,10 @@
           "value": "hide.kapsiv.com"
         }
       ],
-      "dest": "/hide/index.html"
+      "status": 308,
+      "headers": {
+        "Location": "https://www.kapsiv.com/hide"
+      }
     },
     {
       "src": "/(.*)",
@@ -19,7 +22,17 @@
           "value": "hide.kapsiv.com"
         }
       ],
-      "dest": "/hide/index.html"
+      "status": 308,
+      "headers": {
+        "Location": "https://www.kapsiv.com/hide"
+      }
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/hide/index.html",
+      "destination": "/hide",
+      "permanent": true
     }
   ],
   "rewrites": [
