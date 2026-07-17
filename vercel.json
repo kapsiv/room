@@ -1,17 +1,28 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "rewrites": [
+  "routes": [
     {
-      "source": "/(.*)",
+      "src": "/",
       "has": [
         {
-          "type": "header",
-          "key": "host",
+          "type": "host",
           "value": "hide.kapsiv.com"
         }
       ],
-      "destination": "/hide/index.html"
+      "dest": "/hide/index.html"
     },
+    {
+      "src": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "hide.kapsiv.com"
+        }
+      ],
+      "dest": "/hide/index.html"
+    }
+  ],
+  "rewrites": [
     {
       "source": "/albums",
       "destination": "/albums/index.html"
