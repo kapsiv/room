@@ -1,8 +1,8 @@
 :root {
   color-scheme: light;
   font-family:
-    "Aptos",
-    "Segoe UI",
+    'Aptos',
+    'Segoe UI',
     sans-serif;
   background: #fff;
   color: #111827;
@@ -28,12 +28,14 @@ body {
 
 button,
 select,
+input,
 output {
   font: inherit;
 }
 
 button,
-select {
+select,
+input {
   border: 0;
   border-radius: 14px;
   min-height: 44px;
@@ -56,10 +58,15 @@ button[data-armed='true'] {
   color: #fff;
 }
 
-select {
+select,
+input {
   appearance: none;
   background: #f3f4f6;
   color: #111827;
+}
+
+input::placeholder {
+  color: #6b7280;
 }
 
 #map {
@@ -75,10 +82,11 @@ select {
   pointer-events: none;
 }
 
-.overlay > * ,
+.overlay > *,
 .overlay button,
 .overlay select,
 .overlay label,
+.overlay input,
 .overlay output {
   pointer-events: auto;
 }
@@ -99,7 +107,8 @@ select {
 
 .control-row,
 .dice-row,
-.circle-panel {
+.circle-panel,
+.room-panel {
   background: rgba(255, 255, 255, 0.94);
   backdrop-filter: blur(14px);
   border: 1px solid rgba(17, 24, 39, 0.08);
@@ -129,7 +138,9 @@ select {
 .field span,
 .circle-panel-header span,
 .circle-card-subtitle,
-.status {
+.status,
+.participant-meta,
+.room-identity span {
   font-size: 0.88rem;
 }
 
@@ -154,16 +165,65 @@ select {
   font-weight: 600;
 }
 
+.room-panel,
 .circle-panel {
   padding: 12px;
+  display: grid;
   gap: 12px;
 }
 
+.room-panel-header,
 .circle-panel-header {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
   gap: 12px;
+}
+
+.room-identity,
+.participant-info {
+  display: grid;
+  gap: 2px;
+}
+
+.room-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.room-actions {
+  background: none;
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+.participant-list {
+  display: grid;
+  gap: 8px;
+  max-height: 148px;
+  overflow: auto;
+}
+
+.participant-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: #f8fafc;
+}
+
+.participant-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  flex: 0 0 auto;
+}
+
+.participant-name {
+  font-weight: 700;
 }
 
 .circle-panel-header h1 {
@@ -194,6 +254,10 @@ select {
   background: #f8fafc;
 }
 
+.room-empty {
+  width: 100%;
+}
+
 .circle-card-title {
   font-weight: 700;
   margin-bottom: 4px;
@@ -222,21 +286,23 @@ select {
     flex-wrap: wrap;
   }
 
-  .field {
+  .field,
+  .room-form-grid {
     width: 100%;
   }
 
+  .room-form-grid {
+    grid-template-columns: 1fr;
+  }
+
   .control-row > button,
-  .control-row--compact > button {
+  .control-row--compact > button,
+  .dice-row > button {
     flex: 1 1 calc(50% - 4px);
   }
 
   .dice-row {
     flex-wrap: wrap;
-  }
-
-  .dice-row > button {
-    flex: 1 1 calc(50% - 4px);
   }
 
   #dice-result {

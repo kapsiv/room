@@ -1,7 +1,10 @@
+import { ROOM_COLORS } from '../../shared/hideRoomConfig.js';
 import './styles.css';
 
 const LONDON_CENTER = { lat: 51.5072, lng: -0.1276 };
 const DEFAULT_ZOOM = 11;
+const ROOM_SESSION_KEY = 'hide-map-room-session-v1';
+const POLL_INTERVAL_MS = 4000;
 const RADIUS_OPTIONS = [
   { value: 100, label: '100 m' },
   { value: 200, label: '200 m' },
@@ -27,6 +30,17 @@ const diceResult = document.querySelector('#dice-result');
 const statusElement = document.querySelector('#status');
 const circleCountElement = document.querySelector('#circle-count');
 const circleListElement = document.querySelector('#circle-list');
+const nicknameInput = document.querySelector('#nickname-input');
+const roomCodeInput = document.querySelector('#room-code-input');
+const roomPasswordInput = document.querySelector('#room-password-input');
+const roleSelect = document.querySelector('#role-select');
+const createRoomButton = document.querySelector('#create-room');
+const joinRoomButton = document.querySelector('#join-room');
+const leaveRoomButton = document.querySelector('#leave-room');
+const shareToggleButton = document.querySelector('#share-toggle');
+const roomBadge = document.querySelector('#room-badge');
+const roomMeta = document.querySelector('#room-meta');
+const participantListElement = document.querySelector('#participant-list');
 
 const state = {
   map: null,
@@ -34,6 +48,16 @@ const state = {
   isPlacementArmed: false,
   selectedRadius: 500,
   isSatellite: false,
+  localMarker: null,
+  localAccuracyCircle: null,
+  localLocation: null,
+  participantOverlays: new Map(),
+  roomSession: null,
+  participants: [],
+  pollTimerId: null,
+  watchId: null,
+  isSharing: false,
+  lastSharedLocation: null,
 };
 
 function getApiKey() {
@@ -84,11 +108,38 @@ function formatCoordinate(value) {
   return value.toFixed(4);
 }
 
+function formatRelativeTime(timestamp) {
+  if (!timestamp) {
+    return 'never';
+  }
+
+  const elapsedSeconds = Math.max(0, Math.round((Date.now() - timestamp) / 1000));
+  if (elapsedSeconds < 5) {
+    return 'now';
+  }
+  if (elapsedSeconds < 60) {
+    return `${elapsedSeconds}s ago`;
+  }
+  const minutes = Math.round(elapsedSeconds / 60);
+  return `${minutes}m ago`;
+}
+
+function normalizeRoomCode(value) {
+  return String(value || '')
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, '')
+    .slice(0, 5);
+}
+
 function getCircleColor(radius) {
   const maxIndex = Math.max(RADIUS_OPTIONS.length - 1, 1);
   const index = RADIUS_OPTIONS.findIndex((option) => option.value === radius);
   const hue = 212 - Math.max(index, 0) * (132 / maxIndex);
   return `hsl(${hue} 82% 46%)`;
+}
+
+function getParticipantColor(participant) {
+  return participant?.color || ROOM_COLORS[0];
 }
 
 function renderRadiusOptions() {
@@ -114,6 +165,9 @@ function updateControlState() {
   toggleMapTypeButton.textContent = state.isSatellite ? 'Map' : 'Satellite';
   circleCountElement.textContent =
     state.circles.length === 1 ? '1 circle' : `${state.circles.length} circles`;
+  leaveRoomButton.disabled = !state.roomSession;
+  shareToggleButton.disabled = !state.roomSession;
+  shareToggleButton.textContent = state.isSharing ? 'Stop sharing' : 'Start sharing';
 }
 
 function renderCircleList() {
@@ -204,7 +258,6 @@ function addCircle(center, radius) {
     id: crypto.randomUUID(),
     center,
     radius,
-    color,
     circleOverlay,
     marker,
   };
@@ -265,6 +318,7 @@ function fitAllCircles() {
   for (const circleEntry of state.circles) {
     bounds.union(circleEntry.circleOverlay.getBounds());
   }
+  bounds.extend(state.map.getCenter());
   state.map.fitBounds(bounds, 72);
   setStatus('Map fitted to all circles.');
 }
@@ -312,43 +366,602 @@ function armPlacement() {
   setStatus('Placement cancelled.');
 }
 
-function locateMe() {
-  if (!navigator.geolocation) {
-    setStatus('This browser does not support location.', true);
-    return;
-  }
+function requestCurrentPosition() {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject(new Error('Geolocation unavailable.'));
+      return;
+    }
 
-  locateMeButton.disabled = true;
-  setStatus('Requesting your location...');
-
-  navigator.geolocation.getCurrentPosition(
-    (position) => {
-      const nextCenter = {
-        lat: position.coords.latitude,
-        lng: position.coords.longitude,
-      };
-
-      state.map.panTo(nextCenter);
-      state.map.setZoom(Math.max(state.map.getZoom(), 14));
-      locateMeButton.disabled = false;
-      setStatus('Map centred on your location.');
-    },
-    () => {
-      locateMeButton.disabled = false;
-      setStatus('Location was unavailable or denied.', true);
-    },
-    {
+    navigator.geolocation.getCurrentPosition(resolve, reject, {
       enableHighAccuracy: true,
       timeout: 10000,
-      maximumAge: 15000,
+      maximumAge: 10000,
+    });
+  });
+}
+
+function updateLocalLocationMarker(location, options = {}) {
+  state.localLocation = location;
+  const color = state.roomSession?.color || '#111827';
+
+  if (!state.localMarker) {
+    state.localMarker = new google.maps.Marker({
+      map: state.map,
+      position: location,
+      title: 'My location',
+      icon: {
+        path: google.maps.SymbolPath.CIRCLE,
+        scale: 8,
+        fillColor: color,
+        fillOpacity: 1,
+        strokeColor: '#ffffff',
+        strokeWeight: 2,
+      },
+      zIndex: 50,
+    });
+  } else {
+    state.localMarker.setPosition(location);
+    state.localMarker.setIcon({
+      path: google.maps.SymbolPath.CIRCLE,
+      scale: 8,
+      fillColor: color,
+      fillOpacity: 1,
+      strokeColor: '#ffffff',
+      strokeWeight: 2,
+    });
+  }
+
+  if (location.accuracy && Number.isFinite(location.accuracy)) {
+    if (!state.localAccuracyCircle) {
+      state.localAccuracyCircle = new google.maps.Circle({
+        map: state.map,
+        center: location,
+        radius: location.accuracy,
+        strokeColor: color,
+        strokeOpacity: 0.35,
+        strokeWeight: 1,
+        fillColor: color,
+        fillOpacity: 0.08,
+        clickable: false,
+      });
+    } else {
+      state.localAccuracyCircle.setCenter(location);
+      state.localAccuracyCircle.setRadius(location.accuracy);
     }
-  );
+  }
+
+  if (options.centerMap) {
+    state.map.panTo(location);
+    state.map.setZoom(Math.max(state.map.getZoom(), 15));
+  }
+}
+
+async function locateMe() {
+  locateMeButton.disabled = true;
+  setStatus('Requesting your exact location...');
+
+  try {
+    const position = await requestCurrentPosition();
+    const location = {
+      lat: position.coords.latitude,
+      lng: position.coords.longitude,
+      accuracy: position.coords.accuracy,
+      updatedAt: Date.now(),
+    };
+
+    updateLocalLocationMarker(location, { centerMap: true });
+    setStatus(
+      `Marked your location at ${formatCoordinate(location.lat)}, ${formatCoordinate(location.lng)}.`
+    );
+
+    if (state.isSharing) {
+      await sendLocationToRoom(location);
+    }
+  } catch {
+    setStatus('Location was unavailable or denied.', true);
+  } finally {
+    locateMeButton.disabled = false;
+  }
 }
 
 function rollDice(count) {
   const rolls = Array.from({ length: count }, () => Math.floor(Math.random() * 6) + 1);
   const total = rolls.reduce((sum, value) => sum + value, 0);
   diceResult.textContent = count === 1 ? `${rolls[0]}` : `${rolls.join(' + ')} = ${total}`;
+}
+
+function haversineDistanceMeters(a, b) {
+  const toRadians = (value) => (value * Math.PI) / 180;
+  const earthRadius = 6371000;
+  const deltaLat = toRadians(b.lat - a.lat);
+  const deltaLng = toRadians(b.lng - a.lng);
+  const lat1 = toRadians(a.lat);
+  const lat2 = toRadians(b.lat);
+
+  const sinLat = Math.sin(deltaLat / 2);
+  const sinLng = Math.sin(deltaLng / 2);
+  const value =
+    sinLat * sinLat +
+    Math.cos(lat1) * Math.cos(lat2) * sinLng * sinLng;
+
+  return 2 * earthRadius * Math.atan2(Math.sqrt(value), Math.sqrt(1 - value));
+}
+
+function shouldShareLocation(nextLocation) {
+  if (!state.lastSharedLocation) {
+    return true;
+  }
+
+  const elapsedMs = Date.now() - state.lastSharedLocation.updatedAt;
+  if (elapsedMs >= 10000) {
+    return true;
+  }
+
+  return haversineDistanceMeters(state.lastSharedLocation, nextLocation) >= 8;
+}
+
+async function apiJson(url, options = {}) {
+  const response = await fetch(url, options);
+  const payload = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(payload.error || 'Request failed.');
+  }
+
+  return payload;
+}
+
+function persistRoomSession() {
+  if (!state.roomSession) {
+    localStorage.removeItem(ROOM_SESSION_KEY);
+    return;
+  }
+
+  localStorage.setItem(ROOM_SESSION_KEY, JSON.stringify(state.roomSession));
+}
+
+function clearParticipantOverlays() {
+  for (const overlay of state.participantOverlays.values()) {
+    overlay.marker.setMap(null);
+  }
+  state.participantOverlays.clear();
+}
+
+function syncParticipantOverlays() {
+  if (!state.map) {
+    return;
+  }
+
+  const visibleIds = new Set();
+  for (const participant of state.participants) {
+    if (!participant.location || participant.id === state.roomSession?.participantId) {
+      continue;
+    }
+
+    visibleIds.add(participant.id);
+    const color = getParticipantColor(participant);
+    const label = participant.nickname.slice(0, 2).toUpperCase();
+    let overlay = state.participantOverlays.get(participant.id);
+
+    if (!overlay) {
+      const marker = new google.maps.Marker({
+        map: state.map,
+        position: participant.location,
+        label: {
+          text: label,
+          color: '#111827',
+          fontSize: '11px',
+          fontWeight: '700',
+        },
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 10,
+          fillColor: color,
+          fillOpacity: 1,
+          strokeColor: '#ffffff',
+          strokeWeight: 2,
+        },
+        zIndex: 30,
+      });
+      overlay = { marker };
+      state.participantOverlays.set(participant.id, overlay);
+    } else {
+      overlay.marker.setPosition(participant.location);
+      overlay.marker.setLabel({
+        text: label,
+        color: '#111827',
+        fontSize: '11px',
+        fontWeight: '700',
+      });
+      overlay.marker.setIcon({
+        path: google.maps.SymbolPath.CIRCLE,
+        scale: 10,
+        fillColor: color,
+        fillOpacity: 1,
+        strokeColor: '#ffffff',
+        strokeWeight: 2,
+      });
+    }
+  }
+
+  for (const [participantId, overlay] of state.participantOverlays.entries()) {
+    if (!visibleIds.has(participantId)) {
+      overlay.marker.setMap(null);
+      state.participantOverlays.delete(participantId);
+    }
+  }
+}
+
+function renderParticipantList() {
+  participantListElement.innerHTML = '';
+
+  if (!state.roomSession) {
+    const empty = document.createElement('p');
+    empty.className = 'empty-state room-empty';
+    empty.textContent = 'Create a room on the hider device, then join from the seeker devices.';
+    participantListElement.append(empty);
+    return;
+  }
+
+  for (const participant of state.participants) {
+    const row = document.createElement('article');
+    row.className = 'participant-row';
+
+    const swatch = document.createElement('span');
+    swatch.className = 'participant-swatch';
+    swatch.style.background = getParticipantColor(participant);
+
+    const info = document.createElement('div');
+    info.className = 'participant-info';
+
+    const name = document.createElement('div');
+    name.className = 'participant-name';
+    name.textContent =
+      participant.id === state.roomSession.participantId
+        ? `${participant.nickname} (you)`
+        : participant.nickname;
+
+    const meta = document.createElement('div');
+    meta.className = 'participant-meta';
+    meta.textContent =
+      `${participant.role} · ${participant.isOnline ? 'online' : 'idle'} · ` +
+      `${formatRelativeTime(participant.location?.updatedAt || participant.lastSeenAt)}`;
+
+    info.append(name, meta);
+    row.append(swatch, info);
+    participantListElement.append(row);
+  }
+}
+
+function updateRoomUi() {
+  if (!state.roomSession) {
+    roomBadge.textContent = 'Solo map';
+    roomMeta.textContent = 'No room connected';
+    updateControlState();
+    renderParticipantList();
+    return;
+  }
+
+  roomBadge.textContent = `Room ${state.roomSession.roomCode}`;
+  roomMeta.textContent =
+    `${state.roomSession.nickname} · ${state.roomSession.role} · ${state.roomSession.color}`;
+  updateControlState();
+  renderParticipantList();
+}
+
+function setRoomActionBusy(isBusy) {
+  createRoomButton.disabled = isBusy;
+  joinRoomButton.disabled = isBusy;
+}
+
+async function createRoom() {
+  const nickname = nicknameInput.value.trim();
+  const password = roomPasswordInput.value;
+  const role = roleSelect.value;
+  const roomCode = normalizeRoomCode(roomCodeInput.value);
+
+  setRoomActionBusy(true);
+  setStatus('Creating room...');
+
+  try {
+    const payload = await apiJson('/api/hide-room', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'create',
+        nickname,
+        password,
+        role,
+        roomCode,
+      }),
+    });
+
+    state.roomSession = {
+      roomCode: payload.roomCode,
+      participantId: payload.participantId,
+      nickname: payload.participant.nickname,
+      role: payload.participant.role,
+      color: payload.participant.color,
+      password,
+    };
+    roomCodeInput.value = payload.roomCode;
+    state.participants = payload.participants;
+    persistRoomSession();
+    updateRoomUi();
+    syncParticipantOverlays();
+    startPolling();
+    await startSharing();
+    setStatus(`Room ${payload.roomCode} created.`);
+  } catch (error) {
+    setStatus(error.message, true);
+  } finally {
+    setRoomActionBusy(false);
+  }
+}
+
+async function joinRoom() {
+  const nickname = nicknameInput.value.trim();
+  const password = roomPasswordInput.value;
+  const role = roleSelect.value;
+  const roomCode = normalizeRoomCode(roomCodeInput.value);
+
+  setRoomActionBusy(true);
+  setStatus('Joining room...');
+
+  try {
+    const payload = await apiJson('/api/hide-room', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'join',
+        nickname,
+        password,
+        role,
+        roomCode,
+      }),
+    });
+
+    state.roomSession = {
+      roomCode: payload.roomCode,
+      participantId: payload.participantId,
+      nickname: payload.participant.nickname,
+      role: payload.participant.role,
+      color: payload.participant.color,
+      password,
+    };
+    roomCodeInput.value = payload.roomCode;
+    state.participants = payload.participants;
+    persistRoomSession();
+    updateRoomUi();
+    syncParticipantOverlays();
+    startPolling();
+    await startSharing();
+    setStatus(`Joined room ${payload.roomCode}.`);
+  } catch (error) {
+    setStatus(error.message, true);
+  } finally {
+    setRoomActionBusy(false);
+  }
+}
+
+async function leaveRoom() {
+  if (!state.roomSession) {
+    return;
+  }
+
+  try {
+    await apiJson('/api/hide-room', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'leave',
+        roomCode: state.roomSession.roomCode,
+        password: state.roomSession.password,
+        participantId: state.roomSession.participantId,
+      }),
+    });
+  } catch (error) {
+    console.error(error);
+  }
+
+  stopSharing();
+  stopPolling();
+  state.roomSession = null;
+  state.participants = [];
+  clearParticipantOverlays();
+  persistRoomSession();
+  updateRoomUi();
+  setStatus('Left room.');
+}
+
+async function fetchRoomState(isSilent = false) {
+  if (!state.roomSession) {
+    return;
+  }
+
+  try {
+    const query = new URLSearchParams({
+      roomCode: state.roomSession.roomCode,
+      password: state.roomSession.password,
+      participantId: state.roomSession.participantId,
+    });
+
+    const payload = await apiJson(`/api/hide-room?${query.toString()}`);
+    state.roomSession = {
+      ...state.roomSession,
+      roomCode: payload.roomCode,
+      participantId: payload.participantId,
+      nickname: payload.participant.nickname,
+      role: payload.participant.role,
+      color: payload.participant.color,
+    };
+    state.participants = payload.participants;
+    persistRoomSession();
+    updateRoomUi();
+    syncParticipantOverlays();
+  } catch (error) {
+    if (!isSilent) {
+      setStatus(error.message, true);
+    }
+  }
+}
+
+function startPolling() {
+  stopPolling();
+  fetchRoomState(true);
+  state.pollTimerId = window.setInterval(() => {
+    fetchRoomState(true);
+  }, POLL_INTERVAL_MS);
+}
+
+function stopPolling() {
+  if (state.pollTimerId) {
+    window.clearInterval(state.pollTimerId);
+    state.pollTimerId = null;
+  }
+}
+
+async function sendLocationToRoom(location) {
+  if (!state.roomSession) {
+    return;
+  }
+
+  if (!shouldShareLocation(location)) {
+    return;
+  }
+
+  await apiJson('/api/hide-room', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action: 'location',
+      roomCode: state.roomSession.roomCode,
+      password: state.roomSession.password,
+      participantId: state.roomSession.participantId,
+      lat: location.lat,
+      lng: location.lng,
+      accuracy: location.accuracy,
+    }),
+  });
+
+  state.lastSharedLocation = location;
+}
+
+async function startSharing() {
+  if (!state.roomSession) {
+    setStatus('Join a room before sharing location.', true);
+    return;
+  }
+
+  if (state.isSharing) {
+    return;
+  }
+
+  try {
+    const position = await requestCurrentPosition();
+    const location = {
+      lat: position.coords.latitude,
+      lng: position.coords.longitude,
+      accuracy: position.coords.accuracy,
+      updatedAt: Date.now(),
+    };
+
+    updateLocalLocationMarker(location, { centerMap: !state.localLocation });
+    await sendLocationToRoom(location);
+
+    state.watchId = navigator.geolocation.watchPosition(
+      async (nextPosition) => {
+        const nextLocation = {
+          lat: nextPosition.coords.latitude,
+          lng: nextPosition.coords.longitude,
+          accuracy: nextPosition.coords.accuracy,
+          updatedAt: Date.now(),
+        };
+
+        updateLocalLocationMarker(nextLocation);
+        try {
+          await sendLocationToRoom(nextLocation);
+        } catch (error) {
+          console.error(error);
+        }
+      },
+      () => {
+        setStatus('Live location stopped because access was lost.', true);
+        stopSharing();
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 5000,
+      }
+    );
+
+    state.isSharing = true;
+    updateControlState();
+    setStatus('Live location sharing started.');
+  } catch {
+    setStatus('Location access is required for sharing.', true);
+  }
+}
+
+function stopSharing() {
+  if (state.watchId !== null) {
+    navigator.geolocation.clearWatch(state.watchId);
+    state.watchId = null;
+  }
+
+  state.isSharing = false;
+  updateControlState();
+}
+
+async function toggleSharing() {
+  if (state.isSharing) {
+    stopSharing();
+    setStatus('Live location sharing stopped.');
+    return;
+  }
+
+  await startSharing();
+}
+
+function restoreRoomSession() {
+  const rawValue = localStorage.getItem(ROOM_SESSION_KEY);
+  if (!rawValue) {
+    updateRoomUi();
+    return;
+  }
+
+  try {
+    const savedSession = JSON.parse(rawValue);
+    if (
+      !savedSession?.roomCode ||
+      !savedSession?.participantId ||
+      !savedSession?.nickname ||
+      !savedSession?.password
+    ) {
+      throw new Error('Invalid room session.');
+    }
+
+    state.roomSession = {
+      roomCode: normalizeRoomCode(savedSession.roomCode),
+      participantId: String(savedSession.participantId),
+      nickname: String(savedSession.nickname),
+      role: savedSession.role === 'hider' ? 'hider' : 'seeker',
+      color: String(savedSession.color || ROOM_COLORS[0]),
+      password: String(savedSession.password),
+    };
+
+    nicknameInput.value = state.roomSession.nickname;
+    roomCodeInput.value = state.roomSession.roomCode;
+    roomPasswordInput.value = state.roomSession.password;
+    roleSelect.value = state.roomSession.role;
+    updateRoomUi();
+    startPolling();
+    fetchRoomState(true);
+  } catch {
+    localStorage.removeItem(ROOM_SESSION_KEY);
+  }
 }
 
 function buildMap() {
@@ -385,6 +998,10 @@ function bindControls() {
     }
   });
 
+  roomCodeInput.addEventListener('input', () => {
+    roomCodeInput.value = normalizeRoomCode(roomCodeInput.value);
+  });
+
   armPlaceButton.addEventListener('click', armPlacement);
   locateMeButton.addEventListener('click', locateMe);
   fitCirclesButton.addEventListener('click', fitAllCircles);
@@ -404,12 +1021,17 @@ function bindControls() {
   });
   rollOneButton.addEventListener('click', () => rollDice(1));
   rollTwoButton.addEventListener('click', () => rollDice(2));
+  createRoomButton.addEventListener('click', createRoom);
+  joinRoomButton.addEventListener('click', joinRoom);
+  leaveRoomButton.addEventListener('click', leaveRoom);
+  shareToggleButton.addEventListener('click', toggleSharing);
 }
 
 async function initialize() {
   renderRadiusOptions();
   updateControlState();
   renderCircleList();
+  updateRoomUi();
 
   const apiKey = getApiKey();
   if (!apiKey) {
@@ -422,6 +1044,7 @@ async function initialize() {
     buildMap();
     bindControls();
     restoreCircles();
+    restoreRoomSession();
   } catch (error) {
     console.error(error);
     setStatus('Google Maps could not load. Check the API key and referrer rules.', true);

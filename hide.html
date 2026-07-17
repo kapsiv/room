@@ -20,7 +20,7 @@
             <select id="radius-select" aria-label="Choose circle radius"></select>
           </label>
           <button id="arm-place" class="primary" type="button">Place circle</button>
-          <button id="locate-me" type="button">Locate me</button>
+          <button id="locate-me" type="button">Locate + mark</button>
         </div>
 
         <div class="control-row control-row--compact">
@@ -33,6 +33,46 @@
         <p id="status" class="status">
           Pan and zoom freely. Tap <strong>Place circle</strong>, then tap the map.
         </p>
+
+        <section class="room-panel">
+          <div class="room-panel-header">
+            <div class="room-identity">
+              <strong id="room-badge">Solo map</strong>
+              <span id="room-meta">No room connected</span>
+            </div>
+            <button id="share-toggle" type="button" disabled>Start sharing</button>
+          </div>
+
+          <div class="room-form-grid">
+            <label class="field">
+              <span>Nickname</span>
+              <input id="nickname-input" type="text" maxlength="24" placeholder="Kap" />
+            </label>
+            <label class="field">
+              <span>Room code</span>
+              <input id="room-code-input" type="text" maxlength="5" placeholder="AB12C" />
+            </label>
+            <label class="field">
+              <span>Password</span>
+              <input id="room-password-input" type="password" maxlength="32" placeholder="Password" />
+            </label>
+            <label class="field">
+              <span>Role</span>
+              <select id="role-select" aria-label="Choose role">
+                <option value="hider">Hider</option>
+                <option value="seeker">Seeker</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="control-row control-row--compact room-actions">
+            <button id="create-room" type="button">Create room</button>
+            <button id="join-room" type="button">Join room</button>
+            <button id="leave-room" type="button" disabled>Leave room</button>
+          </div>
+
+          <div id="participant-list" class="participant-list" aria-live="polite"></div>
+        </section>
       </div>
 
       <div class="overlay bottom-panel">
