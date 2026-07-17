@@ -37,6 +37,14 @@
   ],
   "rewrites": [
     {
+      "source": "/hide",
+      "destination": "/hide.html"
+    },
+    {
+      "source": "/hide/",
+      "destination": "/hide.html"
+    },
+    {
       "source": "/albums",
       "destination": "/albums/index.html"
     }

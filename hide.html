@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <title>Hide</title>
+  </head>
+  <body data-google-maps-api-key="%VITE_GOOGLE_MAPS_API_KEY%">
+    <div id="hide-app">
+      <div id="map" aria-label="Google map of London"></div>
+
+      <div class="overlay top-panel">
+        <div class="control-row">
+          <label class="field">
+            <span>Radius</span>
+            <select id="radius-select" aria-label="Choose circle radius"></select>
+          </label>
+          <button id="arm-place" class="primary" type="button">Place circle</button>
+          <button id="locate-me" type="button">Locate me</button>
+        </div>
+
+        <div class="control-row control-row--compact">
+          <button id="fit-circles" type="button">Fit circles</button>
+          <button id="undo-circle" type="button">Undo</button>
+          <button id="clear-circles" type="button">Clear all</button>
+          <button id="toggle-map-type" type="button">Satellite</button>
+        </div>
+
+        <p id="status" class="status">
+          Pan and zoom freely. Tap <strong>Place circle</strong>, then tap the map.
+        </p>
+      </div>
+
+      <div class="overlay bottom-panel">
+        <div class="dice-row">
+          <button id="roll-one" type="button">Roll 1 die</button>
+          <button id="roll-two" type="button">Roll 2 dice</button>
+          <output id="dice-result" aria-live="polite">Ready</output>
+        </div>
+
+        <div class="circle-panel">
+          <div class="circle-panel-header">
+            <h1>Hide map</h1>
+            <span id="circle-count">0 circles</span>
+          </div>
+          <div id="circle-list" class="circle-list" aria-live="polite"></div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/hide/main.js"></script>
+  </body>
+</html>
