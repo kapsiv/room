@@ -11,7 +11,7 @@ import {
 const REDIS_URL = process.env.REDIS_URL || process.env.STORAGE_REDIS_URL;
 const ROOM_PREFIX = 'hide:room:';
 const ONLINE_WINDOW_MS = 30_000;
-const MESSAGE_KINDS = new Set(['text', 'question', 'curse', 'system']);
+const MESSAGE_KINDS = new Set(['text', 'question', 'curse', 'powerup', 'system']);
 
 function json(response, status, payload) {
   response.status(status);
@@ -106,6 +106,8 @@ function publicMessage(message) {
     color: message.color,
     kind: message.kind,
     text: message.text,
+    itemType: message.itemType || null,
+    itemName: message.itemName || null,
     createdAt: message.createdAt,
   };
 }
@@ -312,6 +314,8 @@ async function handleSendMessage(client, request, response) {
   const participantId = String(body.participantId || '');
   const text = normalizeMessageText(body.text);
   const kind = normalizeMessageKind(body.kind);
+  const itemType = body.itemType === 'curse' || body.itemType === 'powerup' ? body.itemType : null;
+  const itemName = normalizeMessageText(body.itemName);
 
   if (!roomCode || !password || !participantId) {
     json(response, 400, { error: 'Missing room credentials.' });
@@ -350,6 +354,8 @@ async function handleSendMessage(client, request, response) {
     color: participant.color,
     kind,
     text,
+    itemType,
+    itemName: itemName || null,
     createdAt: Date.now(),
   });
 
