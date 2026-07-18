@@ -66,30 +66,65 @@ const QUESTION_GROUPS = {
     'Are you on the same street as us?',
   ],
 };
-const CURSES = [
-  'Curse of the Impressionable Consumer',
-  'Curse of the Mediocre Travel Agent',
-  'Curse of the Jammed Door',
-  'Curse of the Lemon Phylactery',
-  'Curse of the Distant Cuisine',
-  'Curse of the Drained Brain',
-  'Curse of the Unguided Tourist',
-  'Curse of the Gambler’s Feet',
-  'Curse of the Bridge Troll',
-  'Curse of the Cairn',
-  'Curse of the Luxury Car',
-  'Curse of the Endless Tumble',
-  'Curse of the Foggy Memory',
-  'Curse of the Hidden Hangman',
-  'Curse of the Bird Guide',
-  'Curse of the Frozen Dot',
-  'Curse of the Zoologist',
-  'Curse of the Right Turn',
-  'Curse of the Urban Explorer',
-  'Curse of the Census Taker',
-  'Curse of Free Parking',
-  'Curse of the Sphinx',
-];
+const CURSE_DETAILS = {
+  'Curse of the Impressionable Consumer':
+    'Seekers must enter and gain admission to a location or buy a product from a real-world ad before asking another question. Casting cost: the seekers’ next question is free.',
+  'Curse of the Mediocre Travel Agent':
+    'Choose any publicly-accessible place within half a mile of the seekers. They must go there, stay ten minutes, and bring you a souvenir. Casting cost: destination must be further from you than they are now.',
+  'Curse of the Jammed Door':
+    'For three hours, seekers must roll 2 dice before entering a doorway and need 7 or higher. Casting cost: discard a card.',
+  'Curse of the Lemon Phylactery':
+    'Before asking another question, each seeker must attach a lemon to the outside of their clothes or skin. Casting cost: discard a powerup.',
+  'Curse of the Distant Cuisine':
+    'Find a restaurant in your zone serving food from a specific foreign country. Seekers must visit one serving food from a country at least as far away. Casting cost: you must be at the restaurant.',
+  'Curse of the Drained Brain':
+    'Choose three questions in different categories. Seekers cannot ask them for the rest of your run. Casting cost: discard your hand.',
+  'Curse of the Unguided Tourist':
+    'Send seekers an unzoomed Google Street View image near them. They must find it in real life before transport or another question. Casting cost: seekers must be outside.',
+  'Curse of the Gambler’s Feet':
+    'For the next hour, seekers roll a die before taking steps and may only take that many. Casting cost: roll a die; even means no effect.',
+  'Curse of the Bridge Troll':
+    'Seekers must ask their next question from under a bridge. Casting cost: seekers must be at least 10 km away from you.',
+  'Curse of the Cairn':
+    'Build a rock tower once. Seekers must match the height before asking another question. Casting cost: build a rock tower.',
+  'Curse of the Luxury Car':
+    'Take a photo of a car. Seekers must take a photo of a more expensive car before asking another question. Casting cost: a photo of a car.',
+  'Curse of the Endless Tumble':
+    'Seekers must roll a die at least 100 feet and land a 5 or 6 before their next question. Casting cost: roll a die; 5 or 6 means no effect.',
+  'Curse of the Foggy Memory':
+    'One random question category is disabled at all times during your run, rerolled after each question. Casting cost: discard a time bonus card.',
+  'Curse of the Hidden Hangman':
+    'Seekers must beat the hider in hangman before asking another question or boarding transport. Casting cost: discard 2 cards.',
+  'Curse of the Bird Guide':
+    'Film a bird as long as possible up to 15 minutes. Seekers must beat your time before asking another question. Casting cost: film a bird.',
+  'Curse of the Frozen Dot':
+    'Place a point at least 1,000 feet from the seekers. If they are within 250 feet of it in exactly 15 minutes, they freeze for 30 minutes. Casting cost: seekers must be at least 10 km away.',
+  'Curse of the Zoologist':
+    'Take a photo of a wild animal. Seekers must photograph one in the same category before asking another question. Casting cost: a photo of an animal.',
+  'Curse of the Right Turn':
+    'For the next hour, seekers can only turn right at intersections. Casting cost: discard a curse and one other card.',
+  'Curse of the Urban Explorer':
+    'Seekers cannot ask questions while on transit or in a transit station for the rest of your run. Casting cost: discard 2 cards.',
+  'Curse of the Census Taker':
+    'Seekers must visit a town or city hall within a mile and estimate the population within 25%. Casting cost: the seekers’ next question is free.',
+  'Curse of Free Parking':
+    'Seekers must travel three stops in the opposite direction on the same line. Casting cost: send a street name sign photo from your zone.',
+  'Curse of the Sphinx':
+    'Seekers must answer the hider’s riddle before another question or transport. Casting cost: discard 2 cards.',
+};
+const POWERUP_DETAILS = {
+  '5 minute bonus': 'Adds 5 minutes to your hiding time.',
+  '10 minute bonus': 'Adds 10 minutes to your hiding time.',
+  '15 minute bonus': 'Adds 15 minutes to your hiding time.',
+  '20 minute bonus': 'Adds 20 minutes to your hiding time.',
+  '30 minute bonus': 'Adds 30 minutes to your hiding time.',
+  'Discard one draw two': 'Discard one card, then draw two cards.',
+  'Discard two draw three': 'Discard two cards, then draw three cards.',
+  'Veto question': 'Notify the seekers immediately upon playing to veto the current question.',
+  Move: 'Roll a die. Odd: discard this card. Even: you have 1 hour to move to a new Hiding Zone while seekers stay fixed until you confirm the move message was read.',
+};
+const CURSES = Object.keys(CURSE_DETAILS);
+const POWERUPS = Object.keys(POWERUP_DETAILS);
 const RULES_CONTENT = [
   {
     title: 'Section 1 - Hiding',
@@ -182,11 +217,24 @@ const showUiToggleButton = document.querySelector('#show-ui-toggle');
 const chatMessagesElement = document.querySelector('#chat-messages');
 const chatInput = document.querySelector('#chat-input');
 const chatSendButton = document.querySelector('#chat-send');
+const chatRoleNote = document.querySelector('#chat-role-note');
+const questionSection = document.querySelector('#question-section');
 const questionCategorySelect = document.querySelector('#question-category-select');
 const questionSelect = document.querySelector('#question-select');
 const sendQuestionButton = document.querySelector('#send-question');
-const curseSelect = document.querySelector('#curse-select');
-const sendCurseButton = document.querySelector('#send-curse');
+const handSection = document.querySelector('#hand-section');
+const handCountElement = document.querySelector('#hand-count');
+const handSlotsElement = document.querySelector('#hand-slots');
+const handEditorElement = document.querySelector('#hand-editor');
+const handEditorTitle = document.querySelector('#hand-editor-title');
+const handTypeCurseButton = document.querySelector('#hand-type-curse');
+const handTypePowerupButton = document.querySelector('#hand-type-powerup');
+const handItemSelect = document.querySelector('#hand-item-select');
+const handAssignButton = document.querySelector('#hand-assign');
+const handUseButton = document.querySelector('#hand-use');
+const handRemoveButton = document.querySelector('#hand-remove');
+const handInfoButton = document.querySelector('#hand-info');
+const handCancelButton = document.querySelector('#hand-cancel');
 const rulesContentElement = document.querySelector('#rules-content');
 const rulesFullscreenToggleButton = document.querySelector('#rules-fullscreen-toggle');
 
@@ -212,6 +260,9 @@ const state = {
   isUiHidden: false,
   lastRenderedMessageId: null,
   isRulesFullscreen: false,
+  hand: Array.from({ length: 5 }, () => null),
+  editingHandSlotIndex: null,
+  editingHandType: 'curse',
 };
 
 function getApiKey() {
@@ -275,6 +326,63 @@ function formatRelativeTime(timestamp) {
   return `${Math.round(elapsedSeconds / 60)}m ago`;
 }
 
+function isHider() {
+  return state.roomSession?.role === 'hider';
+}
+
+function isSeeker() {
+  return state.roomSession?.role === 'seeker';
+}
+
+function getItemDescription(itemType, itemName) {
+  if (itemType === 'curse') {
+    return CURSE_DETAILS[itemName] || '';
+  }
+  if (itemType === 'powerup') {
+    return POWERUP_DETAILS[itemName] || '';
+  }
+  return '';
+}
+
+function showItemInfo(itemType, itemName) {
+  const description = getItemDescription(itemType, itemName);
+  if (!description) {
+    window.alert(itemName);
+    return;
+  }
+  window.alert(`${itemName}\n\n${description}`);
+}
+
+function getHandStorageKey() {
+  if (!state.roomSession) return '';
+  return `hide-map-hand-${state.roomSession.roomCode}-${state.roomSession.participantId}`;
+}
+
+function persistHand() {
+  const storageKey = getHandStorageKey();
+  if (!storageKey) return;
+  localStorage.setItem(storageKey, JSON.stringify(state.hand));
+}
+
+function loadHand() {
+  state.hand = Array.from({ length: 5 }, () => null);
+  const storageKey = getHandStorageKey();
+  if (!storageKey || !isHider()) return;
+  const rawValue = localStorage.getItem(storageKey);
+  if (!rawValue) return;
+  try {
+    const parsed = JSON.parse(rawValue);
+    if (!Array.isArray(parsed)) return;
+    state.hand = Array.from({ length: 5 }, (_, index) => {
+      const item = parsed[index];
+      if (!item || !item.type || !item.name) return null;
+      return item;
+    });
+  } catch {
+    localStorage.removeItem(storageKey);
+  }
+}
+
 function normalizeRoomCode(value) {
   return String(value || '')
     .toUpperCase()
@@ -315,14 +423,6 @@ function renderQuestionControls() {
     questionCategorySelect.append(option);
   }
   renderQuestionOptions();
-
-  curseSelect.innerHTML = '';
-  for (const curse of CURSES) {
-    const option = document.createElement('option');
-    option.value = curse;
-    option.textContent = curse;
-    curseSelect.append(option);
-  }
 }
 
 function renderQuestionOptions() {
@@ -334,6 +434,81 @@ function renderQuestionOptions() {
     option.textContent = question;
     questionSelect.append(option);
   }
+}
+
+function renderRoleChatUi() {
+  const connected = Boolean(state.roomSession);
+  const hider = isHider();
+  const seeker = isSeeker();
+
+  questionSection.hidden = !connected || !seeker;
+  handSection.hidden = !connected || !hider;
+
+  if (!connected) {
+    chatRoleNote.textContent = 'Join a room to use role-based chat tools';
+  } else if (hider) {
+    chatRoleNote.textContent = 'Hider view: manage your 5-card hand and send curses or powerups';
+  } else {
+    chatRoleNote.textContent = 'Seeker view: send quick questions without typing them out';
+  }
+}
+
+function renderHandEditor() {
+  const slotIndex = state.editingHandSlotIndex;
+  const slotItem = slotIndex === null ? null : state.hand[slotIndex];
+  const selectedType = slotItem?.type || state.editingHandType;
+  const selectedItems = selectedType === 'powerup' ? POWERUPS : CURSES;
+
+  handEditorElement.hidden = slotIndex === null;
+  if (slotIndex === null) {
+    return;
+  }
+
+  handEditorTitle.textContent = `Slot ${slotIndex + 1}`;
+  handTypeCurseButton.dataset.active = selectedType === 'curse' ? 'true' : 'false';
+  handTypePowerupButton.dataset.active = selectedType === 'powerup' ? 'true' : 'false';
+
+  handItemSelect.innerHTML = '';
+  for (const itemName of selectedItems) {
+    const option = document.createElement('option');
+    option.value = itemName;
+    option.textContent = itemName;
+    if ((slotItem?.name || '') === itemName) {
+      option.selected = true;
+    }
+    handItemSelect.append(option);
+  }
+
+  handRemoveButton.disabled = !slotItem;
+  handUseButton.disabled = !slotItem;
+  handInfoButton.disabled = !slotItem;
+}
+
+function renderHandSlots() {
+  handSlotsElement.innerHTML = '';
+  const filledCount = state.hand.filter(Boolean).length;
+  handCountElement.textContent = `${filledCount} / 5`;
+
+  state.hand.forEach((item, index) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'hand-slot';
+    if (item) {
+      button.dataset.filled = 'true';
+      button.textContent = item.name;
+    } else {
+      button.dataset.empty = 'true';
+      button.textContent = `Empty slot ${index + 1}`;
+    }
+    button.addEventListener('click', () => {
+      state.editingHandSlotIndex = index;
+      state.editingHandType = item?.type || 'curse';
+      renderHandEditor();
+    });
+    handSlotsElement.append(button);
+  });
+
+  renderHandEditor();
 }
 
 function renderRules() {
@@ -451,8 +626,8 @@ function updateControlState() {
   chatToggleButton.disabled = !connected;
   rulesToggleButton.disabled = !connected;
   chatSendButton.disabled = !connected;
-  sendQuestionButton.disabled = !connected;
-  sendCurseButton.disabled = !connected;
+  sendQuestionButton.disabled = !connected || !isSeeker();
+  handAssignButton.disabled = !connected || !isHider();
   updatePanelVisibility();
 }
 
@@ -888,6 +1063,16 @@ function renderMessages() {
     text.textContent = message.text;
 
     bubble.append(meta, text);
+
+    if (message.itemType && message.itemName && getItemDescription(message.itemType, message.itemName)) {
+      const infoButton = document.createElement('button');
+      infoButton.type = 'button';
+      infoButton.className = 'chat-info-button';
+      infoButton.textContent = 'Info';
+      infoButton.addEventListener('click', () => showItemInfo(message.itemType, message.itemName));
+      bubble.append(infoButton);
+    }
+
     chatMessagesElement.append(bubble);
   }
 
@@ -907,6 +1092,8 @@ function updateRoomUi() {
     updateRoomGateVisibility();
     renderParticipantList();
     renderMessages();
+    renderRoleChatUi();
+    renderHandSlots();
     updateControlState();
     return;
   }
@@ -917,6 +1104,8 @@ function updateRoomUi() {
   updateRoomGateVisibility();
   renderParticipantList();
   renderMessages();
+  renderRoleChatUi();
+  renderHandSlots();
   updateControlState();
 }
 
@@ -938,6 +1127,7 @@ function applyRoomPayload(payload, password) {
   state.participants = payload.participants || [];
   state.messages = payload.messages || [];
   state.isUiHidden = false;
+  loadHand();
   persistRoomSession();
   updateRoomUi();
   syncParticipantOverlays();
@@ -1015,6 +1205,8 @@ async function leaveRoom() {
   state.roomSession = null;
   state.participants = [];
   state.messages = [];
+  state.hand = Array.from({ length: 5 }, () => null);
+  state.editingHandSlotIndex = null;
   state.activePanel = null;
   state.isUiHidden = false;
   clearParticipantOverlays();
@@ -1043,6 +1235,9 @@ async function fetchRoomState(isSilent = false) {
     };
     state.participants = payload.participants || [];
     state.messages = payload.messages || [];
+    if (isHider()) {
+      loadHand();
+    }
     persistRoomSession();
     updateRoomUi();
     syncParticipantOverlays();
@@ -1087,7 +1282,7 @@ async function sendLocationToRoom(location) {
   state.lastSharedLocation = location;
 }
 
-async function sendMessage(text, kind = 'text') {
+async function sendMessage(text, kind = 'text', extra = {}) {
   if (!state.roomSession) {
     setStatus('Join a room before chatting.', true);
     return;
@@ -1105,11 +1300,62 @@ async function sendMessage(text, kind = 'text') {
       participantId: state.roomSession.participantId,
       text: trimmedText,
       kind,
+      itemType: extra.itemType || null,
+      itemName: extra.itemName || null,
     }),
   });
 
   state.messages = payload.messages || state.messages;
   renderMessages();
+}
+
+function selectHandType(type) {
+  state.editingHandType = type;
+  renderHandEditor();
+}
+
+function getSelectedHandItem() {
+  if (state.editingHandSlotIndex === null) return null;
+  return {
+    type: state.editingHandType,
+    name: handItemSelect.value,
+  };
+}
+
+function assignHandItem() {
+  if (!isHider() || state.editingHandSlotIndex === null || !handItemSelect.value) return;
+  state.hand[state.editingHandSlotIndex] = getSelectedHandItem();
+  persistHand();
+  renderHandSlots();
+  setStatus(`Saved ${handItemSelect.value} to hand.`);
+}
+
+async function useHandItem() {
+  if (!isHider() || state.editingHandSlotIndex === null) return;
+  const slotItem = state.hand[state.editingHandSlotIndex];
+  if (!slotItem) return;
+  const label = slotItem.type === 'curse' ? `[Curse] ${slotItem.name}` : `[Powerup] ${slotItem.name}`;
+  await sendMessage(label, slotItem.type, {
+    itemType: slotItem.type,
+    itemName: slotItem.name,
+  });
+  state.hand[state.editingHandSlotIndex] = null;
+  persistHand();
+  setStatus(`${slotItem.name} sent to chat.`);
+  renderHandSlots();
+}
+
+function removeHandItem() {
+  if (state.editingHandSlotIndex === null) return;
+  state.hand[state.editingHandSlotIndex] = null;
+  persistHand();
+  setStatus('Removed card from hand.');
+  renderHandSlots();
+}
+
+function closeHandEditor() {
+  state.editingHandSlotIndex = null;
+  renderHandEditor();
 }
 
 async function startSharing() {
@@ -1209,6 +1455,7 @@ function restoreRoomSession() {
     roomPasswordInput.value = state.roomSession.password;
     roleSelect.value = state.roomSession.role;
     state.isUiHidden = false;
+    loadHand();
     updateRoomUi();
     setActivePanel('tools');
     startPolling();
@@ -1298,9 +1545,18 @@ function bindControls() {
     const question = questionSelect.value;
     await sendMessage(`[${category}] ${question}`, 'question');
   });
-  sendCurseButton.addEventListener('click', async () => {
-    await sendMessage(`[Curse] ${curseSelect.value}`, 'curse');
+  handTypeCurseButton.addEventListener('click', () => selectHandType('curse'));
+  handTypePowerupButton.addEventListener('click', () => selectHandType('powerup'));
+  handAssignButton.addEventListener('click', assignHandItem);
+  handUseButton.addEventListener('click', useHandItem);
+  handRemoveButton.addEventListener('click', removeHandItem);
+  handInfoButton.addEventListener('click', () => {
+    const slotItem = state.editingHandSlotIndex === null ? null : state.hand[state.editingHandSlotIndex];
+    if (slotItem) {
+      showItemInfo(slotItem.type, slotItem.name);
+    }
   });
+  handCancelButton.addEventListener('click', closeHandEditor);
 }
 
 async function initialize() {

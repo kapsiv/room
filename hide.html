@@ -121,7 +121,7 @@
             <div class="chat-header">
               <div class="room-identity">
                 <strong>Room chat</strong>
-                <span>Text chat and quick sends for seekers</span>
+                <span id="chat-role-note">Text chat and quick sends</span>
               </div>
             </div>
 
@@ -132,7 +132,7 @@
               <button id="chat-send" class="primary" type="button">Send</button>
             </div>
 
-            <div class="preset-section">
+            <div id="question-section" class="preset-section">
               <div class="preset-heading">Questions</div>
               <div class="preset-grid">
                 <select id="question-category-select" aria-label="Question category"></select>
@@ -141,11 +141,26 @@
               </div>
             </div>
 
-            <div class="preset-section">
-              <div class="preset-heading">Curses</div>
-              <div class="preset-grid">
-                <select id="curse-select" aria-label="Curse preset"></select>
-                <button id="send-curse" type="button">Send curse</button>
+            <div id="hand-section" class="preset-section">
+              <div class="preset-heading-row">
+                <div class="preset-heading">Hand</div>
+                <span id="hand-count">0 / 5</span>
+              </div>
+              <div id="hand-slots" class="hand-slots" aria-live="polite"></div>
+              <div id="hand-editor" class="hand-editor" hidden>
+                <div class="hand-editor-title" id="hand-editor-title">Slot 1</div>
+                <div class="hand-type-row">
+                  <button id="hand-type-curse" type="button">Curse</button>
+                  <button id="hand-type-powerup" type="button">Powerup</button>
+                </div>
+                <select id="hand-item-select" aria-label="Choose hand item"></select>
+                <div class="hand-editor-actions">
+                  <button id="hand-assign" type="button">Save</button>
+                  <button id="hand-use" type="button">Send</button>
+                  <button id="hand-remove" type="button">Remove</button>
+                  <button id="hand-info" type="button">Info</button>
+                  <button id="hand-cancel" type="button">Close</button>
+                </div>
               </div>
             </div>
           </section>
