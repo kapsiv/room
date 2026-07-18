@@ -52,7 +52,6 @@
       <div class="overlay side-stack">
         <div class="floating-rail">
           <button id="tools-toggle" class="floating-button" type="button">Tools</button>
-          <button id="dice-toggle" class="floating-button" type="button">Dice</button>
           <button id="room-toggle" class="floating-button" type="button">Room</button>
           <button id="chat-toggle" class="floating-button" type="button">Chat</button>
           <button id="rules-toggle" class="floating-button" type="button">Rules</button>
@@ -93,14 +92,6 @@
             </div>
           </section>
 
-          <section id="dice-panel" class="panel-card">
-            <div class="dice-row">
-              <button id="roll-one" type="button">Roll 1 die</button>
-              <button id="roll-two" type="button">Roll 2 dice</button>
-              <output id="dice-result" aria-live="polite">Ready</output>
-            </div>
-          </section>
-
           <section id="room-panel" class="panel-card">
             <div class="room-panel-header">
               <div class="room-identity">
@@ -130,6 +121,9 @@
 
             <div class="chat-compose">
               <input id="chat-input" type="text" maxlength="600" placeholder="Type a message" />
+              <button id="chat-roll-dice" class="chat-icon-button" type="button" aria-label="Roll a die">
+                🎲
+              </button>
               <button id="chat-send" class="primary" type="button">Send</button>
             </div>
 
@@ -171,7 +165,7 @@
           <section id="rules-panel" class="panel-card">
             <div class="chat-header">
               <div class="room-identity">
-                <strong>Rules</strong>
+                <strong id="rules-panel-title">Rules</strong>
               </div>
               <button id="rules-fullscreen-toggle" type="button">Full screen</button>
             </div>
