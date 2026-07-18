@@ -471,12 +471,28 @@ p {
   font-size: 0.95rem;
 }
 
+.rules-helper {
+  color: #4b5563;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
 .rules-section ul {
   margin: 0;
   padding-left: 18px;
   color: #374151;
   overflow-wrap: anywhere;
   word-break: break-word;
+}
+
+.rules-switcher {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.rules-switcher button {
+  flex: 1 1 calc(33.333% - 6px);
 }
 
 .compact-row,

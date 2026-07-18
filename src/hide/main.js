@@ -262,6 +262,9 @@ const handCancelButton = document.querySelector('#hand-cancel');
 const rulesContentElement = document.querySelector('#rules-content');
 const chatFullscreenToggleButton = document.querySelector('#chat-fullscreen-toggle');
 const rulesFullscreenToggleButton = document.querySelector('#rules-fullscreen-toggle');
+const rulesQuestionsToggleButton = document.querySelector('#rules-questions-toggle');
+const rulesCursesToggleButton = document.querySelector('#rules-curses-toggle');
+const rulesPowerupsToggleButton = document.querySelector('#rules-powerups-toggle');
 
 const state = {
   map: null,
@@ -286,6 +289,7 @@ const state = {
   lastRenderedMessageId: null,
   isRulesFullscreen: false,
   isChatFullscreen: false,
+  rulesContentMode: 'rules',
   hand: Array.from({ length: 5 }, () => null),
   editingHandSlotIndex: null,
   editingHandType: 'curse',
@@ -562,6 +566,91 @@ function renderHandSlots() {
 
 function renderRules() {
   rulesContentElement.innerHTML = '';
+
+  if (state.rulesContentMode === 'questions') {
+    for (const [category, group] of Object.entries(QUESTION_GROUPS)) {
+      const wrapper = document.createElement('section');
+      wrapper.className = 'rules-section';
+
+      const title = document.createElement('h3');
+      title.textContent = category;
+      wrapper.append(title);
+
+      const reward = document.createElement('p');
+      reward.className = 'rules-helper';
+      reward.textContent = `Reward: ${group.reward}`;
+      wrapper.append(reward);
+
+      if (category === 'Tentacles') {
+        const helper = document.createElement('p');
+        helper.className = 'rules-helper';
+        helper.textContent = group.helper;
+        wrapper.append(helper);
+
+        const categories = document.createElement('p');
+        categories.className = 'rules-helper';
+        categories.textContent = `Categories: ${group.targets.join(', ')}`;
+        wrapper.append(categories);
+
+        const list = document.createElement('ul');
+        for (const radius of group.radii) {
+          const item = document.createElement('li');
+          item.textContent = radius;
+          list.append(item);
+        }
+        wrapper.append(list);
+      } else {
+        const list = document.createElement('ul');
+        for (const question of group.questions) {
+          const item = document.createElement('li');
+          item.textContent = question;
+          list.append(item);
+        }
+        wrapper.append(list);
+      }
+
+      rulesContentElement.append(wrapper);
+    }
+    updateRulesSwitcher();
+    return;
+  }
+
+  if (state.rulesContentMode === 'curses') {
+    for (const [name, description] of Object.entries(CURSE_DETAILS)) {
+      const wrapper = document.createElement('section');
+      wrapper.className = 'rules-section';
+
+      const title = document.createElement('h3');
+      title.textContent = name;
+      const body = document.createElement('p');
+      body.className = 'rules-helper';
+      body.textContent = description;
+
+      wrapper.append(title, body);
+      rulesContentElement.append(wrapper);
+    }
+    updateRulesSwitcher();
+    return;
+  }
+
+  if (state.rulesContentMode === 'powerups') {
+    for (const [name, description] of Object.entries(POWERUP_DETAILS)) {
+      const wrapper = document.createElement('section');
+      wrapper.className = 'rules-section';
+
+      const title = document.createElement('h3');
+      title.textContent = name;
+      const body = document.createElement('p');
+      body.className = 'rules-helper';
+      body.textContent = description;
+
+      wrapper.append(title, body);
+      rulesContentElement.append(wrapper);
+    }
+    updateRulesSwitcher();
+    return;
+  }
+
   for (const section of RULES_CONTENT) {
     const wrapper = document.createElement('section');
     wrapper.className = 'rules-section';
@@ -579,6 +668,27 @@ function renderRules() {
     wrapper.append(title, list);
     rulesContentElement.append(wrapper);
   }
+
+  updateRulesSwitcher();
+}
+
+function updateRulesSwitcher() {
+  const buttons = [
+    ['questions', rulesQuestionsToggleButton, 'Questions'],
+    ['curses', rulesCursesToggleButton, 'Curses'],
+    ['powerups', rulesPowerupsToggleButton, 'Powerups'],
+  ];
+
+  for (const [mode, button, label] of buttons) {
+    const active = state.rulesContentMode === mode;
+    button.textContent = active ? 'Rules' : label;
+    button.dataset.active = active ? 'true' : 'false';
+  }
+}
+
+function toggleRulesContent(mode) {
+  state.rulesContentMode = state.rulesContentMode === mode ? 'rules' : mode;
+  renderRules();
 }
 
 function toggleRulesFullscreen() {
@@ -642,6 +752,7 @@ function updatePanelVisibility() {
   document.body.dataset.rulesFullscreen = state.isRulesFullscreen ? 'true' : 'false';
   chatFullscreenToggleButton.textContent = state.isChatFullscreen ? 'Exit full screen' : 'Full screen';
   rulesFullscreenToggleButton.textContent = state.isRulesFullscreen ? 'Exit full screen' : 'Full screen';
+  updateRulesSwitcher();
 }
 
 function setActivePanel(panelName) {
@@ -1646,6 +1757,9 @@ function bindControls() {
   rulesToggleButton.addEventListener('click', () => togglePanel('rules'));
   chatFullscreenToggleButton.addEventListener('click', toggleChatFullscreen);
   rulesFullscreenToggleButton.addEventListener('click', toggleRulesFullscreen);
+  rulesQuestionsToggleButton.addEventListener('click', () => toggleRulesContent('questions'));
+  rulesCursesToggleButton.addEventListener('click', () => toggleRulesContent('curses'));
+  rulesPowerupsToggleButton.addEventListener('click', () => toggleRulesContent('powerups'));
   hideUiToggleButton.addEventListener('click', () => setUiHidden(true));
   showUiToggleButton.addEventListener('click', () => setUiHidden(false));
   chatSendButton.addEventListener('click', async () => {
