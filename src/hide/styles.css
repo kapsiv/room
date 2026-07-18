@@ -503,6 +503,24 @@ body[data-rules-fullscreen='true'] .panel-shell {
   margin-left: 0;
 }
 
+body[data-chat-fullscreen='true'] .panel-shell {
+  width: 100%;
+  margin-left: 0;
+}
+
+body[data-chat-fullscreen='true'] #chat-panel {
+  position: fixed;
+  inset: calc(env(safe-area-inset-top, 0px) + 12px) 12px calc(env(safe-area-inset-bottom, 0px) + 12px) 12px;
+  z-index: 5;
+  width: auto;
+  max-width: none;
+  max-height: none;
+}
+
+body[data-chat-fullscreen='true'] .chat-messages {
+  max-height: none;
+}
+
 body[data-rules-fullscreen='true'] #rules-panel {
   position: fixed;
   inset: calc(env(safe-area-inset-top, 0px) + 12px) 12px calc(env(safe-area-inset-bottom, 0px) + 12px) 12px;

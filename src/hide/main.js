@@ -260,6 +260,7 @@ const handRemoveButton = document.querySelector('#hand-remove');
 const handInfoButton = document.querySelector('#hand-info');
 const handCancelButton = document.querySelector('#hand-cancel');
 const rulesContentElement = document.querySelector('#rules-content');
+const chatFullscreenToggleButton = document.querySelector('#chat-fullscreen-toggle');
 const rulesFullscreenToggleButton = document.querySelector('#rules-fullscreen-toggle');
 
 const state = {
@@ -284,6 +285,7 @@ const state = {
   isUiHidden: false,
   lastRenderedMessageId: null,
   isRulesFullscreen: false,
+  isChatFullscreen: false,
   hand: Array.from({ length: 5 }, () => null),
   editingHandSlotIndex: null,
   editingHandType: 'curse',
@@ -496,7 +498,7 @@ function renderRoleChatUi() {
   } else if (hider) {
     chatRoleNote.textContent = 'Hider view: manage your 5-card hand and send curses or powerups';
   } else {
-    chatRoleNote.textContent = 'Seeker view: send quick questions without typing them out';
+    chatRoleNote.textContent = 'Seeker view: ask questions to the hider';
   }
 }
 
@@ -584,6 +586,20 @@ function toggleRulesFullscreen() {
     setActivePanel('rules');
   }
   state.isRulesFullscreen = !state.isRulesFullscreen;
+  if (state.isRulesFullscreen) {
+    state.isChatFullscreen = false;
+  }
+  updatePanelVisibility();
+}
+
+function toggleChatFullscreen() {
+  if (state.activePanel !== 'chat') {
+    setActivePanel('chat');
+  }
+  state.isChatFullscreen = !state.isChatFullscreen;
+  if (state.isChatFullscreen) {
+    state.isRulesFullscreen = false;
+  }
   updatePanelVisibility();
 }
 
@@ -622,7 +638,9 @@ function updatePanelVisibility() {
   roomToggleButton.dataset.active = state.activePanel === 'room' ? 'true' : 'false';
   chatToggleButton.dataset.active = state.activePanel === 'chat' ? 'true' : 'false';
   rulesToggleButton.dataset.active = state.activePanel === 'rules' ? 'true' : 'false';
+  document.body.dataset.chatFullscreen = state.isChatFullscreen ? 'true' : 'false';
   document.body.dataset.rulesFullscreen = state.isRulesFullscreen ? 'true' : 'false';
+  chatFullscreenToggleButton.textContent = state.isChatFullscreen ? 'Exit full screen' : 'Full screen';
   rulesFullscreenToggleButton.textContent = state.isRulesFullscreen ? 'Exit full screen' : 'Full screen';
 }
 
@@ -630,6 +648,9 @@ function setActivePanel(panelName) {
   state.activePanel = panelName;
   if (panelName) {
     state.lastPanel = panelName;
+  }
+  if (panelName !== 'chat') {
+    state.isChatFullscreen = false;
   }
   if (panelName !== 'rules') {
     state.isRulesFullscreen = false;
@@ -649,6 +670,7 @@ function togglePanel(panelName) {
 function setUiHidden(isHidden) {
   state.isUiHidden = isHidden;
   if (isHidden) {
+    state.isChatFullscreen = false;
     state.isRulesFullscreen = false;
     setActivePanel(null);
     return;
@@ -1622,6 +1644,7 @@ function bindControls() {
   roomToggleButton.addEventListener('click', () => togglePanel('room'));
   chatToggleButton.addEventListener('click', () => togglePanel('chat'));
   rulesToggleButton.addEventListener('click', () => togglePanel('rules'));
+  chatFullscreenToggleButton.addEventListener('click', toggleChatFullscreen);
   rulesFullscreenToggleButton.addEventListener('click', toggleRulesFullscreen);
   hideUiToggleButton.addEventListener('click', () => setUiHidden(true));
   showUiToggleButton.addEventListener('click', () => setUiHidden(false));
