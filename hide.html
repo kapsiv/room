@@ -13,34 +13,11 @@
     <div id="hide-app">
       <div id="map" aria-label="Google map of London"></div>
 
-      <div class="overlay top-panel">
-        <div class="control-row">
-          <label class="field">
-            <span>Radius</span>
-            <select id="radius-select" aria-label="Choose circle radius"></select>
-          </label>
-          <button id="arm-place" class="primary" type="button">Place circle</button>
-          <button id="locate-me" type="button">Locate + mark</button>
-        </div>
-
-        <div class="control-row control-row--compact">
-          <button id="fit-circles" type="button">Fit circles</button>
-          <button id="undo-circle" type="button">Undo</button>
-          <button id="clear-circles" type="button">Clear all</button>
-          <button id="toggle-map-type" type="button">Satellite</button>
-        </div>
-
-        <p id="status" class="status">
-          Pan and zoom freely. Tap <strong>Place circle</strong>, then tap the map.
-        </p>
-
-        <section class="room-panel">
-          <div class="room-panel-header">
-            <div class="room-identity">
-              <strong id="room-badge">Solo map</strong>
-              <span id="room-meta">No room connected</span>
-            </div>
-            <button id="share-toggle" type="button" disabled>Start sharing</button>
+      <section id="room-gate" class="room-gate">
+        <div class="room-gate-card">
+          <div class="room-gate-header">
+            <h1>Hide map</h1>
+            <p>Join the shared room first. The map stays behind this panel.</p>
           </div>
 
           <div class="room-form-grid">
@@ -65,29 +42,78 @@
             </label>
           </div>
 
-          <div class="control-row control-row--compact room-actions">
-            <button id="create-room" type="button">Create room</button>
+          <div class="gate-actions">
+            <button id="create-room" class="primary" type="button">Create room</button>
             <button id="join-room" type="button">Join room</button>
-            <button id="leave-room" type="button" disabled>Leave room</button>
           </div>
+        </div>
+      </section>
 
-          <div id="participant-list" class="participant-list" aria-live="polite"></div>
-        </section>
-      </div>
-
-      <div class="overlay bottom-panel">
-        <div class="dice-row">
-          <button id="roll-one" type="button">Roll 1 die</button>
-          <button id="roll-two" type="button">Roll 2 dice</button>
-          <output id="dice-result" aria-live="polite">Ready</output>
+      <div class="overlay side-stack">
+        <div class="floating-rail">
+          <button id="tools-toggle" class="floating-button" type="button">Tools</button>
+          <button id="dice-toggle" class="floating-button" type="button">Dice</button>
+          <button id="room-toggle" class="floating-button" type="button">Room</button>
+          <button id="hide-ui-toggle" class="floating-button" type="button">Hide UI</button>
+          <button id="show-ui-toggle" class="floating-button floating-button--primary" type="button">
+            Show UI
+          </button>
         </div>
 
-        <div class="circle-panel">
-          <div class="circle-panel-header">
-            <h1>Hide map</h1>
-            <span id="circle-count">0 circles</span>
-          </div>
-          <div id="circle-list" class="circle-list" aria-live="polite"></div>
+        <div id="panel-shell" class="panel-shell">
+          <section id="tools-panel" class="panel-card">
+            <div class="compact-row">
+              <label class="field field--radius">
+                <span>Radius</span>
+                <select id="radius-select" aria-label="Choose circle radius"></select>
+              </label>
+              <button id="arm-place" class="primary" type="button">Place</button>
+              <button id="locate-me" type="button">Locate</button>
+            </div>
+
+            <div class="compact-row compact-row--actions">
+              <button id="fit-circles" type="button">Fit</button>
+              <button id="undo-circle" type="button">Undo</button>
+              <button id="clear-circles" type="button">Clear</button>
+              <button id="toggle-map-type" type="button">Satellite</button>
+            </div>
+
+            <p id="status" class="status">
+              Pan and zoom freely. Tap <strong>Place</strong>, then tap the map.
+            </p>
+
+            <div class="circle-panel">
+              <div class="circle-panel-header">
+                <h2>Circles</h2>
+                <span id="circle-count">0 circles</span>
+              </div>
+              <div id="circle-list" class="circle-list" aria-live="polite"></div>
+            </div>
+          </section>
+
+          <section id="dice-panel" class="panel-card">
+            <div class="dice-row">
+              <button id="roll-one" type="button">Roll 1 die</button>
+              <button id="roll-two" type="button">Roll 2 dice</button>
+              <output id="dice-result" aria-live="polite">Ready</output>
+            </div>
+          </section>
+
+          <section id="room-panel" class="panel-card">
+            <div class="room-panel-header">
+              <div class="room-identity">
+                <strong id="room-badge">Solo map</strong>
+                <span id="room-meta">No room connected</span>
+              </div>
+              <button id="share-toggle" type="button" disabled>Start sharing</button>
+            </div>
+
+            <div class="room-actions">
+              <button id="leave-room" type="button" disabled>Leave room</button>
+            </div>
+
+            <div id="participant-list" class="participant-list" aria-live="polite"></div>
+          </section>
         </div>
       </div>
     </div>

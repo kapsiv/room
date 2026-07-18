@@ -41,6 +41,16 @@ const shareToggleButton = document.querySelector('#share-toggle');
 const roomBadge = document.querySelector('#room-badge');
 const roomMeta = document.querySelector('#room-meta');
 const participantListElement = document.querySelector('#participant-list');
+const roomGate = document.querySelector('#room-gate');
+const panelShell = document.querySelector('#panel-shell');
+const toolsPanel = document.querySelector('#tools-panel');
+const dicePanel = document.querySelector('#dice-panel');
+const roomPanel = document.querySelector('#room-panel');
+const toolsToggleButton = document.querySelector('#tools-toggle');
+const diceToggleButton = document.querySelector('#dice-toggle');
+const roomToggleButton = document.querySelector('#room-toggle');
+const hideUiToggleButton = document.querySelector('#hide-ui-toggle');
+const showUiToggleButton = document.querySelector('#show-ui-toggle');
 
 const state = {
   map: null,
@@ -58,6 +68,9 @@ const state = {
   watchId: null,
   isSharing: false,
   lastSharedLocation: null,
+  activePanel: null,
+  lastPanel: 'tools',
+  isUiHidden: false,
 };
 
 function getApiKey() {
@@ -120,8 +133,7 @@ function formatRelativeTime(timestamp) {
   if (elapsedSeconds < 60) {
     return `${elapsedSeconds}s ago`;
   }
-  const minutes = Math.round(elapsedSeconds / 60);
-  return `${minutes}m ago`;
+  return `${Math.round(elapsedSeconds / 60)}m ago`;
 }
 
 function normalizeRoomCode(value) {
@@ -156,9 +168,63 @@ function renderRadiusOptions() {
   }
 }
 
+function updateRoomGateVisibility() {
+  document.body.dataset.roomGate = state.roomSession ? 'closed' : 'open';
+  roomGate.hidden = Boolean(state.roomSession);
+}
+
+function updatePanelVisibility() {
+  const hasSession = Boolean(state.roomSession);
+  const uiVisible = hasSession && !state.isUiHidden;
+  document.body.dataset.uiHidden = state.isUiHidden ? 'true' : 'false';
+
+  panelShell.hidden = !uiVisible || !state.activePanel;
+  toolsPanel.hidden = state.activePanel !== 'tools';
+  dicePanel.hidden = state.activePanel !== 'dice';
+  roomPanel.hidden = state.activePanel !== 'room';
+
+  showUiToggleButton.hidden = !hasSession || !state.isUiHidden;
+  hideUiToggleButton.hidden = !hasSession || state.isUiHidden;
+  toolsToggleButton.hidden = !hasSession || state.isUiHidden;
+  diceToggleButton.hidden = !hasSession || state.isUiHidden;
+  roomToggleButton.hidden = !hasSession || state.isUiHidden;
+
+  toolsToggleButton.dataset.active = state.activePanel === 'tools' ? 'true' : 'false';
+  diceToggleButton.dataset.active = state.activePanel === 'dice' ? 'true' : 'false';
+  roomToggleButton.dataset.active = state.activePanel === 'room' ? 'true' : 'false';
+}
+
+function setActivePanel(panelName) {
+  state.activePanel = panelName;
+  if (panelName) {
+    state.lastPanel = panelName;
+  }
+  updatePanelVisibility();
+}
+
+function togglePanel(panelName) {
+  if (state.isUiHidden) {
+    state.isUiHidden = false;
+    setActivePanel(panelName);
+    return;
+  }
+
+  setActivePanel(state.activePanel === panelName ? null : panelName);
+}
+
+function setUiHidden(isHidden) {
+  state.isUiHidden = isHidden;
+  if (isHidden) {
+    setActivePanel(null);
+    return;
+  }
+
+  setActivePanel(state.lastPanel || 'tools');
+}
+
 function updateControlState() {
   armPlaceButton.dataset.armed = state.isPlacementArmed ? 'true' : 'false';
-  armPlaceButton.textContent = state.isPlacementArmed ? 'Tap map now' : 'Place circle';
+  armPlaceButton.textContent = state.isPlacementArmed ? 'Tap map' : 'Place';
   undoCircleButton.disabled = state.circles.length === 0;
   clearCirclesButton.disabled = state.circles.length === 0;
   fitCirclesButton.disabled = state.circles.length === 0;
@@ -168,6 +234,8 @@ function updateControlState() {
   leaveRoomButton.disabled = !state.roomSession;
   shareToggleButton.disabled = !state.roomSession;
   shareToggleButton.textContent = state.isSharing ? 'Stop sharing' : 'Start sharing';
+  roomToggleButton.disabled = !state.roomSession;
+  updatePanelVisibility();
 }
 
 function renderCircleList() {
@@ -428,6 +496,10 @@ function updateLocalLocationMarker(location, options = {}) {
     } else {
       state.localAccuracyCircle.setCenter(location);
       state.localAccuracyCircle.setRadius(location.accuracy);
+      state.localAccuracyCircle.setOptions({
+        strokeColor: color,
+        fillColor: color,
+      });
     }
   }
 
@@ -478,7 +550,6 @@ function haversineDistanceMeters(a, b) {
   const deltaLng = toRadians(b.lng - a.lng);
   const lat1 = toRadians(a.lat);
   const lat2 = toRadians(b.lat);
-
   const sinLat = Math.sin(deltaLat / 2);
   const sinLng = Math.sin(deltaLng / 2);
   const value =
@@ -599,7 +670,7 @@ function renderParticipantList() {
   if (!state.roomSession) {
     const empty = document.createElement('p');
     empty.className = 'empty-state room-empty';
-    empty.textContent = 'Create a room on the hider device, then join from the seeker devices.';
+    empty.textContent = 'No room connected.';
     participantListElement.append(empty);
     return;
   }
@@ -636,18 +707,22 @@ function renderParticipantList() {
 
 function updateRoomUi() {
   if (!state.roomSession) {
-    roomBadge.textContent = 'Solo map';
-    roomMeta.textContent = 'No room connected';
-    updateControlState();
+    roomBadge.textContent = 'No room';
+    roomMeta.textContent = 'Join from the gate first';
+    state.participants = [];
+    clearParticipantOverlays();
+    updateRoomGateVisibility();
     renderParticipantList();
+    updateControlState();
     return;
   }
 
   roomBadge.textContent = `Room ${state.roomSession.roomCode}`;
   roomMeta.textContent =
     `${state.roomSession.nickname} · ${state.roomSession.role} · ${state.roomSession.color}`;
-  updateControlState();
+  updateRoomGateVisibility();
   renderParticipantList();
+  updateControlState();
 }
 
 function setRoomActionBusy(isBusy) {
@@ -687,11 +762,13 @@ async function createRoom() {
     };
     roomCodeInput.value = payload.roomCode;
     state.participants = payload.participants;
+    state.isUiHidden = false;
     persistRoomSession();
     updateRoomUi();
     syncParticipantOverlays();
     startPolling();
     await startSharing();
+    setActivePanel('tools');
     setStatus(`Room ${payload.roomCode} created.`);
   } catch (error) {
     setStatus(error.message, true);
@@ -732,11 +809,13 @@ async function joinRoom() {
     };
     roomCodeInput.value = payload.roomCode;
     state.participants = payload.participants;
+    state.isUiHidden = false;
     persistRoomSession();
     updateRoomUi();
     syncParticipantOverlays();
     startPolling();
     await startSharing();
+    setActivePanel('tools');
     setStatus(`Joined room ${payload.roomCode}.`);
   } catch (error) {
     setStatus(error.message, true);
@@ -769,9 +848,12 @@ async function leaveRoom() {
   stopPolling();
   state.roomSession = null;
   state.participants = [];
+  state.activePanel = null;
+  state.isUiHidden = false;
   clearParticipantOverlays();
   persistRoomSession();
   updateRoomUi();
+  updatePanelVisibility();
   setStatus('Left room.');
 }
 
@@ -929,6 +1011,7 @@ function restoreRoomSession() {
   const rawValue = localStorage.getItem(ROOM_SESSION_KEY);
   if (!rawValue) {
     updateRoomUi();
+    updatePanelVisibility();
     return;
   }
 
@@ -956,11 +1039,14 @@ function restoreRoomSession() {
     roomCodeInput.value = state.roomSession.roomCode;
     roomPasswordInput.value = state.roomSession.password;
     roleSelect.value = state.roomSession.role;
+    state.isUiHidden = false;
     updateRoomUi();
+    setActivePanel('tools');
     startPolling();
     fetchRoomState(true);
   } catch {
     localStorage.removeItem(ROOM_SESSION_KEY);
+    updateRoomUi();
   }
 }
 
@@ -1025,12 +1111,18 @@ function bindControls() {
   joinRoomButton.addEventListener('click', joinRoom);
   leaveRoomButton.addEventListener('click', leaveRoom);
   shareToggleButton.addEventListener('click', toggleSharing);
+  toolsToggleButton.addEventListener('click', () => togglePanel('tools'));
+  diceToggleButton.addEventListener('click', () => togglePanel('dice'));
+  roomToggleButton.addEventListener('click', () => togglePanel('room'));
+  hideUiToggleButton.addEventListener('click', () => setUiHidden(true));
+  showUiToggleButton.addEventListener('click', () => setUiHidden(false));
 }
 
 async function initialize() {
   renderRadiusOptions();
-  updateControlState();
   renderCircleList();
+  updateRoomGateVisibility();
+  updateControlState();
   updateRoomUi();
 
   const apiKey = getApiKey();
