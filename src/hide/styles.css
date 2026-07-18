@@ -86,6 +86,10 @@ p {
   inset: 0;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 .overlay {
   position: absolute;
   inset: 0;
