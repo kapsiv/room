@@ -64,18 +64,34 @@
         <div id="panel-shell" class="panel-shell">
           <section id="tools-panel" class="panel-card">
             <div class="compact-row">
+              <label class="field field--shape">
+                <span>Shape</span>
+                <select id="shape-type-select" aria-label="Choose shape type">
+                  <option value="circle">Circle</option>
+                  <option value="line">Line</option>
+                </select>
+              </label>
               <label class="field field--radius">
                 <span>Radius</span>
                 <select id="radius-select" aria-label="Choose circle radius"></select>
+              </label>
+              <label id="line-type-field" class="field field--radius" hidden>
+                <span>Line</span>
+                <select id="line-type-select" aria-label="Choose line type">
+                  <option value="longitude">Longitude</option>
+                  <option value="latitude">Latitude</option>
+                  <option value="distance">Measure distance</option>
+                  <option value="midpoint">Midpoint</option>
+                </select>
               </label>
               <button id="arm-place" class="primary" type="button">Place</button>
               <button id="locate-me" type="button">Locate</button>
             </div>
 
             <div class="compact-row compact-row--actions">
-              <button id="fit-circles" type="button">Fit</button>
-              <button id="undo-circle" type="button">Undo</button>
-              <button id="clear-circles" type="button">Clear</button>
+              <button id="fit-shapes" type="button">Fit</button>
+              <button id="undo-shape" type="button">Undo</button>
+              <button id="clear-shapes" type="button">Clear</button>
               <button id="toggle-map-type" type="button">Satellite</button>
             </div>
 
@@ -85,10 +101,10 @@
 
             <div class="circle-panel">
               <div class="circle-panel-header">
-                <h2>Circles</h2>
-                <span id="circle-count">0 circles</span>
+                <h2>Shapes</h2>
+                <span id="shape-count">0 shapes</span>
               </div>
-              <div id="circle-list" class="circle-list" aria-live="polite"></div>
+              <div id="shape-list" class="circle-list" aria-live="polite"></div>
             </div>
           </section>
 

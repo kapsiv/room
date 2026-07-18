@@ -171,6 +171,10 @@ p {
   min-width: 126px;
 }
 
+.field--shape {
+  min-width: 110px;
+}
+
 .room-form-grid,
 .preset-grid {
   display: grid;
