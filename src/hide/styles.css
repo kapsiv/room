@@ -26,6 +26,10 @@ body {
   background: #fff;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 button,
 select,
 input,
@@ -77,6 +81,7 @@ input::placeholder {
 
 h1,
 h2,
+h3,
 p {
   margin: 0;
 }
@@ -84,10 +89,6 @@ p {
 #map {
   position: absolute;
   inset: 0;
-}
-
-[hidden] {
-  display: none !important;
 }
 
 .overlay {
@@ -133,7 +134,11 @@ p {
   padding: 18px;
 }
 
-.room-gate-header {
+.room-gate-header,
+.room-identity,
+.participant-info,
+.circle-panel,
+.rules-section {
   display: grid;
   gap: 6px;
 }
@@ -153,7 +158,9 @@ p {
 .circle-panel-header span,
 .circle-card-subtitle,
 .participant-meta,
-.status {
+.status,
+.chat-meta,
+.preset-heading {
   font-size: 0.88rem;
 }
 
@@ -161,16 +168,22 @@ p {
   min-width: 126px;
 }
 
-.room-form-grid {
+.room-form-grid,
+.preset-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
 }
 
+.preset-grid {
+  grid-template-columns: 1fr;
+}
+
 .gate-actions,
 .room-actions,
 .compact-row,
-.dice-row {
+.dice-row,
+.chat-compose {
   display: flex;
   gap: 8px;
 }
@@ -178,8 +191,13 @@ p {
 .gate-actions button,
 .room-actions button,
 .compact-row button,
-.dice-row button {
+.dice-row button,
+.chat-compose button {
   flex: 1 1 0;
+}
+
+.chat-compose input {
+  flex: 1 1 auto;
 }
 
 .side-stack {
@@ -216,10 +234,6 @@ p {
   align-items: end;
 }
 
-.compact-row--actions button {
-  min-width: 0;
-}
-
 .status {
   color: #1f2937;
 }
@@ -228,16 +242,9 @@ p {
   color: #b91c1c;
 }
 
-.circle-panel,
-.room-panel-header,
-.room-identity,
-.participant-info {
-  display: grid;
-  gap: 6px;
-}
-
 .circle-panel-header,
-.room-panel-header {
+.room-panel-header,
+.chat-header {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
@@ -256,12 +263,14 @@ p {
   scrollbar-width: none;
 }
 
-.circle-list::-webkit-scrollbar {
+.circle-list::-webkit-scrollbar,
+.chat-messages::-webkit-scrollbar {
   display: none;
 }
 
 .circle-card,
-.empty-state {
+.empty-state,
+.chat-bubble {
   flex: 0 0 auto;
   width: min(240px, calc(100vw - 84px));
   padding: 12px;
@@ -298,10 +307,11 @@ p {
   font-weight: 700;
 }
 
-.participant-list {
+.participant-list,
+.rules-content {
   display: grid;
   gap: 8px;
-  max-height: 180px;
+  max-height: 220px;
   overflow: auto;
 }
 
@@ -319,6 +329,52 @@ p {
   height: 12px;
   border-radius: 999px;
   flex: 0 0 auto;
+}
+
+.chat-messages {
+  display: grid;
+  gap: 8px;
+  max-height: 240px;
+  overflow: auto;
+  padding-right: 2px;
+  scrollbar-width: none;
+}
+
+.chat-bubble {
+  width: 100%;
+  border-left: 4px solid var(--message-color, #111827);
+}
+
+.chat-bubble[data-own='true'] {
+  background: #eef2ff;
+}
+
+.chat-meta {
+  color: #4b5563;
+  margin-bottom: 6px;
+}
+
+.chat-text {
+  white-space: pre-wrap;
+}
+
+.preset-section {
+  display: grid;
+  gap: 8px;
+}
+
+.preset-heading {
+  font-weight: 700;
+}
+
+.rules-section h3 {
+  font-size: 0.95rem;
+}
+
+.rules-section ul {
+  margin: 0;
+  padding-left: 18px;
+  color: #374151;
 }
 
 .empty-state {
@@ -345,7 +401,8 @@ body[data-room-gate='open'] .side-stack {
   .compact-row,
   .gate-actions,
   .room-actions,
-  .dice-row {
+  .dice-row,
+  .chat-compose {
     flex-wrap: wrap;
   }
 
@@ -354,8 +411,13 @@ body[data-room-gate='open'] .side-stack {
   }
 
   .compact-row button,
-  .dice-row button {
+  .dice-row button,
+  .chat-compose button {
     flex: 1 1 calc(50% - 4px);
+  }
+
+  .chat-compose input {
+    width: 100%;
   }
 
   #dice-result {

@@ -1,11 +1,17 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { createClient } from 'redis';
 
-import { ROOM_CODE_LENGTH, ROOM_COLORS, ROOM_TTL_SECONDS } from '../shared/hideRoomConfig.js';
+import {
+  ROOM_CODE_LENGTH,
+  ROOM_COLORS,
+  ROOM_MESSAGE_LIMIT,
+  ROOM_TTL_SECONDS,
+} from '../shared/hideRoomConfig.js';
 
 const REDIS_URL = process.env.REDIS_URL || process.env.STORAGE_REDIS_URL;
 const ROOM_PREFIX = 'hide:room:';
 const ONLINE_WINDOW_MS = 30_000;
+const MESSAGE_KINDS = new Set(['text', 'question', 'curse', 'system']);
 
 function json(response, status, payload) {
   response.status(status);
@@ -38,6 +44,17 @@ function hashPassword(password) {
 
 function roomKey(roomCode) {
   return `${ROOM_PREFIX}${roomCode}`;
+}
+
+function normalizeMessageKind(value) {
+  return MESSAGE_KINDS.has(value) ? value : 'text';
+}
+
+function normalizeMessageText(value) {
+  return String(value || '')
+    .trim()
+    .replace(/\s+/g, ' ')
+    .slice(0, 600);
 }
 
 function makeRoomCode() {
@@ -78,6 +95,19 @@ async function saveRoom(client, room) {
   await client.set(roomKey(room.code), JSON.stringify(room), {
     EX: ROOM_TTL_SECONDS,
   });
+}
+
+function publicMessage(message) {
+  return {
+    id: message.id,
+    participantId: message.participantId,
+    nickname: message.nickname,
+    role: message.role,
+    color: message.color,
+    kind: message.kind,
+    text: message.text,
+    createdAt: message.createdAt,
+  };
 }
 
 function publicParticipant(participant) {
@@ -174,6 +204,7 @@ async function handleCreate(client, request, response) {
     passwordHash: hashPassword(password),
     createdAt: now,
     participants: [participant],
+    messages: [],
   };
 
   await saveRoom(client, room);
@@ -183,6 +214,7 @@ async function handleCreate(client, request, response) {
     participantId: participant.id,
     participant: publicParticipant(participant),
     participants: visibleParticipants(room, participant),
+    messages: room.messages.map(publicMessage),
   });
 }
 
@@ -229,6 +261,7 @@ async function handleJoin(client, request, response) {
     participantId: participant.id,
     participant: publicParticipant(participant),
     participants: visibleParticipants(room, participant),
+    messages: (room.messages || []).map(publicMessage),
   });
 }
 
@@ -268,6 +301,66 @@ async function handleState(client, request, response) {
     participantId,
     participant: publicParticipant(participant),
     participants: visibleParticipants(room, participant),
+    messages: (room.messages || []).map(publicMessage),
+  });
+}
+
+async function handleSendMessage(client, request, response) {
+  const body = await parseRequestBody(request);
+  const roomCode = normalizeRoomCode(body.roomCode);
+  const password = String(body.password || '');
+  const participantId = String(body.participantId || '');
+  const text = normalizeMessageText(body.text);
+  const kind = normalizeMessageKind(body.kind);
+
+  if (!roomCode || !password || !participantId) {
+    json(response, 400, { error: 'Missing room credentials.' });
+    return;
+  }
+
+  if (!text) {
+    json(response, 400, { error: 'Message is empty.' });
+    return;
+  }
+
+  const room = await loadRoom(client, roomCode);
+  if (!room) {
+    json(response, 404, { error: 'Room not found.' });
+    return;
+  }
+
+  if (room.passwordHash !== hashPassword(password)) {
+    json(response, 403, { error: 'Password is incorrect.' });
+    return;
+  }
+
+  const participant = findParticipant(room, participantId);
+  if (!participant) {
+    json(response, 404, { error: 'Participant not found.' });
+    return;
+  }
+
+  participant.lastSeenAt = Date.now();
+  room.messages = Array.isArray(room.messages) ? room.messages : [];
+  room.messages.push({
+    id: randomUUID(),
+    participantId: participant.id,
+    nickname: participant.nickname,
+    role: participant.role,
+    color: participant.color,
+    kind,
+    text,
+    createdAt: Date.now(),
+  });
+
+  if (room.messages.length > ROOM_MESSAGE_LIMIT) {
+    room.messages = room.messages.slice(-ROOM_MESSAGE_LIMIT);
+  }
+
+  await saveRoom(client, room);
+  json(response, 200, {
+    ok: true,
+    messages: room.messages.map(publicMessage),
   });
 }
 
@@ -381,6 +474,11 @@ export default async function handler(request, response) {
 
       if (action === 'location') {
         await handleLocation(client, request, response);
+        return;
+      }
+
+      if (action === 'message') {
+        await handleSendMessage(client, request, response);
         return;
       }
 

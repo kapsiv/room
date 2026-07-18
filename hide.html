@@ -54,6 +54,8 @@
           <button id="tools-toggle" class="floating-button" type="button">Tools</button>
           <button id="dice-toggle" class="floating-button" type="button">Dice</button>
           <button id="room-toggle" class="floating-button" type="button">Room</button>
+          <button id="chat-toggle" class="floating-button" type="button">Chat</button>
+          <button id="rules-toggle" class="floating-button" type="button">Rules</button>
           <button id="hide-ui-toggle" class="floating-button" type="button">Hide UI</button>
           <button id="show-ui-toggle" class="floating-button floating-button--primary" type="button">
             Show UI
@@ -113,6 +115,47 @@
             </div>
 
             <div id="participant-list" class="participant-list" aria-live="polite"></div>
+          </section>
+
+          <section id="chat-panel" class="panel-card">
+            <div class="chat-header">
+              <div class="room-identity">
+                <strong>Room chat</strong>
+                <span>Text chat and quick sends for seekers</span>
+              </div>
+            </div>
+
+            <div id="chat-messages" class="chat-messages" aria-live="polite"></div>
+
+            <div class="chat-compose">
+              <input id="chat-input" type="text" maxlength="600" placeholder="Type a message" />
+              <button id="chat-send" class="primary" type="button">Send</button>
+            </div>
+
+            <div class="preset-section">
+              <div class="preset-heading">Questions</div>
+              <div class="preset-grid">
+                <select id="question-category-select" aria-label="Question category"></select>
+                <select id="question-select" aria-label="Question preset"></select>
+                <button id="send-question" type="button">Send question</button>
+              </div>
+            </div>
+
+            <div class="preset-section">
+              <div class="preset-heading">Curses</div>
+              <div class="preset-grid">
+                <select id="curse-select" aria-label="Curse preset"></select>
+                <button id="send-curse" type="button">Send curse</button>
+              </div>
+            </div>
+          </section>
+
+          <section id="rules-panel" class="panel-card">
+            <div class="room-identity">
+              <strong>Rules</strong>
+              <span>Quick in-game reference</span>
+            </div>
+            <div id="rules-content" class="rules-content"></div>
           </section>
         </div>
       </div>
