@@ -44,6 +44,8 @@ input {
   border-radius: 14px;
   min-height: 44px;
   padding: 0 14px;
+  max-width: 100%;
+  min-width: 0;
 }
 
 button {
@@ -151,6 +153,7 @@ p {
   display: grid;
   gap: 6px;
   min-width: 0;
+  max-width: 100%;
 }
 
 .field span,
@@ -222,12 +225,17 @@ p {
 .panel-shell {
   margin-left: 10px;
   width: min(100%, 430px);
+  min-width: 0;
+  max-width: 100%;
 }
 
 .panel-card {
   display: grid;
   gap: 12px;
   padding: 12px;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .compact-row {
@@ -261,6 +269,8 @@ p {
   overflow-x: auto;
   padding-bottom: 2px;
   scrollbar-width: none;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .circle-list::-webkit-scrollbar,
@@ -313,6 +323,8 @@ p {
   gap: 8px;
   max-height: 220px;
   overflow: auto;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .participant-row {
@@ -322,6 +334,8 @@ p {
   padding: 10px 12px;
   border-radius: 14px;
   background: #f8fafc;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .participant-swatch {
@@ -338,10 +352,13 @@ p {
   overflow: auto;
   padding-right: 2px;
   scrollbar-width: none;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .chat-bubble {
   width: 100%;
+  max-width: 100%;
   border-left: 4px solid var(--message-color, #111827);
 }
 
@@ -352,10 +369,14 @@ p {
 .chat-meta {
   color: #4b5563;
   margin-bottom: 6px;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .chat-text {
   white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .preset-section {
@@ -375,6 +396,45 @@ p {
   margin: 0;
   padding-left: 18px;
   color: #374151;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.compact-row,
+.chat-compose,
+.preset-section,
+.preset-grid,
+.room-actions,
+.gate-actions,
+.chat-header,
+.room-panel-header {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.preset-grid select,
+.preset-grid button,
+.chat-compose input,
+.chat-compose button {
+  width: 100%;
+}
+
+body[data-rules-fullscreen='true'] .panel-shell {
+  width: 100%;
+  margin-left: 0;
+}
+
+body[data-rules-fullscreen='true'] #rules-panel {
+  position: fixed;
+  inset: calc(env(safe-area-inset-top, 0px) + 12px) 12px calc(env(safe-area-inset-bottom, 0px) + 12px) 12px;
+  z-index: 5;
+  width: auto;
+  max-width: none;
+  max-height: none;
+}
+
+body[data-rules-fullscreen='true'] .rules-content {
+  max-height: none;
 }
 
 .empty-state {
@@ -396,6 +456,7 @@ body[data-room-gate='open'] .side-stack {
 
   .panel-shell {
     width: min(100%, calc(100vw - 94px));
+    min-width: 0;
   }
 
   .compact-row,
@@ -439,5 +500,6 @@ body[data-room-gate='open'] .side-stack {
 
   .panel-shell {
     width: min(360px, calc(100vw - 106px));
+    min-width: 0;
   }
 }

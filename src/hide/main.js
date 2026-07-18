@@ -92,35 +92,51 @@ const CURSES = [
 ];
 const RULES_CONTENT = [
   {
-    title: 'Hiding',
+    title: 'Section 1 - Hiding',
     bullets: [
-      'Hider chooses a TfL station in zones 1–6 and hides within 500 metres.',
-      'Hider has 1 hour to reach the zone.',
-      'Once seekers enter the hiding zone, endgame starts and the hider must stop moving.',
+      'The first Hider is determined as the player who roles the highest number of a two-dice roll',
+      'The Hider may only move using TfL Bus, Underground, Overground, Elizabeth Line and DLR services (between zones 1-6) and on foot.',
+      'The Hider must choose a TfL Underground, Overground, Elizabeth Line or DLR station (within zones 1-6) as the centre of their Hiding Zone.',
+      'The Hiding Zone extends a 500 metre radius from their chosen Hiding Station, regardless of terrain. The centre of the Zone is defined as the location where the roundel for the hiding station is displayed on Google Maps.',
+      'The Hider has a maximum of 1 hour to arrive within their chosen hiding zone.',
+      'If the Hider is not within 500m of their desired hiding station by the end of the 1 hour, they will be allocated the nearest station (as per rule 1c) as the centre of their Hiding Zone. They must travel to this Zone immediately.',
+      'The Hider may only hide on publicly-accessible streets and within publicly-accessible parks. The Hider may not hide wherever the Seekers may be restricted from access. The Hider may not hide in a manner that would reasonably draw public scrutiny and/or police/security attention.',
+      'Once the Seeking period has begun, the Hider may exit their Zone, but must be able to answer any question from the Seekers within its allocated time (Section 3) and return to the Zone before the Seekers enter it.',
+      'Once the Seekers enter the Hiding Zone, the Endgame is triggered. The Hider may not move from their position at the time the Seekers enter the Hiding Zone.',
+      'During the Seeking Period and Endgame, the Hider may draw and play Curses and/or Powerups against the Seekers (as per Sections 3 and 4)',
+      'Once the first Hider is found, the player who scored second-highest on the dice roll at the beginning becomes the new Hider. Once they are found, the remaining player becomes the Hider.',
+      'At the end of the game, the player with the longest hiding time is declared the winner.',
     ],
   },
   {
-    title: 'Seeking',
+    title: 'Section 2 - Seeking',
     bullets: [
-      'Seekers must keep trackers visible to the hider.',
-      'Seekers may use TfL and walking only.',
-      'Street View is banned; regular Google Maps imagery is allowed.',
+      'The first Seekers are determined as the players who did not roll the highest on the initial two-dice roll.',
+      'The Seekers must make their trackers visible to the Hider at all times (except when connection is lost due to reasons beyond their control).',
+      'The Seekers must remain within the previous Hider’s Hiding Zone for the duration of the new Hiding Period (for the first round’s Hiding Period the Seekers must remain within 500 metres of the game’s starting point)',
+      'The Seekers may only move using TfL Bus, Underground, Overground, Elizabeth Line and DLR services (between zones 1-6) and on foot.',
+      'Seekers may only view images shown on Google Maps during the Seeking Period, though may not use Google Street View.',
+      'The Seekers may ask questions to the Hider to gather information on their Hiding Zone, in return for Curses or Powerups (as per Sections 3 and 4).',
+      'The Seekers must physically tap the Hider to end the round and immediately begin the next.',
     ],
   },
   {
-    title: 'Questions',
+    title: 'Section 3 - Questions',
     bullets: [
-      'A question may only be asked once per round unless the hider fails to answer in time.',
-      'Radar distances: 100m, 200m, 500m, 1km, 2km, 3km, 5km, 10km, 25km.',
-      'Tentacles omitted from quick sender here.',
+      'The Seekers may ask as many Questions from the Questions List as they desire, at any time during the Seeking Period.',
+      'Each Question has a time period within which the Hider must return an answer to the Seekers, beginning upon its confirmed delivery to the Hider.',
+      'Once a Question has been asked by the Seekers it cannot be asked again for the duration of the round (except where rule 3d applies).',
+      'If a Hider fails to answer or is unable to answer a Question within its time period, the Seekers retains the ability to ask that Question once more and may ask their next question for free (without giving a Reward to the Hider).',
+      'Each Question has a reward which the Hider receives for their answer upon its confirmed delivery to the Seekers.',
     ],
   },
   {
-    title: 'Rewards',
+    title: 'Section 4 - Rewards for Answers (Curses and Powerups)',
     bullets: [
-      'Questions grant curses and powerups to the hider.',
-      'Keep a hand of five or fewer cards.',
-      'Use chat for quick question and curse sends.',
+      'The Hider must select Curses and/or Powerups from the Curses and Powerups List as specified in the “Reward” section of each Question.',
+      'The Hider may play a Curse at any time during the round by notifying the Seekers of its details. The Curse comes into effect upon its confirmed delivery to the Seekers.',
+      'The Hider may only have a maximum of five Curses and/or Powerups in their hand at any time. Should the Hider possess more than five, they must play or discard excess Curses and/or Powerups of their choice immediately.',
+      'If any of the Seekers fails to abide by a Curse for its specified duration, the curse is discarded and Hider may randomly draw one new Powerup or Curse.',
     ],
   },
 ];
@@ -172,6 +188,7 @@ const sendQuestionButton = document.querySelector('#send-question');
 const curseSelect = document.querySelector('#curse-select');
 const sendCurseButton = document.querySelector('#send-curse');
 const rulesContentElement = document.querySelector('#rules-content');
+const rulesFullscreenToggleButton = document.querySelector('#rules-fullscreen-toggle');
 
 const state = {
   map: null,
@@ -194,6 +211,7 @@ const state = {
   lastPanel: 'tools',
   isUiHidden: false,
   lastRenderedMessageId: null,
+  isRulesFullscreen: false,
 };
 
 function getApiKey() {
@@ -339,6 +357,14 @@ function renderRules() {
   }
 }
 
+function toggleRulesFullscreen() {
+  if (state.activePanel !== 'rules') {
+    setActivePanel('rules');
+  }
+  state.isRulesFullscreen = !state.isRulesFullscreen;
+  updatePanelVisibility();
+}
+
 function updateRoomGateVisibility() {
   document.body.dataset.roomGate = state.roomSession ? 'closed' : 'open';
   roomGate.hidden = Boolean(state.roomSession);
@@ -374,12 +400,17 @@ function updatePanelVisibility() {
   roomToggleButton.dataset.active = state.activePanel === 'room' ? 'true' : 'false';
   chatToggleButton.dataset.active = state.activePanel === 'chat' ? 'true' : 'false';
   rulesToggleButton.dataset.active = state.activePanel === 'rules' ? 'true' : 'false';
+  document.body.dataset.rulesFullscreen = state.isRulesFullscreen ? 'true' : 'false';
+  rulesFullscreenToggleButton.textContent = state.isRulesFullscreen ? 'Exit full screen' : 'Full screen';
 }
 
 function setActivePanel(panelName) {
   state.activePanel = panelName;
   if (panelName) {
     state.lastPanel = panelName;
+  }
+  if (panelName !== 'rules') {
+    state.isRulesFullscreen = false;
   }
   updatePanelVisibility();
 }
@@ -396,6 +427,7 @@ function togglePanel(panelName) {
 function setUiHidden(isHidden) {
   state.isUiHidden = isHidden;
   if (isHidden) {
+    state.isRulesFullscreen = false;
     setActivePanel(null);
     return;
   }
@@ -1254,6 +1286,7 @@ function bindControls() {
   roomToggleButton.addEventListener('click', () => togglePanel('room'));
   chatToggleButton.addEventListener('click', () => togglePanel('chat'));
   rulesToggleButton.addEventListener('click', () => togglePanel('rules'));
+  rulesFullscreenToggleButton.addEventListener('click', toggleRulesFullscreen);
   hideUiToggleButton.addEventListener('click', () => setUiHidden(true));
   showUiToggleButton.addEventListener('click', () => setUiHidden(false));
   chatSendButton.addEventListener('click', async () => {
