@@ -11,7 +11,7 @@ import {
 const REDIS_URL = process.env.REDIS_URL || process.env.STORAGE_REDIS_URL;
 const ROOM_PREFIX = 'hide:room:';
 const ONLINE_WINDOW_MS = 30_000;
-const MESSAGE_KINDS = new Set(['text', 'question', 'curse', 'powerup', 'system']);
+const MESSAGE_KINDS = new Set(['text', 'question', 'curse', 'powerup', 'system', 'dice']);
 
 function json(response, status, payload) {
   response.status(status);

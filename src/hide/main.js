@@ -205,9 +205,6 @@ const fitCirclesButton = document.querySelector('#fit-circles');
 const undoCircleButton = document.querySelector('#undo-circle');
 const clearCirclesButton = document.querySelector('#clear-circles');
 const toggleMapTypeButton = document.querySelector('#toggle-map-type');
-const rollOneButton = document.querySelector('#roll-one');
-const rollTwoButton = document.querySelector('#roll-two');
-const diceResult = document.querySelector('#dice-result');
 const statusElement = document.querySelector('#status');
 const circleCountElement = document.querySelector('#circle-count');
 const circleListElement = document.querySelector('#circle-list');
@@ -225,12 +222,10 @@ const participantListElement = document.querySelector('#participant-list');
 const roomGate = document.querySelector('#room-gate');
 const panelShell = document.querySelector('#panel-shell');
 const toolsPanel = document.querySelector('#tools-panel');
-const dicePanel = document.querySelector('#dice-panel');
 const roomPanel = document.querySelector('#room-panel');
 const chatPanel = document.querySelector('#chat-panel');
 const rulesPanel = document.querySelector('#rules-panel');
 const toolsToggleButton = document.querySelector('#tools-toggle');
-const diceToggleButton = document.querySelector('#dice-toggle');
 const roomToggleButton = document.querySelector('#room-toggle');
 const chatToggleButton = document.querySelector('#chat-toggle');
 const rulesToggleButton = document.querySelector('#rules-toggle');
@@ -238,6 +233,7 @@ const hideUiToggleButton = document.querySelector('#hide-ui-toggle');
 const showUiToggleButton = document.querySelector('#show-ui-toggle');
 const chatMessagesElement = document.querySelector('#chat-messages');
 const chatInput = document.querySelector('#chat-input');
+const chatRollDiceButton = document.querySelector('#chat-roll-dice');
 const chatSendButton = document.querySelector('#chat-send');
 const chatRoleNote = document.querySelector('#chat-role-note');
 const questionSection = document.querySelector('#question-section');
@@ -260,6 +256,7 @@ const handRemoveButton = document.querySelector('#hand-remove');
 const handInfoButton = document.querySelector('#hand-info');
 const handCancelButton = document.querySelector('#hand-cancel');
 const rulesContentElement = document.querySelector('#rules-content');
+const rulesPanelTitle = document.querySelector('#rules-panel-title');
 const chatFullscreenToggleButton = document.querySelector('#chat-fullscreen-toggle');
 const rulesFullscreenToggleButton = document.querySelector('#rules-fullscreen-toggle');
 const rulesQuestionsToggleButton = document.querySelector('#rules-questions-toggle');
@@ -346,6 +343,11 @@ function formatCoordinate(value) {
 function formatTime(timestamp) {
   const date = new Date(timestamp);
   return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+function formatMessageKind(kind) {
+  if (kind === 'dice') return 'rolled a dice';
+  return kind;
 }
 
 function formatRelativeTime(timestamp) {
@@ -673,6 +675,14 @@ function renderRules() {
 }
 
 function updateRulesSwitcher() {
+  const titleByMode = {
+    rules: 'Rules',
+    questions: 'Questions',
+    curses: 'Curses',
+    powerups: 'Powerups',
+  };
+  rulesPanelTitle.textContent = titleByMode[state.rulesContentMode] || 'Rules';
+
   const buttons = [
     ['questions', rulesQuestionsToggleButton, 'Questions'],
     ['curses', rulesCursesToggleButton, 'Curses'],
@@ -725,7 +735,6 @@ function updatePanelVisibility() {
 
   panelShell.hidden = !uiVisible || !state.activePanel;
   toolsPanel.hidden = state.activePanel !== 'tools';
-  dicePanel.hidden = state.activePanel !== 'dice';
   roomPanel.hidden = state.activePanel !== 'room';
   chatPanel.hidden = state.activePanel !== 'chat';
   rulesPanel.hidden = state.activePanel !== 'rules';
@@ -733,7 +742,6 @@ function updatePanelVisibility() {
   const floatingButtons = [
     hideUiToggleButton,
     toolsToggleButton,
-    diceToggleButton,
     roomToggleButton,
     chatToggleButton,
     rulesToggleButton,
@@ -744,7 +752,6 @@ function updatePanelVisibility() {
   showUiToggleButton.hidden = !hasSession || !state.isUiHidden;
 
   toolsToggleButton.dataset.active = state.activePanel === 'tools' ? 'true' : 'false';
-  diceToggleButton.dataset.active = state.activePanel === 'dice' ? 'true' : 'false';
   roomToggleButton.dataset.active = state.activePanel === 'room' ? 'true' : 'false';
   chatToggleButton.dataset.active = state.activePanel === 'chat' ? 'true' : 'false';
   rulesToggleButton.dataset.active = state.activePanel === 'rules' ? 'true' : 'false';
@@ -805,6 +812,7 @@ function updateControlState() {
   roomToggleButton.disabled = !connected;
   chatToggleButton.disabled = !connected;
   rulesToggleButton.disabled = !connected;
+  chatRollDiceButton.disabled = !connected;
   chatSendButton.disabled = !connected;
   sendQuestionButton.disabled = !connected || !isSeeker();
   handAssignButton.disabled = !connected || !isHider();
@@ -1073,10 +1081,8 @@ async function locateMe() {
   }
 }
 
-function rollDice(count) {
-  const rolls = Array.from({ length: count }, () => Math.floor(Math.random() * 6) + 1);
-  const total = rolls.reduce((sum, value) => sum + value, 0);
-  diceResult.textContent = count === 1 ? `${rolls[0]}` : `${rolls.join(' + ')} = ${total}`;
+function rollDice() {
+  return Math.floor(Math.random() * 6) + 1;
 }
 
 function haversineDistanceMeters(a, b) {
@@ -1236,7 +1242,7 @@ function renderMessages() {
 
     const meta = document.createElement('div');
     meta.className = 'chat-meta';
-    meta.textContent = `${message.nickname} · ${message.kind} · ${formatTime(message.createdAt)}`;
+    meta.textContent = `${message.nickname} · ${formatMessageKind(message.kind)} · ${formatTime(message.createdAt)}`;
 
     if (message.participantId === state.roomSession?.participantId && !message.deleted) {
       const deleteButton = document.createElement('button');
@@ -1514,6 +1520,11 @@ async function sendMessage(text, kind = 'text', extra = {}) {
   renderMessages();
 }
 
+async function sendDiceRoll() {
+  const result = rollDice();
+  await sendMessage(String(result), 'dice');
+}
+
 async function deleteMessage(messageId) {
   if (!state.roomSession) return;
   const payload = await apiJson('/api/hide-room', {
@@ -1744,14 +1755,11 @@ function bindControls() {
     );
     updateControlState();
   });
-  rollOneButton.addEventListener('click', () => rollDice(1));
-  rollTwoButton.addEventListener('click', () => rollDice(2));
   createRoomButton.addEventListener('click', createRoom);
   joinRoomButton.addEventListener('click', joinRoom);
   leaveRoomButton.addEventListener('click', leaveRoom);
   shareToggleButton.addEventListener('click', toggleSharing);
   toolsToggleButton.addEventListener('click', () => togglePanel('tools'));
-  diceToggleButton.addEventListener('click', () => togglePanel('dice'));
   roomToggleButton.addEventListener('click', () => togglePanel('room'));
   chatToggleButton.addEventListener('click', () => togglePanel('chat'));
   rulesToggleButton.addEventListener('click', () => togglePanel('rules'));
@@ -1766,6 +1774,7 @@ function bindControls() {
     await sendMessage(chatInput.value, 'text');
     chatInput.value = '';
   });
+  chatRollDiceButton.addEventListener('click', sendDiceRoll);
   sendQuestionButton.addEventListener('click', async () => {
     const category = questionCategorySelect.value;
     const group = QUESTION_GROUPS[category];
