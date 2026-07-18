@@ -17,54 +17,76 @@ const RADIUS_OPTIONS = [
   { value: 25000, label: '25 km' },
 ];
 const QUESTION_GROUPS = {
-  Relative: [
-    'Is your latitude higher or lower than ours?',
-    'Is your longitude higher or lower than ours?',
-    'Is your altitude higher or lower than ours?',
-    'Is your borough the same as ours?',
-    'Did your constituency vote for the same political party as ours in the 2024 General Election?',
-    'Is your nearest international airport the same as ours?',
-  ],
-  Radar: [
-    'Are you within 100 metres of us?',
-    'Are you within 200 metres of us?',
-    'Are you within 500 metres of us?',
-    'Are you within 1 km of us?',
-    'Are you within 2 km of us?',
-    'Are you within 3 km of us?',
-    'Are you within 5 km of us?',
-    'Are you within 10 km of us?',
-    'Are you within 25 km of us?',
-  ],
-  Photos: [
-    'Send a Picture of the Tallest Visible Structure',
-    'Send a Picture of the Local Church',
-    'Send a Picture of the facade of your Hiding Station',
-    'Send a Picture where at least 5 Buildings are Visible',
-    'Send a Picture of the largest body of water within your Hiding Zone',
-    'Send a Picture of the Local Bank',
-    'Send a Picture of your Local Town Hall',
-    'Send a Picture of a McDonalds',
-  ],
-  Oddball: [
-    'Facetime the seekers until you show them a bird',
-    'Send 30 seconds of audio from your Hiding Station',
-    'Send the Seekers 5 words. One must rhyme with your station.',
-    'Send a Strava of yourself walking 1km on streets (including at least 6 turns)',
-    'Is your next train at your next station at an odd or even time?',
-  ],
-  Precision: [
-    'What is the (rounded) price of your nearest hotel?',
-    'Send a Photo with the camera facing straight upwards',
-    'Send a Photo of yourself',
-    'What letter does your nearest street begin with?',
-    'How long (in minutes) would it take you to walk to your nearest train station?',
-    'What is the rating of your nearest restaurant?',
-    'What Intercardinal direction does your nearest street run?',
-    'Rounded to 5, how many metres are you from your nearest road?',
-    'Rounded to 5, how many metres are you from your nearest intersection?',
-    'Are you on the same street as us?',
-  ],
+  Relative: {
+    reward: 'Draw 3, Choose 2',
+    questions: [
+      'Is your latitude higher or lower than ours?',
+      'Is your longitude higher or lower than ours?',
+      'Is your altitude higher or lower than ours?',
+      'Is your borough the same as ours?',
+      'Did your constituency vote for the same political party as ours in the 2024 General Election?',
+      'Is your nearest international airport the same as ours?',
+    ],
+  },
+  Radar: {
+    reward: 'Draw 3, Choose 2',
+    questions: [
+      'Are you within 100 metres of us?',
+      'Are you within 200 metres of us?',
+      'Are you within 500 metres of us?',
+      'Are you within 1 km of us?',
+      'Are you within 2 km of us?',
+      'Are you within 3 km of us?',
+      'Are you within 5 km of us?',
+      'Are you within 10 km of us?',
+      'Are you within 25 km of us?',
+    ],
+  },
+  Photos: {
+    reward: 'Draw 2, Choose 1',
+    questions: [
+      'Send a Picture of the Tallest Visible Structure',
+      'Send a Picture of the Local Church',
+      'Send a Picture of the facade of your Hiding Station',
+      'Send a Picture where at least 5 Buildings are Visible',
+      'Send a Picture of the largest body of water within your Hiding Zone',
+      'Send a Picture of the Local Bank',
+      'Send a Picture of your Local Town Hall',
+      'Send a Picture of a McDonalds',
+    ],
+  },
+  Oddball: {
+    reward: 'Draw 2, Choose 1',
+    questions: [
+      'Facetime the seekers until you show them a bird',
+      'Send 30 seconds of audio from your Hiding Station',
+      'Send the Seekers 5 words. One must rhyme with your station.',
+      'Send a Strava of yourself walking 1km on streets (including at least 6 turns)',
+      'Is your next train at your next station at an odd or even time?',
+    ],
+  },
+  Tentacles: {
+    reward: 'Draw 4, Choose 2',
+    helper:
+      'The seekers send all of a certain thing in a certain radius. If the hider is in that radius, they must tell what their nearest one is.',
+    targets: ['Aquariums', 'Cinemas', 'M&S', 'McDonalds', 'Zoos'],
+    radii: ['2km radius', '5km radius', '10km radius'],
+  },
+  Precision: {
+    reward: 'Draw 2, Choose 1',
+    questions: [
+      'What is the (rounded) price of your nearest hotel?',
+      'Send a Photo with the camera facing straight upwards',
+      'Send a Photo of yourself',
+      'What letter does your nearest street begin with?',
+      'How long (in minutes) would it take you to walk to your nearest train station?',
+      'What is the rating of your nearest restaurant?',
+      'What Intercardinal direction does your nearest street run?',
+      'Rounded to 5, how many metres are you from your nearest road?',
+      'Rounded to 5, how many metres are you from your nearest intersection?',
+      'Are you on the same street as us?',
+    ],
+  },
 };
 const CURSE_DETAILS = {
   'Curse of the Impressionable Consumer':
@@ -221,6 +243,8 @@ const chatRoleNote = document.querySelector('#chat-role-note');
 const questionSection = document.querySelector('#question-section');
 const questionCategorySelect = document.querySelector('#question-category-select');
 const questionSelect = document.querySelector('#question-select');
+const tentaclesTargetSelect = document.querySelector('#tentacles-target-select');
+const tentaclesRadiusSelect = document.querySelector('#tentacles-radius-select');
 const sendQuestionButton = document.querySelector('#send-question');
 const handSection = document.querySelector('#hand-section');
 const handCountElement = document.querySelector('#hand-count');
@@ -427,8 +451,31 @@ function renderQuestionControls() {
 
 function renderQuestionOptions() {
   const category = questionCategorySelect.value || Object.keys(QUESTION_GROUPS)[0];
+  const group = QUESTION_GROUPS[category];
   questionSelect.innerHTML = '';
-  for (const question of QUESTION_GROUPS[category]) {
+  tentaclesTargetSelect.hidden = category !== 'Tentacles';
+  tentaclesRadiusSelect.hidden = category !== 'Tentacles';
+  questionSelect.hidden = category === 'Tentacles';
+
+  if (category === 'Tentacles') {
+    tentaclesTargetSelect.innerHTML = '';
+    tentaclesRadiusSelect.innerHTML = '';
+    for (const target of group.targets) {
+      const option = document.createElement('option');
+      option.value = target;
+      option.textContent = target;
+      tentaclesTargetSelect.append(option);
+    }
+    for (const radius of group.radii) {
+      const option = document.createElement('option');
+      option.value = radius;
+      option.textContent = radius;
+      tentaclesRadiusSelect.append(option);
+    }
+    return;
+  }
+
+  for (const question of group.questions) {
     const option = document.createElement('option');
     option.value = question;
     option.textContent = question;
@@ -1058,13 +1105,37 @@ function renderMessages() {
     meta.className = 'chat-meta';
     meta.textContent = `${message.nickname} · ${message.kind} · ${formatTime(message.createdAt)}`;
 
+    if (message.participantId === state.roomSession?.participantId && !message.deleted) {
+      const deleteButton = document.createElement('button');
+      deleteButton.type = 'button';
+      deleteButton.className = 'chat-delete-button';
+      deleteButton.textContent = 'Delete';
+      deleteButton.addEventListener('click', async () => {
+        await deleteMessage(message.id);
+      });
+      meta.append(' ');
+      meta.append(deleteButton);
+    }
+
     const text = document.createElement('div');
     text.className = 'chat-text';
     text.textContent = message.text;
 
     bubble.append(meta, text);
 
-    if (message.itemType && message.itemName && getItemDescription(message.itemType, message.itemName)) {
+    if (message.detail) {
+      const detail = document.createElement('div');
+      detail.className = 'chat-detail';
+      detail.textContent = message.detail;
+      bubble.append(detail);
+    }
+
+    if (
+      !message.deleted &&
+      message.itemType &&
+      message.itemName &&
+      getItemDescription(message.itemType, message.itemName)
+    ) {
       const infoButton = document.createElement('button');
       infoButton.type = 'button';
       infoButton.className = 'chat-info-button';
@@ -1300,8 +1371,27 @@ async function sendMessage(text, kind = 'text', extra = {}) {
       participantId: state.roomSession.participantId,
       text: trimmedText,
       kind,
+      detail: extra.detail || null,
       itemType: extra.itemType || null,
       itemName: extra.itemName || null,
+    }),
+  });
+
+  state.messages = payload.messages || state.messages;
+  renderMessages();
+}
+
+async function deleteMessage(messageId) {
+  if (!state.roomSession) return;
+  const payload = await apiJson('/api/hide-room', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action: 'delete-message',
+      roomCode: state.roomSession.roomCode,
+      password: state.roomSession.password,
+      participantId: state.roomSession.participantId,
+      messageId,
     }),
   });
 
@@ -1334,8 +1424,7 @@ async function useHandItem() {
   if (!isHider() || state.editingHandSlotIndex === null) return;
   const slotItem = state.hand[state.editingHandSlotIndex];
   if (!slotItem) return;
-  const label = slotItem.type === 'curse' ? `[Curse] ${slotItem.name}` : `[Powerup] ${slotItem.name}`;
-  await sendMessage(label, slotItem.type, {
+  await sendMessage(slotItem.name, slotItem.type, {
     itemType: slotItem.type,
     itemName: slotItem.name,
   });
@@ -1542,8 +1631,18 @@ function bindControls() {
   });
   sendQuestionButton.addEventListener('click', async () => {
     const category = questionCategorySelect.value;
-    const question = questionSelect.value;
-    await sendMessage(`[${category}] ${question}`, 'question');
+    const group = QUESTION_GROUPS[category];
+    let question = questionSelect.value;
+    let detail = `Reward: ${group.reward}`;
+
+    if (category === 'Tentacles') {
+      const target = tentaclesTargetSelect.value;
+      const radius = tentaclesRadiusSelect.value;
+      question = `Tentacles: ${target} in a ${radius}`;
+      detail = `Reward: ${group.reward} • ${group.helper}`;
+    }
+
+    await sendMessage(`[${category}] ${question}`, 'question', { detail });
   });
   handTypeCurseButton.addEventListener('click', () => selectHandType('curse'));
   handTypePowerupButton.addEventListener('click', () => selectHandType('powerup'));
