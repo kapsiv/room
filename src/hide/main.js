@@ -18,6 +18,7 @@ const RADIUS_OPTIONS = [
 ];
 const SHAPES_STORAGE_KEY = 'hide-map-shapes';
 const LEGACY_CIRCLES_STORAGE_KEY = 'hide-map-circles';
+const HUNDRED_MILES_IN_METERS = 160934.4;
 const QUESTION_GROUPS = {
   Relative: {
     reward: 'Draw 3, Choose 2',
@@ -912,36 +913,83 @@ function createLabelMarker(position, text) {
   });
 }
 
-function getMapSpanPath(axis, point) {
-  const bounds = state.map?.getBounds();
-  if (!bounds) {
-    if (axis === 'longitude') {
-      return [
-        { lat: 51.0, lng: point.lng },
-        { lat: 52.0, lng: point.lng },
-      ];
-    }
-    return [
-      { lat: point.lat, lng: -0.7 },
-      { lat: point.lat, lng: 0.5 },
-    ];
-  }
+function getMetersPerDegreeLat(latitude) {
+  const radians = (latitude * Math.PI) / 180;
+  return (
+    111132.92 -
+    559.82 * Math.cos(2 * radians) +
+    1.175 * Math.cos(4 * radians) -
+    0.0023 * Math.cos(6 * radians)
+  );
+}
 
-  const northEast = bounds.getNorthEast().toJSON();
-  const southWest = bounds.getSouthWest().toJSON();
-  const latPadding = Math.max((northEast.lat - southWest.lat) * 0.15, 0.02);
-  const lngPadding = Math.max((northEast.lng - southWest.lng) * 0.15, 0.02);
+function getMetersPerDegreeLng(latitude) {
+  const radians = (latitude * Math.PI) / 180;
+  return (
+    111412.84 * Math.cos(radians) -
+    93.5 * Math.cos(3 * radians) +
+    0.118 * Math.cos(5 * radians)
+  );
+}
 
+function movePointByMeters(point, eastMeters, northMeters) {
+  const metersPerDegreeLat = getMetersPerDegreeLat(point.lat);
+  const metersPerDegreeLng = Math.max(getMetersPerDegreeLng(point.lat), 1e-6);
+  const lat = point.lat + northMeters / metersPerDegreeLat;
+  const lng = point.lng + eastMeters / metersPerDegreeLng;
+  return {
+    lat: Math.max(-85, Math.min(85, lat)),
+    lng: Math.max(-180, Math.min(180, lng)),
+  };
+}
+
+function getFixedAxisPath(axis, point) {
+  const halfLengthMeters = HUNDRED_MILES_IN_METERS / 2;
   if (axis === 'longitude') {
     return [
-      { lat: Math.max(-85, southWest.lat - latPadding), lng: point.lng },
-      { lat: Math.min(85, northEast.lat + latPadding), lng: point.lng },
+      movePointByMeters(point, 0, -halfLengthMeters),
+      movePointByMeters(point, 0, halfLengthMeters),
     ];
   }
 
   return [
-    { lat: point.lat, lng: Math.max(-180, southWest.lng - lngPadding) },
-    { lat: point.lat, lng: Math.min(180, northEast.lng + lngPadding) },
+    movePointByMeters(point, -halfLengthMeters, 0),
+    movePointByMeters(point, halfLengthMeters, 0),
+  ];
+}
+
+function getPerpendicularMidpointPath(startPoint, endPoint) {
+  const midpoint = getLineMidpoint(startPoint, endPoint);
+  const averageLatitude = (startPoint.lat + endPoint.lat) / 2;
+  const eastMeters =
+    (endPoint.lng - startPoint.lng) * getMetersPerDegreeLng(averageLatitude);
+  const northMeters =
+    (endPoint.lat - startPoint.lat) * getMetersPerDegreeLat(averageLatitude);
+  const segmentLengthMeters = Math.hypot(eastMeters, northMeters);
+
+  if (segmentLengthMeters < 1) {
+    const fallbackHalfLength = HUNDRED_MILES_IN_METERS / 20;
+    return [
+      movePointByMeters(midpoint, -fallbackHalfLength, 0),
+      movePointByMeters(midpoint, fallbackHalfLength, 0),
+    ];
+  }
+
+  const halfLengthMeters = segmentLengthMeters / 2;
+  const unitPerpendicularEast = -northMeters / segmentLengthMeters;
+  const unitPerpendicularNorth = eastMeters / segmentLengthMeters;
+
+  return [
+    movePointByMeters(
+      midpoint,
+      -unitPerpendicularEast * halfLengthMeters,
+      -unitPerpendicularNorth * halfLengthMeters
+    ),
+    movePointByMeters(
+      midpoint,
+      unitPerpendicularEast * halfLengthMeters,
+      unitPerpendicularNorth * halfLengthMeters
+    ),
   ];
 }
 
@@ -1110,10 +1158,16 @@ function addCircle(center, radius) {
 function addLineShape(lineType, firstPoint, secondPoint = null, options = {}) {
   const color = getLineColor(lineType);
   const anchorPoint = options.anchor || firstPoint;
-  const axisPath = !secondPoint ? getMapSpanPath(lineType, firstPoint) : null;
-  const start = secondPoint ? firstPoint : axisPath[0];
-  const end = secondPoint ? secondPoint : axisPath[1];
-  const path = secondPoint ? [firstPoint, secondPoint] : axisPath;
+  const axisPath =
+    !secondPoint && (lineType === 'longitude' || lineType === 'latitude')
+      ? getFixedAxisPath(lineType, firstPoint)
+      : null;
+  const midpointPath = lineType === 'midpoint' && secondPoint
+    ? getPerpendicularMidpointPath(firstPoint, secondPoint)
+    : null;
+  const start = midpointPath ? midpointPath[0] : secondPoint ? firstPoint : axisPath[0];
+  const end = midpointPath ? midpointPath[1] : secondPoint ? secondPoint : axisPath[1];
+  const path = midpointPath || (secondPoint ? [firstPoint, secondPoint] : axisPath);
   const polyline = new google.maps.Polyline({
     map: state.map,
     path,
