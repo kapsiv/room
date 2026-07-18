@@ -16,6 +16,8 @@ const RADIUS_OPTIONS = [
   { value: 10000, label: '10 km' },
   { value: 25000, label: '25 km' },
 ];
+const SHAPES_STORAGE_KEY = 'hide-map-shapes';
+const LEGACY_CIRCLES_STORAGE_KEY = 'hide-map-circles';
 const QUESTION_GROUPS = {
   Relative: {
     reward: 'Draw 3, Choose 2',
@@ -198,16 +200,20 @@ const RULES_CONTENT = [
   },
 ];
 
+const shapeTypeSelect = document.querySelector('#shape-type-select');
 const radiusSelect = document.querySelector('#radius-select');
+const radiusField = radiusSelect.closest('label');
+const lineTypeField = document.querySelector('#line-type-field');
+const lineTypeSelect = document.querySelector('#line-type-select');
 const armPlaceButton = document.querySelector('#arm-place');
 const locateMeButton = document.querySelector('#locate-me');
-const fitCirclesButton = document.querySelector('#fit-circles');
-const undoCircleButton = document.querySelector('#undo-circle');
-const clearCirclesButton = document.querySelector('#clear-circles');
+const fitShapesButton = document.querySelector('#fit-shapes');
+const undoShapeButton = document.querySelector('#undo-shape');
+const clearShapesButton = document.querySelector('#clear-shapes');
 const toggleMapTypeButton = document.querySelector('#toggle-map-type');
 const statusElement = document.querySelector('#status');
-const circleCountElement = document.querySelector('#circle-count');
-const circleListElement = document.querySelector('#circle-list');
+const shapeCountElement = document.querySelector('#shape-count');
+const shapeListElement = document.querySelector('#shape-list');
 const nicknameInput = document.querySelector('#nickname-input');
 const roomCodeInput = document.querySelector('#room-code-input');
 const roomPasswordInput = document.querySelector('#room-password-input');
@@ -265,8 +271,12 @@ const rulesPowerupsToggleButton = document.querySelector('#rules-powerups-toggle
 
 const state = {
   map: null,
-  circles: [],
+  shapes: [],
   isPlacementArmed: false,
+  placementStep: 0,
+  pendingPlacementPoints: [],
+  selectedShapeType: 'circle',
+  selectedLineType: 'longitude',
   selectedRadius: 500,
   isSatellite: false,
   localMarker: null,
@@ -443,6 +453,66 @@ function renderRadiusOptions() {
       element.selected = true;
     }
     radiusSelect.append(element);
+  }
+}
+
+function renderShapeControls() {
+  shapeTypeSelect.value = state.selectedShapeType;
+  radiusField.hidden = state.selectedShapeType !== 'circle';
+  lineTypeField.hidden = state.selectedShapeType !== 'line';
+  if (state.selectedShapeType === 'line') {
+    lineTypeSelect.value = state.selectedLineType;
+  }
+}
+
+function formatDistance(distanceMeters) {
+  if (distanceMeters >= 1000) {
+    return `${(distanceMeters / 1000).toFixed(distanceMeters >= 10000 ? 0 : 1)} km`;
+  }
+  return `${Math.round(distanceMeters)} m`;
+}
+
+function getLineColor(lineType) {
+  if (lineType === 'longitude') return '#8b5cf6';
+  if (lineType === 'latitude') return '#f97316';
+  if (lineType === 'midpoint') return '#10b981';
+  return '#2563eb';
+}
+
+function getPlacementInstruction() {
+  if (state.selectedShapeType === 'circle') {
+    return `Tap the map to place a ${formatRadius(state.selectedRadius)} circle.`;
+  }
+  if (state.selectedLineType === 'longitude') {
+    return 'Tap the map to place a dashed longitude line.';
+  }
+  if (state.selectedLineType === 'latitude') {
+    return 'Tap the map to place a dashed latitude line.';
+  }
+  if (state.selectedLineType === 'distance') {
+    return state.placementStep === 0
+      ? 'Tap the first point for a distance line.'
+      : 'Tap the second point to measure the crow-flies distance.';
+  }
+  return state.placementStep === 0
+    ? 'Tap the first point for a midpoint line.'
+    : 'Tap the second point to mark the midpoint.';
+}
+
+function updatePlacementStatus() {
+  if (state.isPlacementArmed) {
+    setStatus(getPlacementInstruction());
+    return;
+  }
+  setStatus('Pan and zoom freely. Tap Place, then tap the map.');
+}
+
+function resetPlacement(shouldUpdate = true) {
+  state.isPlacementArmed = false;
+  state.placementStep = 0;
+  state.pendingPlacementPoints = [];
+  if (shouldUpdate) {
+    updateControlState();
   }
 }
 
@@ -798,13 +868,15 @@ function setUiHidden(isHidden) {
 
 function updateControlState() {
   armPlaceButton.dataset.armed = state.isPlacementArmed ? 'true' : 'false';
-  armPlaceButton.textContent = state.isPlacementArmed ? 'Tap map' : 'Place';
-  undoCircleButton.disabled = state.circles.length === 0;
-  clearCirclesButton.disabled = state.circles.length === 0;
-  fitCirclesButton.disabled = state.circles.length === 0;
+  armPlaceButton.textContent =
+    state.isPlacementArmed && state.placementStep > 0 ? 'Tap 2' : state.isPlacementArmed ? 'Tap map' : 'Place';
+  undoShapeButton.disabled = state.shapes.length === 0;
+  clearShapesButton.disabled = state.shapes.length === 0;
+  fitShapesButton.disabled = state.shapes.length === 0;
   toggleMapTypeButton.textContent = state.isSatellite ? 'Map' : 'Satellite';
-  circleCountElement.textContent =
-    state.circles.length === 1 ? '1 circle' : `${state.circles.length} circles`;
+  shapeCountElement.textContent =
+    state.shapes.length === 1 ? '1 shape' : `${state.shapes.length} shapes`;
+  renderShapeControls();
   const connected = Boolean(state.roomSession);
   leaveRoomButton.disabled = !connected;
   shareToggleButton.disabled = !connected;
@@ -819,29 +891,142 @@ function updateControlState() {
   updatePanelVisibility();
 }
 
-function renderCircleList() {
-  circleListElement.innerHTML = '';
-  if (state.circles.length === 0) {
+function createLabelMarker(position, text) {
+  return new google.maps.Marker({
+    map: state.map,
+    position,
+    clickable: false,
+    icon: {
+      path: google.maps.SymbolPath.CIRCLE,
+      scale: 0.001,
+      fillOpacity: 0,
+      strokeOpacity: 0,
+    },
+    label: {
+      text,
+      color: '#111827',
+      fontSize: '12px',
+      fontWeight: '700',
+    },
+    zIndex: 20,
+  });
+}
+
+function getMapSpanPath(axis, point) {
+  const bounds = state.map?.getBounds();
+  if (!bounds) {
+    if (axis === 'longitude') {
+      return [
+        { lat: 51.0, lng: point.lng },
+        { lat: 52.0, lng: point.lng },
+      ];
+    }
+    return [
+      { lat: point.lat, lng: -0.7 },
+      { lat: point.lat, lng: 0.5 },
+    ];
+  }
+
+  const northEast = bounds.getNorthEast().toJSON();
+  const southWest = bounds.getSouthWest().toJSON();
+  const latPadding = Math.max((northEast.lat - southWest.lat) * 0.15, 0.02);
+  const lngPadding = Math.max((northEast.lng - southWest.lng) * 0.15, 0.02);
+
+  if (axis === 'longitude') {
+    return [
+      { lat: Math.max(-85, southWest.lat - latPadding), lng: point.lng },
+      { lat: Math.min(85, northEast.lat + latPadding), lng: point.lng },
+    ];
+  }
+
+  return [
+    { lat: point.lat, lng: Math.max(-180, southWest.lng - lngPadding) },
+    { lat: point.lat, lng: Math.min(180, northEast.lng + lngPadding) },
+  ];
+}
+
+function getLineMidpoint(start, end) {
+  return {
+    lat: (start.lat + end.lat) / 2,
+    lng: (start.lng + end.lng) / 2,
+  };
+}
+
+function buildShapeSummary(shapeEntry) {
+  if (shapeEntry.type === 'circle') {
+    return {
+      title: `Circle · ${formatRadius(shapeEntry.radius)}`,
+      subtitle: `${formatCoordinate(shapeEntry.center.lat)}, ${formatCoordinate(shapeEntry.center.lng)}`,
+      status: `${formatRadius(shapeEntry.radius)} circle placed. Pan and zoom normally.`,
+      removeLabel: 'Circle removed.',
+      focusLabel: `Focused ${formatRadius(shapeEntry.radius)} circle.`,
+    };
+  }
+
+  if (shapeEntry.lineType === 'longitude') {
+    const anchor = shapeEntry.anchor || shapeEntry.midpoint || shapeEntry.start;
+    return {
+      title: `Longitude · ${formatCoordinate(anchor.lng)}°`,
+      subtitle: `${formatCoordinate(anchor.lat)}, ${formatCoordinate(anchor.lng)}`,
+      status: 'Longitude line placed.',
+      removeLabel: 'Longitude line removed.',
+      focusLabel: 'Focused longitude line.',
+    };
+  }
+
+  if (shapeEntry.lineType === 'latitude') {
+    const anchor = shapeEntry.anchor || shapeEntry.midpoint || shapeEntry.start;
+    return {
+      title: `Latitude · ${formatCoordinate(anchor.lat)}°`,
+      subtitle: `${formatCoordinate(anchor.lat)}, ${formatCoordinate(anchor.lng)}`,
+      status: 'Latitude line placed.',
+      removeLabel: 'Latitude line removed.',
+      focusLabel: 'Focused latitude line.',
+    };
+  }
+
+  if (shapeEntry.lineType === 'midpoint') {
+    return {
+      title: `Midpoint · ${formatCoordinate(shapeEntry.midpoint.lat)}, ${formatCoordinate(shapeEntry.midpoint.lng)}`,
+      subtitle: `${formatDistance(shapeEntry.distance)} between points`,
+      status: 'Midpoint line placed.',
+      removeLabel: 'Midpoint line removed.',
+      focusLabel: 'Focused midpoint line.',
+    };
+  }
+
+  return {
+    title: `Distance · ${formatDistance(shapeEntry.distance)}`,
+    subtitle: `${formatCoordinate(shapeEntry.start.lat)}, ${formatCoordinate(shapeEntry.start.lng)} → ${formatCoordinate(shapeEntry.end.lat)}, ${formatCoordinate(shapeEntry.end.lng)}`,
+    status: 'Distance line placed.',
+    removeLabel: 'Distance line removed.',
+    focusLabel: 'Focused distance line.',
+  };
+}
+
+function renderShapeList() {
+  shapeListElement.innerHTML = '';
+  if (state.shapes.length === 0) {
     const emptyState = document.createElement('p');
     emptyState.className = 'empty-state';
-    emptyState.textContent = 'No circles yet.';
-    circleListElement.append(emptyState);
+    emptyState.textContent = 'No shapes yet.';
+    shapeListElement.append(emptyState);
     return;
   }
 
-  const circles = [...state.circles].reverse();
-  for (const circleEntry of circles) {
+  const shapes = [...state.shapes].reverse();
+  for (const shapeEntry of shapes) {
+    const summary = buildShapeSummary(shapeEntry);
     const item = document.createElement('article');
     item.className = 'circle-card';
 
     const title = document.createElement('div');
     title.className = 'circle-card-title';
-    title.textContent = formatRadius(circleEntry.radius);
+    title.textContent = summary.title;
 
     const subtitle = document.createElement('div');
     subtitle.className = 'circle-card-subtitle';
-    subtitle.textContent =
-      `${formatCoordinate(circleEntry.center.lat)}, ${formatCoordinate(circleEntry.center.lng)}`;
+    subtitle.textContent = summary.subtitle;
 
     const actions = document.createElement('div');
     actions.className = 'circle-card-actions';
@@ -849,26 +1034,43 @@ function renderCircleList() {
     const focusButton = document.createElement('button');
     focusButton.type = 'button';
     focusButton.textContent = 'Focus';
-    focusButton.addEventListener('click', () => focusCircle(circleEntry.id));
+    focusButton.addEventListener('click', () => focusShape(shapeEntry.id));
 
     const deleteButton = document.createElement('button');
     deleteButton.type = 'button';
     deleteButton.textContent = 'Delete';
-    deleteButton.addEventListener('click', () => removeCircle(circleEntry.id));
+    deleteButton.addEventListener('click', () => removeShape(shapeEntry.id));
 
     actions.append(focusButton, deleteButton);
     item.append(title, subtitle, actions);
-    circleListElement.append(item);
+    shapeListElement.append(item);
   }
 }
 
-function persistCircleState() {
-  const serializableCircles = state.circles.map((circleEntry) => ({
-    id: circleEntry.id,
-    radius: circleEntry.radius,
-    center: circleEntry.center,
-  }));
-  localStorage.setItem('hide-map-circles', JSON.stringify(serializableCircles));
+function persistShapeState() {
+  const serializableShapes = state.shapes.map((shapeEntry) => {
+    if (shapeEntry.type === 'circle') {
+      return {
+        id: shapeEntry.id,
+        type: 'circle',
+        radius: shapeEntry.radius,
+        center: shapeEntry.center,
+      };
+    }
+
+    return {
+      id: shapeEntry.id,
+      type: 'line',
+      lineType: shapeEntry.lineType,
+      anchor: shapeEntry.anchor || null,
+      start: shapeEntry.start,
+      end: shapeEntry.end,
+      midpoint: shapeEntry.midpoint || null,
+      distance: shapeEntry.distance || null,
+      labelText: shapeEntry.labelText || '',
+    };
+  });
+  localStorage.setItem(SHAPES_STORAGE_KEY, JSON.stringify(serializableShapes));
 }
 
 function addCircle(center, radius) {
@@ -897,93 +1099,254 @@ function addCircle(center, radius) {
     },
     zIndex: 10,
   });
-  const circleEntry = { id: crypto.randomUUID(), center, radius, circleOverlay, marker };
-  state.circles.push(circleEntry);
-  persistCircleState();
-  renderCircleList();
+  const circleEntry = { id: crypto.randomUUID(), type: 'circle', center, radius, circleOverlay, marker };
+  state.shapes.push(circleEntry);
+  persistShapeState();
+  renderShapeList();
   updateControlState();
-  setStatus(`${formatRadius(radius)} circle placed. Pan and zoom normally.`);
+  setStatus(buildShapeSummary(circleEntry).status);
 }
 
-function removeCircle(circleId) {
-  const circleIndex = state.circles.findIndex((circleEntry) => circleEntry.id === circleId);
-  if (circleIndex === -1) return;
-  const [circleEntry] = state.circles.splice(circleIndex, 1);
-  circleEntry.circleOverlay.setMap(null);
-  circleEntry.marker.setMap(null);
-  persistCircleState();
-  renderCircleList();
-  updateControlState();
-  setStatus('Circle removed.');
-}
+function addLineShape(lineType, firstPoint, secondPoint = null, options = {}) {
+  const color = getLineColor(lineType);
+  const anchorPoint = options.anchor || firstPoint;
+  const axisPath = !secondPoint ? getMapSpanPath(lineType, firstPoint) : null;
+  const start = secondPoint ? firstPoint : axisPath[0];
+  const end = secondPoint ? secondPoint : axisPath[1];
+  const path = secondPoint ? [firstPoint, secondPoint] : axisPath;
+  const polyline = new google.maps.Polyline({
+    map: state.map,
+    path,
+    strokeOpacity: 0,
+    strokeWeight: 3,
+    clickable: false,
+    icons: [
+      {
+        icon: {
+          path: 'M 0,-1 0,1',
+          strokeOpacity: 1,
+          strokeColor: color,
+          scale: 3,
+        },
+        offset: '0',
+        repeat: '12px',
+      },
+    ],
+    zIndex: 8,
+  });
 
-function clearAllCircles() {
-  for (const circleEntry of state.circles) {
-    circleEntry.circleOverlay.setMap(null);
-    circleEntry.marker.setMap(null);
+  const midpoint = getLineMidpoint(start, end);
+  const distance = secondPoint ? haversineDistanceMeters(firstPoint, secondPoint) : null;
+  const labelText =
+    lineType === 'longitude'
+      ? `Lng ${formatCoordinate(anchorPoint.lng)}`
+      : lineType === 'latitude'
+        ? `Lat ${formatCoordinate(anchorPoint.lat)}`
+        : lineType === 'midpoint'
+          ? 'Midpoint'
+          : formatDistance(distance);
+  const labelMarker = createLabelMarker(midpoint, labelText);
+
+  let midpointMarker = null;
+  if (lineType === 'midpoint') {
+    midpointMarker = new google.maps.Marker({
+      map: state.map,
+      position: midpoint,
+      clickable: false,
+      icon: {
+        path: google.maps.SymbolPath.CIRCLE,
+        scale: 5,
+        fillColor: color,
+        fillOpacity: 1,
+        strokeColor: '#ffffff',
+        strokeWeight: 2,
+      },
+      zIndex: 12,
+    });
   }
-  state.circles = [];
-  persistCircleState();
-  renderCircleList();
+
+  const lineEntry = {
+    id: crypto.randomUUID(),
+    type: 'line',
+    lineType,
+    anchor: options.anchor || (secondPoint ? null : firstPoint),
+    start,
+    end,
+    midpoint,
+    distance,
+    labelText,
+    polyline,
+    labelMarker,
+    midpointMarker,
+  };
+
+  state.shapes.push(lineEntry);
+  persistShapeState();
+  renderShapeList();
   updateControlState();
-  setStatus('All circles cleared.');
+  setStatus(buildShapeSummary(lineEntry).status);
 }
 
-function focusCircle(circleId) {
-  const circleEntry = state.circles.find((entry) => entry.id === circleId);
-  if (!circleEntry) return;
-  state.map.panTo(circleEntry.center);
-  state.map.fitBounds(circleEntry.circleOverlay.getBounds(), 72);
-  setStatus(`Focused ${formatRadius(circleEntry.radius)} circle.`);
+function clearShapeOverlays(shapeEntry) {
+  if (shapeEntry.circleOverlay) {
+    shapeEntry.circleOverlay.setMap(null);
+  }
+  if (shapeEntry.marker) {
+    shapeEntry.marker.setMap(null);
+  }
+  if (shapeEntry.polyline) {
+    shapeEntry.polyline.setMap(null);
+  }
+  if (shapeEntry.labelMarker) {
+    shapeEntry.labelMarker.setMap(null);
+  }
+  if (shapeEntry.midpointMarker) {
+    shapeEntry.midpointMarker.setMap(null);
+  }
 }
 
-function fitAllCircles() {
-  if (state.circles.length === 0) return;
+function removeShape(shapeId) {
+  const shapeIndex = state.shapes.findIndex((shapeEntry) => shapeEntry.id === shapeId);
+  if (shapeIndex === -1) return;
+  const [shapeEntry] = state.shapes.splice(shapeIndex, 1);
+  clearShapeOverlays(shapeEntry);
+  persistShapeState();
+  renderShapeList();
+  updateControlState();
+  setStatus(buildShapeSummary(shapeEntry).removeLabel);
+}
+
+function clearAllShapes() {
+  for (const shapeEntry of state.shapes) {
+    clearShapeOverlays(shapeEntry);
+  }
+  state.shapes = [];
+  persistShapeState();
+  renderShapeList();
+  updateControlState();
+  setStatus('All shapes cleared.');
+}
+
+function getShapeBounds(shapeEntry) {
   const bounds = new google.maps.LatLngBounds();
-  for (const circleEntry of state.circles) {
-    bounds.union(circleEntry.circleOverlay.getBounds());
+  if (shapeEntry.type === 'circle') {
+    return shapeEntry.circleOverlay.getBounds();
+  }
+  bounds.extend(shapeEntry.start);
+  bounds.extend(shapeEntry.end);
+  return bounds;
+}
+
+function focusShape(shapeId) {
+  const shapeEntry = state.shapes.find((entry) => entry.id === shapeId);
+  if (!shapeEntry) return;
+  const bounds = getShapeBounds(shapeEntry);
+  if (shapeEntry.type === 'circle') {
+    state.map.panTo(shapeEntry.center);
+  } else {
+    state.map.panTo(shapeEntry.midpoint);
+  }
+  state.map.fitBounds(bounds, 72);
+  setStatus(buildShapeSummary(shapeEntry).focusLabel);
+}
+
+function fitAllShapes() {
+  if (state.shapes.length === 0) return;
+  const bounds = new google.maps.LatLngBounds();
+  for (const shapeEntry of state.shapes) {
+    bounds.union(getShapeBounds(shapeEntry));
   }
   bounds.extend(state.map.getCenter());
   state.map.fitBounds(bounds, 72);
-  setStatus('Map fitted to all circles.');
+  setStatus('Map fitted to all shapes.');
 }
 
-function restoreCircles() {
-  const savedValue = localStorage.getItem('hide-map-circles');
-  if (!savedValue) {
-    renderCircleList();
+function restoreShapes() {
+  const savedValue = localStorage.getItem(SHAPES_STORAGE_KEY);
+  const legacyValue = localStorage.getItem(LEGACY_CIRCLES_STORAGE_KEY);
+  const valueToRestore = savedValue || legacyValue;
+  if (!valueToRestore) {
+    renderShapeList();
     updateControlState();
     return;
   }
   try {
-    const savedCircles = JSON.parse(savedValue);
-    if (!Array.isArray(savedCircles)) {
-      throw new Error('Invalid saved circles.');
+    const savedShapes = JSON.parse(valueToRestore);
+    if (!Array.isArray(savedShapes)) {
+      throw new Error('Invalid saved shapes.');
     }
-    for (const circleEntry of savedCircles) {
+    for (const shapeEntry of savedShapes) {
+      if (shapeEntry?.type === 'line') {
+        if (
+          typeof shapeEntry.start?.lat !== 'number' ||
+          typeof shapeEntry.start?.lng !== 'number' ||
+          typeof shapeEntry.end?.lat !== 'number' ||
+          typeof shapeEntry.end?.lng !== 'number'
+        ) {
+          continue;
+        }
+        addLineShape(shapeEntry.lineType || 'distance', shapeEntry.start, shapeEntry.end, {
+          anchor: shapeEntry.anchor || null,
+        });
+        continue;
+      }
+      if (typeof shapeEntry.radius !== 'number') {
+        continue;
+      }
       if (
-        typeof circleEntry.radius !== 'number' ||
-        typeof circleEntry.center?.lat !== 'number' ||
-        typeof circleEntry.center?.lng !== 'number'
+        typeof shapeEntry.center?.lat !== 'number' ||
+        typeof shapeEntry.center?.lng !== 'number'
       ) {
         continue;
       }
-      addCircle(circleEntry.center, circleEntry.radius);
+      addCircle(shapeEntry.center, shapeEntry.radius);
     }
+    localStorage.removeItem(LEGACY_CIRCLES_STORAGE_KEY);
   } catch {
-    localStorage.removeItem('hide-map-circles');
-    setStatus('Saved circles could not be restored.', true);
+    localStorage.removeItem(SHAPES_STORAGE_KEY);
+    localStorage.removeItem(LEGACY_CIRCLES_STORAGE_KEY);
+    setStatus('Saved shapes could not be restored.', true);
   }
 }
 
 function armPlacement() {
   state.isPlacementArmed = !state.isPlacementArmed;
+  state.placementStep = 0;
+  state.pendingPlacementPoints = [];
   updateControlState();
   if (state.isPlacementArmed) {
-    setStatus(`Tap the map to place a ${formatRadius(state.selectedRadius)} circle.`);
+    setStatus(getPlacementInstruction());
     return;
   }
   setStatus('Placement cancelled.');
+}
+
+function handleMapPlacementClick(point) {
+  if (!state.isPlacementArmed) return;
+
+  if (state.selectedShapeType === 'circle') {
+    addCircle(point, state.selectedRadius);
+    resetPlacement();
+    return;
+  }
+
+  if (state.selectedLineType === 'longitude' || state.selectedLineType === 'latitude') {
+    addLineShape(state.selectedLineType, point);
+    resetPlacement();
+    return;
+  }
+
+  state.pendingPlacementPoints.push(point);
+  if (state.pendingPlacementPoints.length === 1) {
+    state.placementStep = 1;
+    updateControlState();
+    setStatus(getPlacementInstruction());
+    return;
+  }
+
+  const [firstPoint, secondPoint] = state.pendingPlacementPoints;
+  addLineShape(state.selectedLineType, firstPoint, secondPoint);
+  resetPlacement();
 }
 
 function requestCurrentPosition() {
@@ -1714,19 +2077,28 @@ function buildMap() {
     disableDoubleClickZoom: true,
   });
   state.map.addListener('click', (event) => {
-    if (!state.isPlacementArmed) return;
-    addCircle(event.latLng.toJSON(), state.selectedRadius);
-    state.isPlacementArmed = false;
-    updateControlState();
+    handleMapPlacementClick(event.latLng.toJSON());
   });
 }
 
 function bindControls() {
+  shapeTypeSelect.addEventListener('change', (event) => {
+    state.selectedShapeType = event.target.value === 'line' ? 'line' : 'circle';
+    resetPlacement(false);
+    updateControlState();
+    updatePlacementStatus();
+  });
   radiusSelect.addEventListener('change', (event) => {
     state.selectedRadius = Number(event.target.value);
     if (state.isPlacementArmed) {
-      setStatus(`Tap the map to place a ${formatRadius(state.selectedRadius)} circle.`);
+      setStatus(getPlacementInstruction());
     }
+  });
+  lineTypeSelect.addEventListener('change', (event) => {
+    state.selectedLineType = event.target.value;
+    resetPlacement(false);
+    updateControlState();
+    updatePlacementStatus();
   });
   roomCodeInput.addEventListener('input', () => {
     roomCodeInput.value = normalizeRoomCode(roomCodeInput.value);
@@ -1742,12 +2114,12 @@ function bindControls() {
 
   armPlaceButton.addEventListener('click', armPlacement);
   locateMeButton.addEventListener('click', locateMe);
-  fitCirclesButton.addEventListener('click', fitAllCircles);
-  undoCircleButton.addEventListener('click', () => {
-    const lastCircle = state.circles.at(-1);
-    if (lastCircle) removeCircle(lastCircle.id);
+  fitShapesButton.addEventListener('click', fitAllShapes);
+  undoShapeButton.addEventListener('click', () => {
+    const lastShape = state.shapes.at(-1);
+    if (lastShape) removeShape(lastShape.id);
   });
-  clearCirclesButton.addEventListener('click', clearAllCircles);
+  clearShapesButton.addEventListener('click', clearAllShapes);
   toggleMapTypeButton.addEventListener('click', () => {
     state.isSatellite = !state.isSatellite;
     state.map.setMapTypeId(
@@ -1806,9 +2178,10 @@ function bindControls() {
 
 async function initialize() {
   renderRadiusOptions();
+  renderShapeControls();
   renderQuestionControls();
   renderRules();
-  renderCircleList();
+  renderShapeList();
   renderMessages();
   updateRoomGateVisibility();
   updateControlState();
@@ -1824,7 +2197,7 @@ async function initialize() {
     await loadGoogleMaps(apiKey);
     buildMap();
     bindControls();
-    restoreCircles();
+    restoreShapes();
     restoreRoomSession();
   } catch (error) {
     console.error(error);
