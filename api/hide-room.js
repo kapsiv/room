@@ -106,8 +106,10 @@ function publicMessage(message) {
     color: message.color,
     kind: message.kind,
     text: message.text,
+    detail: message.detail || null,
     itemType: message.itemType || null,
     itemName: message.itemName || null,
+    deleted: Boolean(message.deleted),
     createdAt: message.createdAt,
   };
 }
@@ -314,6 +316,7 @@ async function handleSendMessage(client, request, response) {
   const participantId = String(body.participantId || '');
   const text = normalizeMessageText(body.text);
   const kind = normalizeMessageKind(body.kind);
+  const detail = normalizeMessageText(body.detail);
   const itemType = body.itemType === 'curse' || body.itemType === 'powerup' ? body.itemType : null;
   const itemName = normalizeMessageText(body.itemName);
 
@@ -354,6 +357,7 @@ async function handleSendMessage(client, request, response) {
     color: participant.color,
     kind,
     text,
+    detail: detail || null,
     itemType,
     itemName: itemName || null,
     createdAt: Date.now(),
@@ -362,6 +366,59 @@ async function handleSendMessage(client, request, response) {
   if (room.messages.length > ROOM_MESSAGE_LIMIT) {
     room.messages = room.messages.slice(-ROOM_MESSAGE_LIMIT);
   }
+
+  await saveRoom(client, room);
+  json(response, 200, {
+    ok: true,
+    messages: room.messages.map(publicMessage),
+  });
+}
+
+async function handleDeleteMessage(client, request, response) {
+  const body = await parseRequestBody(request);
+  const roomCode = normalizeRoomCode(body.roomCode);
+  const password = String(body.password || '');
+  const participantId = String(body.participantId || '');
+  const messageId = String(body.messageId || '');
+
+  if (!roomCode || !password || !participantId || !messageId) {
+    json(response, 400, { error: 'Missing delete payload.' });
+    return;
+  }
+
+  const room = await loadRoom(client, roomCode);
+  if (!room) {
+    json(response, 404, { error: 'Room not found.' });
+    return;
+  }
+
+  if (room.passwordHash !== hashPassword(password)) {
+    json(response, 403, { error: 'Password is incorrect.' });
+    return;
+  }
+
+  const participant = findParticipant(room, participantId);
+  if (!participant) {
+    json(response, 404, { error: 'Participant not found.' });
+    return;
+  }
+
+  const message = (room.messages || []).find((entry) => entry.id === messageId);
+  if (!message) {
+    json(response, 404, { error: 'Message not found.' });
+    return;
+  }
+
+  if (message.participantId !== participantId) {
+    json(response, 403, { error: 'You can only delete your own messages.' });
+    return;
+  }
+
+  message.text = 'Message was deleted';
+  message.detail = null;
+  message.itemType = null;
+  message.itemName = null;
+  message.deleted = true;
 
   await saveRoom(client, room);
   json(response, 200, {
@@ -485,6 +542,11 @@ export default async function handler(request, response) {
 
       if (action === 'message') {
         await handleSendMessage(client, request, response);
+        return;
+      }
+
+      if (action === 'delete-message') {
+        await handleDeleteMessage(client, request, response);
         return;
       }
 

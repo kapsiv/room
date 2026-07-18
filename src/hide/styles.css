@@ -373,8 +373,26 @@ p {
   word-break: break-word;
 }
 
+.chat-delete-button {
+  min-height: 0;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #6b7280;
+  font-size: 0.78rem;
+  text-decoration: underline;
+}
+
 .chat-text {
   white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.chat-detail {
+  margin-top: 6px;
+  font-size: 0.82rem;
+  color: #6b7280;
   overflow-wrap: anywhere;
   word-break: break-word;
 }
