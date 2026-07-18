@@ -53,7 +53,13 @@ button:disabled {
 }
 
 button.primary,
-button[data-armed='true'] {
+button[data-armed='true'],
+.floating-button--primary {
+  background: #111827;
+  color: #fff;
+}
+
+button[data-active='true'] {
   background: #111827;
   color: #fff;
 }
@@ -69,6 +75,12 @@ input::placeholder {
   color: #6b7280;
 }
 
+h1,
+h2,
+p {
+  margin: 0;
+}
+
 #map {
   position: absolute;
   inset: 0;
@@ -76,77 +88,135 @@ input::placeholder {
 
 .overlay {
   position: absolute;
-  left: 12px;
-  right: 12px;
-  z-index: 1;
+  inset: 0;
+  z-index: 2;
   pointer-events: none;
 }
 
-.overlay > *,
 .overlay button,
 .overlay select,
-.overlay label,
 .overlay input,
-.overlay output {
+.overlay output,
+.overlay label,
+.panel-card,
+.floating-rail {
   pointer-events: auto;
 }
 
-.top-panel,
-.bottom-panel {
+.room-gate {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
   display: grid;
-  gap: 10px;
+  place-items: center;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(8px);
 }
 
-.top-panel {
-  top: calc(env(safe-area-inset-top, 0px) + 12px);
-}
-
-.bottom-panel {
-  bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
-}
-
-.control-row,
-.dice-row,
-.circle-panel,
-.room-panel {
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(14px);
+.room-gate-card,
+.panel-card {
+  background: rgba(255, 255, 255, 0.96);
   border: 1px solid rgba(17, 24, 39, 0.08);
-  border-radius: 18px;
+  border-radius: 20px;
   box-shadow: 0 10px 28px rgba(15, 23, 42, 0.14);
 }
 
-.control-row,
-.dice-row {
-  display: flex;
-  gap: 8px;
-  align-items: end;
-  padding: 10px;
+.room-gate-card {
+  width: min(100%, 520px);
+  display: grid;
+  gap: 14px;
+  padding: 18px;
 }
 
-.control-row--compact {
-  align-items: center;
+.room-gate-header {
+  display: grid;
+  gap: 6px;
+}
+
+.room-gate-header p {
+  color: #4b5563;
 }
 
 .field {
   display: grid;
   gap: 6px;
-  flex: 1 1 auto;
   min-width: 0;
 }
 
 .field span,
+.room-identity span,
 .circle-panel-header span,
 .circle-card-subtitle,
-.status,
 .participant-meta,
-.room-identity span {
+.status {
   font-size: 0.88rem;
 }
 
+.field--radius {
+  min-width: 126px;
+}
+
+.room-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.gate-actions,
+.room-actions,
+.compact-row,
+.dice-row {
+  display: flex;
+  gap: 8px;
+}
+
+.gate-actions button,
+.room-actions button,
+.compact-row button,
+.dice-row button {
+  flex: 1 1 0;
+}
+
+.side-stack {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: calc(env(safe-area-inset-top, 0px) + 12px) 12px calc(env(safe-area-inset-bottom, 0px) + 12px);
+}
+
+.floating-rail {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.floating-button {
+  min-width: 68px;
+  padding-inline: 12px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+}
+
+.panel-shell {
+  margin-left: 10px;
+  width: min(100%, 430px);
+}
+
+.panel-card {
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+}
+
+.compact-row {
+  align-items: end;
+}
+
+.compact-row--actions button {
+  min-width: 0;
+}
+
 .status {
-  margin: 0;
-  padding: 0 4px;
   color: #1f2937;
 }
 
@@ -154,55 +224,80 @@ input::placeholder {
   color: #b91c1c;
 }
 
-.dice-row {
+.circle-panel,
+.room-panel-header,
+.room-identity,
+.participant-info {
+  display: grid;
+  gap: 6px;
+}
+
+.circle-panel-header,
+.room-panel-header {
+  display: flex;
   justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.circle-panel-header h2 {
+  font-size: 1rem;
+}
+
+.circle-list {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+
+.circle-list::-webkit-scrollbar {
+  display: none;
+}
+
+.circle-card,
+.empty-state {
+  flex: 0 0 auto;
+  width: min(240px, calc(100vw - 84px));
+  padding: 12px;
+  border-radius: 16px;
+  background: #f8fafc;
+}
+
+.circle-card-title,
+.participant-name {
+  font-weight: 700;
+}
+
+.circle-card-subtitle {
+  color: #4b5563;
+  margin: 4px 0 10px;
+}
+
+.circle-card-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.circle-card-actions button {
+  flex: 1 1 0;
+}
+
+.dice-row {
   align-items: center;
 }
 
 #dice-result {
-  min-width: 90px;
+  min-width: 96px;
   text-align: right;
-  font-weight: 600;
-}
-
-.room-panel,
-.circle-panel {
-  padding: 12px;
-  display: grid;
-  gap: 12px;
-}
-
-.room-panel-header,
-.circle-panel-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 12px;
-}
-
-.room-identity,
-.participant-info {
-  display: grid;
-  gap: 2px;
-}
-
-.room-form-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-}
-
-.room-actions {
-  background: none;
-  border: 0;
-  box-shadow: none;
-  padding: 0;
+  font-weight: 700;
 }
 
 .participant-list {
   display: grid;
   gap: 8px;
-  max-height: 148px;
+  max-height: 180px;
   overflow: auto;
 }
 
@@ -222,91 +317,61 @@ input::placeholder {
   flex: 0 0 auto;
 }
 
-.participant-name {
-  font-weight: 700;
+.empty-state {
+  color: #4b5563;
 }
 
-.circle-panel-header h1 {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 700;
-}
-
-.circle-list {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  padding-bottom: 2px;
-  scrollbar-width: none;
-}
-
-.circle-list::-webkit-scrollbar {
+body[data-room-gate='open'] .side-stack {
   display: none;
 }
 
-.circle-card,
-.empty-state {
-  flex: 0 0 auto;
-  width: min(240px, calc(100vw - 56px));
-  margin: 0;
-  padding: 12px;
-  border-radius: 16px;
-  background: #f8fafc;
-}
-
-.room-empty {
-  width: 100%;
-}
-
-.circle-card-title {
-  font-weight: 700;
-  margin-bottom: 4px;
-}
-
-.circle-card-subtitle {
-  color: #4b5563;
-  margin-bottom: 10px;
-}
-
-.circle-card-actions {
-  display: flex;
-  gap: 8px;
-}
-
-.circle-card-actions button {
-  flex: 1 1 0;
-}
-
-.empty-state {
-  color: #4b5563;
-}
-
 @media (max-width: 720px) {
-  .control-row {
-    flex-wrap: wrap;
-  }
-
-  .field,
-  .room-form-grid {
-    width: 100%;
-  }
-
   .room-form-grid {
     grid-template-columns: 1fr;
   }
 
-  .control-row > button,
-  .control-row--compact > button,
-  .dice-row > button {
-    flex: 1 1 calc(50% - 4px);
+  .floating-rail {
+    flex-direction: column;
   }
 
+  .panel-shell {
+    width: min(100%, calc(100vw - 94px));
+  }
+
+  .compact-row,
+  .gate-actions,
+  .room-actions,
   .dice-row {
     flex-wrap: wrap;
+  }
+
+  .field--radius {
+    flex: 1 1 100%;
+  }
+
+  .compact-row button,
+  .dice-row button {
+    flex: 1 1 calc(50% - 4px);
   }
 
   #dice-result {
     width: 100%;
     text-align: left;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 540px) {
+  .side-stack {
+    padding-left: calc(env(safe-area-inset-left, 0px) + 12px);
+    padding-right: 12px;
+    align-items: flex-start;
+  }
+
+  .floating-rail {
+    flex-direction: column;
+  }
+
+  .panel-shell {
+    width: min(360px, calc(100vw - 106px));
   }
 }
