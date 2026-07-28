@@ -28,14 +28,17 @@
       }
     }
   ],
-  "redirects": [
-    {
-      "source": "/hide/index.html",
-      "destination": "/hide",
-      "permanent": true
-    }
-  ],
   "rewrites": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "cv.kapsiv.com"
+        }
+      ],
+      "destination": "/CV-July-2026.pdf"
+    },
     {
       "source": "/hide",
       "destination": "/hide.html"
@@ -47,6 +50,13 @@
     {
       "source": "/albums",
       "destination": "/albums/index.html"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/hide/index.html",
+      "destination": "/hide",
+      "permanent": true
     }
   ],
   "crons": [
