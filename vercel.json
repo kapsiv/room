@@ -6,6 +6,32 @@
       "has": [
         {
           "type": "host",
+          "value": "cv.kapsiv.com"
+        }
+      ],
+      "status": 308,
+      "headers": {
+        "Location": "https://www.kapsiv.com/CV-July-2026.pdf"
+      }
+    },
+    {
+      "src": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "cv.kapsiv.com"
+        }
+      ],
+      "status": 308,
+      "headers": {
+        "Location": "https://www.kapsiv.com/CV-July-2026.pdf"
+      }
+    },
+    {
+      "src": "/",
+      "has": [
+        {
+          "type": "host",
           "value": "hide.kapsiv.com"
         }
       ],
@@ -29,26 +55,6 @@
     }
   ],
   "rewrites": [
-    {
-      "source": "/",
-      "has": [
-        {
-          "type": "host",
-          "value": "cv.kapsiv.com"
-        }
-      ],
-      "destination": "/CV-July-2026.pdf"
-    },
-    {
-      "source": "/:path*",
-      "has": [
-        {
-          "type": "host",
-          "value": "cv.kapsiv.com"
-        }
-      ],
-      "destination": "/CV-July-2026.pdf"
-    },
     {
       "source": "/hide",
       "destination": "/hide.html"
