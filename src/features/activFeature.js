@@ -205,6 +205,16 @@ function formatMinutesAsTime(totalMinutes) {
   return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
 }
 
+function formatMinutesAsDuration(totalMinutes) {
+  if (!Number.isFinite(totalMinutes)) return "--";
+  const rounded = Math.max(0, Math.round(totalMinutes));
+  const hours = Math.floor(rounded / 60);
+  const minutes = rounded % 60;
+  if (hours && minutes) return `${hours}h ${minutes}m`;
+  if (hours) return `${hours}h`;
+  return `${minutes}m`;
+}
+
 function getDayDifferenceInclusive(start, end) {
   const ms = startOfUtcDay(end).getTime() - startOfUtcDay(start).getTime();
   return Math.max(1, Math.floor(ms / 86400000) + 1);
@@ -341,6 +351,12 @@ function buildYearStats(visits) {
   const averageDaysPerWeek = totalDaysTracked ? attendanceDayCount / (totalDaysTracked / 7) : 0;
   const averageEntryMinutes = yearVisits.length ? totalEntryMinutes / yearVisits.length : NaN;
   const attendanceRate = totalDaysTracked ? (attendanceDayCount / totalDaysTracked) * 100 : 0;
+  const totalDurationMinutes = yearVisits.reduce(
+    (sum, visit) => sum + (Number.isFinite(visit.durationMinutes) ? visit.durationMinutes : 0),
+    0,
+  );
+  const averageDurationMinutes = yearVisits.length ? totalDurationMinutes / yearVisits.length : NaN;
+  const averageWeeklyDurationMinutes = totalDaysTracked ? totalDurationMinutes / (totalDaysTracked / 7) : NaN;
 
   return {
     focusYear,
@@ -355,6 +371,9 @@ function buildYearStats(visits) {
     averageDaysPerWeek,
     averageEntryMinutes,
     attendanceRate,
+    totalDurationMinutes,
+    averageDurationMinutes,
+    averageWeeklyDurationMinutes,
   };
 }
 
@@ -806,6 +825,13 @@ async function renderModal(modal, visits, scrobbles, collection, heatmapState) {
 
   renderFactCard(
     modal,
+    "#activFactAverageDuration",
+    formatMinutesAsDuration(stats.averageDurationMinutes),
+    `${stats.yearVisits.length} visit${stats.yearVisits.length === 1 ? "" : "s"} in ${stats.focusYear}`,
+  );
+
+  renderFactCard(
+    modal,
     "#activFactLastVisit",
     lastVisit ? formatDateCompact(lastVisit.enteredAt) : "--",
     lastVisit
@@ -818,6 +844,13 @@ async function renderModal(modal, visits, scrobbles, collection, heatmapState) {
     "#activFactAttendanceRate",
     formatPercent(stats.attendanceRate),
     `${stats.attendanceDayCount} of ${stats.totalDaysTracked}`,
+  );
+
+  renderFactCard(
+    modal,
+    "#activFactWeeklyDuration",
+    formatMinutesAsDuration(stats.averageWeeklyDurationMinutes),
+    `${formatMinutesAsDuration(stats.totalDurationMinutes)} total in ${stats.focusYear}`,
   );
 }
 
