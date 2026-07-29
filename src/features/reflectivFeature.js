@@ -2881,6 +2881,20 @@ function isMobileLayout() {
     setText("#musiclib-total-songs", rows.length.toLocaleString());
     setText("#musiclib-total-artists", artists.size.toLocaleString());
     setText("#musiclib-total-genres", genres.size.toLocaleString());
+    setText("#musiclib-total-duration", formatDurationHoursMinutesLabel(totalDurationSeconds));
+
+    const libraryYears = [...albumYearByKey.values()]
+      .map((year) => Number(year))
+      .filter((year) => Number.isFinite(year))
+      .sort((a, b) => a - b);
+    const minLibraryYear = libraryYears[0];
+    const maxLibraryYear = libraryYears[libraryYears.length - 1];
+    const yearRangeLabel = Number.isFinite(minLibraryYear)
+      ? minLibraryYear === maxLibraryYear
+        ? String(minLibraryYear)
+        : `${minLibraryYear}-${maxLibraryYear}`
+      : "-";
+    setText("#musiclib-year-range", yearRangeLabel);
 
     const setStat = (baseId, value, detail) => {
       setText(`#${baseId}`, value || "-");
