@@ -52,9 +52,27 @@
       "headers": {
         "Location": "https://www.kapsiv.com/hide"
       }
+    },
+    {
+      "src": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "blog.kapsiv.com"
+        }
+      ],
+      "dest": "/blog.html"
     }
   ],
   "rewrites": [
+    {
+      "source": "/blog",
+      "destination": "/blog.html"
+    },
+    {
+      "source": "/blog/",
+      "destination": "/blog.html"
+    },
     {
       "source": "/hide",
       "destination": "/hide.html"
@@ -69,6 +87,11 @@
     }
   ],
   "redirects": [
+    {
+      "source": "/blog/index.html",
+      "destination": "/blog",
+      "permanent": true
+    },
     {
       "source": "/hide/index.html",
       "destination": "/hide",

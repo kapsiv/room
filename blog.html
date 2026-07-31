@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>cursiv</title>
+    <meta
+      name="description"
+      content="cursiv, a kapsiv blog."
+    />
+    <link rel="stylesheet" href="https://use.typekit.net/jvy3rde.css" />
+    <link rel="icon" type="image/png" href="./cursiv/assets/cursiv-logo.png" />
+    <link rel="stylesheet" href="./cursiv/styles.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <div class="hero-mark">
+        <img
+          class="hero-logo"
+          src="./cursiv/assets/cursiv-logo.png"
+          alt="cursiv logo"
+        />
+      </div>
+
+      <section class="hero-copy" aria-label="cursiv introduction">
+        <h1 class="hero-title" aria-label="cursiv">
+          <span id="typedWord" class="hero-title-word"></span><span class="hero-cursor" aria-hidden="true"></span>
+        </h1>
+        <p class="hero-subtitle">a kapsiv blog</p>
+      </section>
+    </main>
+
+    <script>
+      const target = "cursiv";
+      const typedWord = document.getElementById("typedWord");
+      let index = 0;
+
+      function typeNext() {
+        if (!typedWord || index >= target.length) return;
+        typedWord.textContent += target[index];
+        index += 1;
+        window.setTimeout(typeNext, index === target.length ? 120 : 105);
+      }
+
+      window.setTimeout(typeNext, 180);
+    </script>
+  </body>
+</html>
