@@ -1546,7 +1546,7 @@ backgroundAudio.preload = "auto";
 backgroundAudio.volume = 0.42;
 
 let audioUnlocked = false;
-let backgroundAudioMuted = false;
+let backgroundAudioMuted = initialRouteModalKey === "work";
 
 function updateSoundToggleButton() {
   if (!soundToggleButton) return;

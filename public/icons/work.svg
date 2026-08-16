@@ -1,3 +1,25 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" fill="none">
-  <path fill="#000" d="M335 176c0-33.14 26.86-60 60-60h210c33.14 0 60 26.86 60 60v82h92c52.47 0 95 42.53 95 95v333c0 52.47-42.53 95-95 95H243c-52.47 0-95-42.53-95-95V353c0-52.47 42.53-95 95-95h92v-82Zm90 0v82h150v-82H425Zm-182 172c-2.76 0-5 2.24-5 5v333c0 2.76 2.24 5 5 5h514c2.76 0 5-2.24 5-5V353c0-2.76-2.24-5-5-5H243Zm187 118h140c24.3 0 44 19.7 44 44v19h143c24.3 0 44 19.7 44 44s-19.7 44-44 44H614v19c0 24.3-19.7 44-44 44H430c-24.3 0-44-19.7-44-44v-19H243c-24.3 0-44-19.7-44-44s19.7-44 44-44h143v-19c0-24.3 19.7-44 44-44Zm44 88v58h52v-58h-52Z"/>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="projects" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
+  <defs>
+    <style>
+      .cls-1 {
+        stroke-width: 25px;
+      }
+
+      .cls-1, .cls-2 {
+        fill: none;
+        stroke: #4f4839;
+        stroke-miterlimit: 10;
+      }
+
+      .cls-2 {
+        stroke-width: 50px;
+      }
+    </style>
+  </defs>
+  <rect class="cls-2" x="97.37" y="181.59" width="308.7" height="202.06"/>
+  <rect class="cls-1" x="223.83" y="277.37" width="55.77" height="47.17"/>
+  <polyline class="cls-2" points="197.6 190.94 197.6 116.35 305.83 116.35 305.83 190.94"/>
+  <line class="cls-1" x1="93.94" y1="299.79" x2="220.42" y2="299.79"/>
+  <line class="cls-1" x1="279.29" y1="299.79" x2="405.77" y2="299.79"/>
 </svg>
