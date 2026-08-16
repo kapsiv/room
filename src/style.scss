@@ -1915,9 +1915,7 @@ b {
   padding: 16px;
   border: 2px solid rgba(78, 71, 56, 0.24);
   border-radius: 16px;
-  background:
-    radial-gradient(circle at top left, rgba(255, 255, 255, 0.45), transparent 48%),
-    linear-gradient(160deg, #f1ebe1 0%, #e3d7c7 100%);
+  background: #e6dccf;
   color: vars.$base-brown;
   text-decoration: none;
   transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
