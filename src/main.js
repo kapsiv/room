@@ -25,7 +25,10 @@ const LASTFM_API_KEY = "683650a829cee53959e8d505e8841726";
 const LASTFM_ENDPOINT = "https://ws.audioscrobbler.com/2.0/";
 const MOBILE_BREAKPOINT = 760;
 const MOBILE_VIEWPORT_INSET = 12;
-const MOBILE_LITE_LAUNCHER_IDS = ["reflectiv", "about", "logo", "faq"];
+const MOBILE_LITE_LAUNCHER_IDS = ["work", "reflectiv", "about", "logo", "faq"];
+const ROUTE_MODAL_MAP = {
+  "/work": "work",
+};
 const DATA_PIPELINE_HOVER_TARGET_IDS = [
   "actIV",
   "github_repo",
@@ -49,6 +52,17 @@ const DATA_PIPELINE_LINKS = {
   "last.fm": "https://www.last.fm/user/kapsiv",
   github_repo: "https://github.com/kapsiv/room",
 };
+
+function normalizePathname(pathname = window.location.pathname) {
+  const normalized = pathname.replace(/\/+$/u, "");
+  return normalized || "/";
+}
+
+const initialRouteModalKey = ROUTE_MODAL_MAP[normalizePathname()] || null;
+if (initialRouteModalKey === "work") {
+  document.title = "KAPSIV | work";
+}
+
 function parseDataPipelineTags(value) {
   return (value || "")
     .trim()
@@ -184,9 +198,11 @@ const fabManager = createFabManager({
     isLoading = false;
     if (selectedMobileExperienceMode === "lite") {
       renderMobileLiteShell();
+      showInitialRouteModal();
       return;
     }
     playIntroAnimation();
+    showInitialRouteModal();
   },
 });
 
@@ -234,6 +250,7 @@ const modals = {
   food: document.querySelector(".modal.food"),
   marimo: document.querySelector(".modal.marimo"),
   inventory: document.querySelector(".modal.inventory"),
+  work: document.querySelector(".modal.work"),
   genreDistribution: document.querySelector(".modal.genre-distribution"),
   albumsByYear: document.querySelector(".modal.albums-by-year"),
   cv: document.querySelector(".modal.cv"),
@@ -519,6 +536,20 @@ modalManager.init();
 initDataPipelinesDiagram();
 setupTooltipBounds();
 
+let initialRouteModalShown = false;
+
+function showInitialRouteModal() {
+  if (initialRouteModalShown || !initialRouteModalKey || typeof showModal !== "function") return;
+
+  const modal = modals[initialRouteModalKey];
+  if (!modal) return;
+
+  initialRouteModalShown = true;
+  window.setTimeout(() => {
+    showModal(modal);
+  }, 720);
+}
+
 document.querySelectorAll("[data-modal-target]").forEach((link) => {
   link.addEventListener("click", (e) => {
     e.preventDefault();
@@ -560,7 +591,7 @@ const INVENTORY_LABEL_OVERRIDES = {
 const INVENTORY_CATEGORY_DEFS = [
   { key: "K", label: "knowledge", items: ["book", "info", "logo", "libraryLookup", "faq"] },
   { key: "A", label: "art", items: ["guitar", "modelling", "projects", "designPhilosophy", "albums"] },
-  { key: "P", label: "profession", items: ["cv", "archive", "dataPipelines", "utilities", "vinaflow"] },
+  { key: "P", label: "profession", items: ["work", "cv", "archive", "dataPipelines", "utilities", "vinaflow"] },
   { key: "S", label: "social", items: ["blu", "calendar", "gallery", "links"] },
   { key: "I", label: "introspection", items: ["about", "nowplaying", "reflectiv"] },
   { key: "V", label: "vitality", items: ["activ", "inactiv", "food", "marimo"] },
