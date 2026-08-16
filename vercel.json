@@ -84,6 +84,14 @@
     {
       "source": "/albums",
       "destination": "/albums/index.html"
+    },
+    {
+      "source": "/work",
+      "destination": "/"
+    },
+    {
+      "source": "/work/",
+      "destination": "/"
     }
   ],
   "redirects": [
