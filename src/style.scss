@@ -2879,24 +2879,43 @@ b {
 }
 
 .reflectiv-ranking-filter {
+  position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  flex: 0 0 auto;
 }
 
-.reflectiv-ranking-filter-label {
+.reflectiv-ranking-filter::after {
+  content: "▾";
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: vars.$base-brown;
   font-size: 12px;
-  color: rgba(78, 71, 56, 0.82);
-  text-transform: lowercase;
+  line-height: 1;
+  pointer-events: none;
 }
 
 .reflectiv-ranking-filter-select {
-  border: 1px solid rgba(78, 71, 56, 0.35);
-  border-radius: 6px;
-  padding: 4px 6px;
+  appearance: none;
+  -webkit-appearance: none;
+  border: 2px solid vars.$base-brown;
+  border-radius: 8px;
+  padding: 5px 28px 5px 10px;
   background: #f5f0e8;
-  color: #4e4738;
+  color: vars.$base-brown;
   font-size: 12px;
+  font-weight: 700;
+  line-height: 1.2;
+  cursor: pointer;
+  box-shadow: none;
+}
+
+.reflectiv-ranking-filter-select:hover,
+.reflectiv-ranking-filter-select:focus-visible {
+  background: #ece5da;
+  outline: none;
 }
 
 .top-artists-scroll--tall {
@@ -3055,7 +3074,6 @@ b {
 }
 
 #scrobblesOverTime,
-#tagPie,
 #peakHours,
 #tagStream,
 #libraryAlbumsByYear,
@@ -3069,6 +3087,11 @@ b {
 #libraryDurationScatter {
   width: 100%;
   height: 220px;
+}
+
+#tagPie {
+  width: 100%;
+  height: 180px;
 }
 
 #libraryGenreAverageDurationChart {
