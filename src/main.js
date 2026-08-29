@@ -153,8 +153,9 @@ async function fetchNowPlayingTrack() {
   const album = track?.album?.["#text"] || "";
   const images = track?.image || [];
   const imageUrl = images.length ? images[images.length - 1]?.["#text"] || "" : "";
+  const isNowPlaying = track?.["@attr"]?.nowplaying === "true";
   if (!title || !artist) return null;
-  return { title, artist, album, imageUrl };
+  return { title, artist, album, imageUrl, isNowPlaying };
 }
 
 if (import.meta.env.PROD) {

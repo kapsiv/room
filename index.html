@@ -82,7 +82,7 @@
             <p>> aspiring designer and developer</p>
             <p>> based in london</p>
             <p class="now-playing-pill">
-              currently listening to:
+              <span class="now-playing-label">currently listening to:</span>
               <span class="now-playing-wrap">
                 <span class="now-playing-inner">
                   <span class="now-playing-text"> loading...</span>
@@ -308,7 +308,22 @@
 
           <section class="chart-row">
             <div class="chart-section half">
-              <h3 class="chart-title">top artists</h3>
+              <div class="chart-title-row chart-title-row--split">
+                <h3 class="chart-title">top artists</h3>
+                <div class="reflectiv-ranking-filter">
+                  <label for="topArtistsRangeFilter" class="reflectiv-ranking-filter-label">range</label>
+                  <select
+                    id="topArtistsRangeFilter"
+                    class="reflectiv-ranking-filter-select"
+                    data-reflectiv-ranking-range="artists"
+                  >
+                    <option value="all">all time</option>
+                    <option value="month">past month</option>
+                    <option value="quarter">past 3 months</option>
+                    <option value="year">past year</option>
+                  </select>
+                </div>
+              </div>
               <div class="top-artists-columns">
                 <span>artist</span>
                 <span>scrobbles</span>
@@ -333,6 +348,69 @@
                 </span>
               </div>
               <canvas id="tagPie"></canvas>
+            </div>
+          </section>
+
+          <section class="chart-row">
+            <div class="chart-section half">
+              <div class="chart-title-row chart-title-row--split">
+                <h3 class="chart-title">top songs</h3>
+                <div class="reflectiv-ranking-filter">
+                  <label for="topSongsRangeFilter" class="reflectiv-ranking-filter-label">range</label>
+                  <select
+                    id="topSongsRangeFilter"
+                    class="reflectiv-ranking-filter-select"
+                    data-reflectiv-ranking-range="songs"
+                  >
+                    <option value="all">all time</option>
+                    <option value="month">past month</option>
+                    <option value="quarter">past 3 months</option>
+                    <option value="year">past year</option>
+                  </select>
+                </div>
+              </div>
+              <div class="top-artists-columns">
+                <span>song</span>
+                <span>scrobbles</span>
+              </div>
+              <div class="top-artists-scroll">
+                <ul id="topSongsList" class="top-artists-list">
+                  <li>
+                    <span class="artist-name">loading...</span>
+                    <span class="artist-count">-</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div class="chart-section half">
+              <div class="chart-title-row chart-title-row--split">
+                <h3 class="chart-title">top albums</h3>
+                <div class="reflectiv-ranking-filter">
+                  <label for="topAlbumsRangeFilter" class="reflectiv-ranking-filter-label">range</label>
+                  <select
+                    id="topAlbumsRangeFilter"
+                    class="reflectiv-ranking-filter-select"
+                    data-reflectiv-ranking-range="albums"
+                  >
+                    <option value="all">all time</option>
+                    <option value="month">past month</option>
+                    <option value="quarter">past 3 months</option>
+                    <option value="year">past year</option>
+                  </select>
+                </div>
+              </div>
+              <div class="top-artists-columns">
+                <span>album</span>
+                <span>scrobbles</span>
+              </div>
+              <div class="top-artists-scroll">
+                <ul id="topAlbumsList" class="top-artists-list">
+                  <li>
+                    <span class="artist-name">loading...</span>
+                    <span class="artist-count">-</span>
+                  </li>
+                </ul>
+              </div>
             </div>
           </section>
 

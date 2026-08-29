@@ -2878,6 +2878,27 @@ b {
   overflow-y: auto;
 }
 
+.reflectiv-ranking-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.reflectiv-ranking-filter-label {
+  font-size: 12px;
+  color: rgba(78, 71, 56, 0.82);
+  text-transform: lowercase;
+}
+
+.reflectiv-ranking-filter-select {
+  border: 1px solid rgba(78, 71, 56, 0.35);
+  border-radius: 6px;
+  padding: 4px 6px;
+  background: #f5f0e8;
+  color: #4e4738;
+  font-size: 12px;
+}
+
 .top-artists-scroll--tall {
   max-height: 300px;
 }
