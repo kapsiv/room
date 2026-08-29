@@ -273,6 +273,9 @@ const normalizedGenreUmbrellaMap = Object.fromEntries(
 export function createReflectivFeature({ gsap, modals, getShowModal }) {
 const reflectivState = {
     range: "all",
+    topArtistsRange: "all",
+    topSongsRange: "all",
+    topAlbumsRange: "all",
     libraryMetric: "songs",
     libraryYearGenreFilter: "all",
     libraryCountryGenreFilter: "all",
@@ -383,9 +386,10 @@ function isMobileLayout() {
     const album = track?.album?.["#text"] || "";
     const images = track?.image || [];
     const imageUrl = images.length ? images[images.length - 1]?.["#text"] || "" : "";
+    const isNowPlaying = track?.["@attr"]?.nowplaying === "true";
 
     if (!title || !artist) return null;
-    return { title, artist, album, imageUrl };
+    return { title, artist, album, imageUrl, isNowPlaying };
   }
 
   async function fetchRecentTracks(limit = 11) {
@@ -404,6 +408,7 @@ function isMobileLayout() {
           artist: track?.artist?.["#text"] || "",
           album: track?.album?.["#text"] || "",
           imageUrl: images.length ? images[images.length - 1]?.["#text"] || "" : "",
+          isNowPlaying: track?.["@attr"]?.nowplaying === "true",
         };
       })
       .filter((t) => t.title && t.artist);
@@ -618,6 +623,7 @@ function isMobileLayout() {
 
     const cutoff = new Date(latestDate);
     if (range === "year") cutoff.setUTCFullYear(cutoff.getUTCFullYear() - 1);
+    else if (range === "quarter") cutoff.setUTCMonth(cutoff.getUTCMonth() - 3);
     else if (range === "month") cutoff.setUTCMonth(cutoff.getUTCMonth() - 1);
     else if (range === "week") cutoff.setUTCDate(cutoff.getUTCDate() - 7);
     else return null;
@@ -2216,9 +2222,13 @@ function isMobileLayout() {
   }
 
   function setNowPlayingPill(modal, track) {
+    const labelEl = modal.querySelector(".now-playing-label");
     const textEls = modal.querySelectorAll(".now-playing-text");
     const innerEl = modal.querySelector(".now-playing-inner");
     if (!textEls.length || !innerEl) return;
+    if (labelEl) {
+      labelEl.textContent = track?.isNowPlaying ? "currently listening to:" : "last listened to:";
+    }
     const value = track
       ? ` ${String(track.title).toLowerCase()} - ${String(track.artist).toLowerCase()}`
       : " not sure right now";
@@ -2342,15 +2352,83 @@ function isMobileLayout() {
   }
 
   function renderReflectivTopArtists(modal) {
-    const list = modal.querySelector("#topArtistsList");
+    const scrobbles = getScrobblesForRange(reflectivState.topArtistsRange);
+    const items = sortRankingEntries(
+      [...countBy(scrobbles, (s) => s.artist).entries()]
+        .map(([name, count]) => ({ name, count })),
+    );
+    renderReflectivRankingList(modal, "#topArtistsList", items, "no artists found");
+  }
+
+  function sortRankingEntries(entries) {
+    return entries.sort((a, b) => (
+      b.count - a.count ||
+      a.name.localeCompare(b.name, undefined, { sensitivity: "base" })
+    ));
+  }
+
+  function buildRankedScrobbleEntries(scrobbles, type) {
+    const entries = new Map();
+
+    scrobbles.forEach((scrobble) => {
+      const artist = String(scrobble?.artist || "").trim();
+      const track = String(scrobble?.track || "").trim();
+      const album = String(scrobble?.album || "").trim();
+
+      if (type === "songs") {
+        const songKey = `${normalizeKey(artist)}::${normalizeKey(track)}`;
+        if (!songKey || !track || !artist) return;
+        if (!entries.has(songKey)) entries.set(songKey, { name: `${track} - ${artist}`, count: 0 });
+        entries.get(songKey).count += 1;
+        return;
+      }
+
+      const albumKey = `${normalizeKey(artist)}::${normalizeKey(album)}`;
+      if (!albumKey || !album || !artist) return;
+      if (!entries.has(albumKey)) entries.set(albumKey, { name: `${album} - ${artist}`, count: 0 });
+      entries.get(albumKey).count += 1;
+    });
+
+    return sortRankingEntries([...entries.values()]);
+  }
+
+  function renderReflectivRankingList(modal, selector, items, emptyLabel) {
+    const list = modal.querySelector(selector);
     if (!list) return;
-    const top = reflectivState.topArtists.slice(0, 30);
+
+    const top = items.slice(0, 30);
     list.innerHTML = "";
-    top.forEach((a, idx) => {
+
+    if (!top.length) {
       const li = document.createElement("li");
-      li.innerHTML = `<span class="artist-name">${idx + 1}. ${a.name}</span><span class="artist-count">${a.count.toLocaleString()}</span>`;
+      li.innerHTML = `<span class="artist-name">${emptyLabel}</span><span class="artist-count">-</span>`;
+      list.appendChild(li);
+      return;
+    }
+
+    top.forEach((item, idx) => {
+      const li = document.createElement("li");
+      li.innerHTML = `<span class="artist-name">${idx + 1}. ${item.name}</span><span class="artist-count">${item.count.toLocaleString()}</span>`;
       list.appendChild(li);
     });
+  }
+
+  function renderReflectivSongsAndAlbums(modal) {
+    const songScrobbles = getScrobblesForRange(reflectivState.topSongsRange);
+    const albumScrobbles = getScrobblesForRange(reflectivState.topAlbumsRange);
+
+    renderReflectivRankingList(
+      modal,
+      "#topSongsList",
+      buildRankedScrobbleEntries(songScrobbles, "songs"),
+      "no songs found",
+    );
+    renderReflectivRankingList(
+      modal,
+      "#topAlbumsList",
+      buildRankedScrobbleEntries(albumScrobbles, "albums"),
+      "no albums found",
+    );
   }
 
   function renderReflectivCharts(modal) {
@@ -3134,6 +3212,22 @@ function isMobileLayout() {
       });
     });
 
+    const rankingRangeSelects = modal.querySelectorAll("[data-reflectiv-ranking-range]");
+    rankingRangeSelects.forEach((select) => {
+      select.addEventListener("change", () => {
+        const type = select.getAttribute("data-reflectiv-ranking-range");
+        const next = select.value || "all";
+        if (type === "artists") reflectivState.topArtistsRange = next;
+        if (type === "songs") reflectivState.topSongsRange = next;
+        if (type === "albums") reflectivState.topAlbumsRange = next;
+        if (type === "artists") {
+          renderReflectivTopArtists(modal);
+          return;
+        }
+        renderReflectivSongsAndAlbums(modal);
+      });
+    });
+
     const libraryBtn = modal.querySelector(".reflectiv-musiclib-button");
     if (libraryBtn) {
       libraryBtn.addEventListener("click", () => {
@@ -3270,8 +3364,16 @@ function isMobileLayout() {
         .sort((a, b) => b.count - a.count)
         .slice(0, 20);
 
+      const topArtistsRangeFilter = modal.querySelector("#topArtistsRangeFilter");
+      const topSongsRangeFilter = modal.querySelector("#topSongsRangeFilter");
+      const topAlbumsRangeFilter = modal.querySelector("#topAlbumsRangeFilter");
+      if (topArtistsRangeFilter) topArtistsRangeFilter.value = reflectivState.topArtistsRange;
+      if (topSongsRangeFilter) topSongsRangeFilter.value = reflectivState.topSongsRange;
+      if (topAlbumsRangeFilter) topAlbumsRangeFilter.value = reflectivState.topAlbumsRange;
+
       updateReflectivFacts(modal);
       renderReflectivTopArtists(modal);
+      renderReflectivSongsAndAlbums(modal);
       renderReflectivCharts(modal);
       renderMusicLibraryPanel(modal, collection);
     } catch (err) {
