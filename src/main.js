@@ -1536,7 +1536,7 @@ const stringAudioByIndex = {
   3: new Audio("/audio/guitar-string-3.mp3"),
   4: new Audio("/audio/guitar-string-4.mp3"),
 };
-const backgroundAudio = new Audio("/audio/bensound-rainyday.mp3");
+const backgroundAudio = new Audio("/audio/elevator-music.mp3");
 
 Object.values(stringAudioByIndex).forEach((a) => {
   a.preload = "auto";
