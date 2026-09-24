@@ -3,6 +3,16 @@ import CalendarLabel from "cal-heatmap/plugins/CalendarLabel";
 import "cal-heatmap/cal-heatmap.css";
 
 const WEEKDAY_LABELS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+const ACTIV_EXCLUDED_DATE_KEYS = new Set([
+  "2026-09-07",
+  "2026-09-08",
+  "2026-09-09",
+  "2026-09-10",
+  "2026-09-20",
+  "2026-09-21",
+  "2026-09-22",
+  "2026-09-23",
+]);
 
 function normalizeKey(value) {
   return String(value || "")
@@ -124,6 +134,12 @@ function startOfUtcDay(date) {
   return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
 }
 
+function startOfUtcWeek(date) {
+  const day = startOfUtcDay(date);
+  const daysSinceMonday = (day.getUTCDay() + 6) % 7;
+  return addUtcDays(day, -daysSinceMonday);
+}
+
 function getLondonDateParts(date = new Date()) {
   const parts = new Intl.DateTimeFormat("en-GB", {
     timeZone: "Europe/London",
@@ -213,11 +229,6 @@ function formatMinutesAsDuration(totalMinutes) {
   if (hours && minutes) return `${hours}h ${minutes}m`;
   if (hours) return `${hours}h`;
   return `${minutes}m`;
-}
-
-function getDayDifferenceInclusive(start, end) {
-  const ms = startOfUtcDay(end).getTime() - startOfUtcDay(start).getTime();
-  return Math.max(1, Math.floor(ms / 86400000) + 1);
 }
 
 function getYearStart(year) {
@@ -328,8 +339,17 @@ function buildYearStats(visits) {
   }
 
   const calculationStart = addUtcDays(yearStart, 7);
+  const excludedWeekStarts = new Set(
+    [...ACTIV_EXCLUDED_DATE_KEYS]
+      .filter((dateKey) => dateKey.startsWith(`${focusYear}-`))
+      .map((dateKey) => startOfUtcWeek(new Date(`${dateKey}T00:00:00Z`)).getTime()),
+  );
+  const isExcludedWeek = (date) => excludedWeekStarts.has(startOfUtcWeek(date).getTime());
   const attendanceDaysAfterOpeningWeek = new Set(
-    [...attendanceDays].filter((dateKey) => new Date(`${dateKey}T00:00:00Z`).getTime() >= calculationStart.getTime()),
+    [...attendanceDays].filter((dateKey) => {
+      const date = new Date(`${dateKey}T00:00:00Z`);
+      return date.getTime() >= calculationStart.getTime() && !isExcludedWeek(date);
+    }),
   );
   const weekdayCounts = new Map(WEEKDAY_LABELS.map((_, index) => [index, 0]));
   attendanceDaysAfterOpeningWeek.forEach((dateKey) => {
@@ -337,16 +357,15 @@ function buildYearStats(visits) {
     weekdayCounts.set(weekdayIndex, (weekdayCounts.get(weekdayIndex) || 0) + 1);
   });
   const weekdayTotals = new Map(WEEKDAY_LABELS.map((_, index) => [index, 0]));
+  let totalDaysTracked = 0;
   if (coverageEnd.getTime() >= calculationStart.getTime()) {
     for (let cursor = calculationStart; cursor.getTime() <= coverageEnd.getTime(); cursor = addUtcDays(cursor, 1)) {
+      if (isExcludedWeek(cursor)) continue;
       const weekdayIndex = (cursor.getUTCDay() + 6) % 7;
       weekdayTotals.set(weekdayIndex, (weekdayTotals.get(weekdayIndex) || 0) + 1);
+      totalDaysTracked += 1;
     }
   }
-  const totalDaysTracked =
-    coverageEnd.getTime() >= calculationStart.getTime()
-      ? getDayDifferenceInclusive(calculationStart, coverageEnd)
-      : 0;
   const attendanceDayCount = attendanceDaysAfterOpeningWeek.size;
   const averageDaysPerWeek = totalDaysTracked ? attendanceDayCount / (totalDaysTracked / 7) : 0;
   const averageEntryMinutes = yearVisits.length ? totalEntryMinutes / yearVisits.length : NaN;
@@ -356,7 +375,18 @@ function buildYearStats(visits) {
     0,
   );
   const averageDurationMinutes = yearVisits.length ? totalDurationMinutes / yearVisits.length : NaN;
-  const averageWeeklyDurationMinutes = totalDaysTracked ? totalDurationMinutes / (totalDaysTracked / 7) : NaN;
+  const weeklyDurationMinutes = yearVisits
+    .filter(
+      (visit) =>
+        visit.enteredAt.getTime() >= calculationStart.getTime() &&
+        visit.enteredAt.getTime() <= coverageEnd.getTime() + 86400000 - 1 &&
+        !isExcludedWeek(visit.enteredAt),
+    )
+    .reduce(
+      (sum, visit) => sum + (Number.isFinite(visit.durationMinutes) ? visit.durationMinutes : 0),
+      0,
+    );
+  const averageWeeklyDurationMinutes = totalDaysTracked ? weeklyDurationMinutes / (totalDaysTracked / 7) : NaN;
 
   return {
     focusYear,
@@ -372,6 +402,7 @@ function buildYearStats(visits) {
     averageEntryMinutes,
     attendanceRate,
     totalDurationMinutes,
+    weeklyDurationMinutes,
     averageDurationMinutes,
     averageWeeklyDurationMinutes,
   };
@@ -477,11 +508,21 @@ function renderFactCard(modal, selector, value, detail = "") {
 }
 
 function buildAttendanceData(stats) {
-  return [...stats.attendanceDays]
-    .sort()
-    .map((dateKey) => ({
+  const dayValues = new Map(
+    [...ACTIV_EXCLUDED_DATE_KEYS]
+      .filter((dateKey) => dateKey.startsWith(`${stats.focusYear}-`))
+      .map((dateKey) => [dateKey, 1]),
+  );
+
+  stats.attendanceDays.forEach((dateKey) => {
+    dayValues.set(dateKey, 2);
+  });
+
+  return [...dayValues.entries()]
+    .sort(([dateA], [dateB]) => dateA.localeCompare(dateB))
+    .map(([dateKey, value]) => ({
       date: new Date(`${dateKey}T00:00:00Z`).getTime(),
-      value: 1,
+      value,
     }));
 }
 
@@ -534,8 +575,8 @@ async function renderAttendanceHeatmap(modal, stats, heatmapState) {
       scale: {
         color: {
           type: "threshold",
-          range: ["#e5ddd0", "#4e4738"],
-          domain: [1],
+          range: ["#e5ddd0", "#9d9589", "#4e4738"],
+          domain: [1, 2],
         },
       },
       animationDuration: 0,
@@ -850,7 +891,7 @@ async function renderModal(modal, visits, scrobbles, collection, heatmapState) {
     modal,
     "#activFactWeeklyDuration",
     formatMinutesAsDuration(stats.averageWeeklyDurationMinutes),
-    `${formatMinutesAsDuration(stats.totalDurationMinutes)} total in ${stats.focusYear}`,
+    `${formatMinutesAsDuration(stats.weeklyDurationMinutes)} counted in ${stats.focusYear}`,
   );
 }
 
