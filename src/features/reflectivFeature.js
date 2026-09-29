@@ -1511,6 +1511,117 @@ function isMobileLayout() {
     }
   }
 
+  function drawRuntimeDistributionLines(canvas, runtimeSeries, options = {}) {
+    const ctx = canvas?.getContext?.("2d");
+    if (!ctx) return;
+    const width = canvas.clientWidth || 720;
+    const height = canvas.clientHeight || 240;
+    canvas.width = width;
+    canvas.height = height;
+    ctx.clearRect(0, 0, width, height);
+
+    const {
+      binSize = 5 * 60,
+      maxDurationCap = 200 * 60,
+      tickStep = 30 * 60,
+      emptyText = "No LP or EP runtime data available",
+    } = options;
+    const series = runtimeSeries
+      .map(({ label, color, durations }) => {
+        const countsByBin = new Map();
+        durations.forEach((duration) => {
+          if (duration < 0 || duration > maxDurationCap) return;
+          const bin = Math.floor(duration / binSize) * binSize;
+          countsByBin.set(bin, (countsByBin.get(bin) || 0) + 1);
+        });
+        const bins = [];
+        for (let bin = 0; bin <= maxDurationCap; bin += binSize) {
+          bins.push({ duration: bin, count: countsByBin.get(bin) || 0 });
+        }
+        return { label, color, bins, hasValues: countsByBin.size > 0 };
+      })
+      .filter(({ hasValues }) => hasValues);
+
+    if (!series.length) {
+      ctx.fillStyle = "#4e4738";
+      ctx.font = "14px 'Ubuntu Mono', monospace";
+      ctx.fillText(emptyText, 12, 20);
+      return;
+    }
+
+    const maxCount = Math.max(...series.flatMap(({ bins }) => bins.map(({ count }) => count)), 1);
+    const pad = { l: 40, r: 12, t: 30, b: 36 };
+    const usableW = width - pad.l - pad.r;
+    const usableH = height - pad.t - pad.b;
+    const xForDuration = (duration) => pad.l + (duration / maxDurationCap) * usableW;
+    const yForCount = (count) => pad.t + usableH - (count / maxCount) * usableH;
+
+    ctx.strokeStyle = "rgba(78,71,56,0.2)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(pad.l, pad.t + usableH);
+    ctx.lineTo(width - pad.r, pad.t + usableH);
+    ctx.stroke();
+
+    const legendItemWidth = Math.min(76, Math.max(58, (width - pad.l - pad.r) / series.length));
+    series.forEach(({ label, color }, index) => {
+      const x = pad.l + index * legendItemWidth;
+      const y = 12;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + 14, y);
+      ctx.stroke();
+      ctx.fillStyle = "rgba(78,71,56,0.9)";
+      ctx.font = "10px 'Ubuntu Mono', monospace";
+      ctx.textAlign = "left";
+      ctx.textBaseline = "middle";
+      ctx.fillText(label, x + 19, y);
+    });
+
+    series.forEach(({ bins, color }) => {
+      const points = bins.map(({ duration, count }) => ({
+        x: xForDuration(duration),
+        y: yForCount(count),
+      }));
+      ctx.strokeStyle = color;
+      ctx.globalAlpha = 0.88;
+      ctx.lineWidth = 2;
+      ctx.lineJoin = "round";
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.moveTo(points[0].x, points[0].y);
+      for (let i = 0; i < points.length - 1; i += 1) {
+        const p0 = points[i - 1] || points[i];
+        const p1 = points[i];
+        const p2 = points[i + 1];
+        const p3 = points[i + 2] || p2;
+        const cp1x = p1.x + ((p2.x - p0.x) / 6) * 0.92;
+        const cp1y = p1.y + ((p2.y - p0.y) / 6) * 0.92;
+        const cp2x = p2.x - ((p3.x - p1.x) / 6) * 0.92;
+        const cp2y = p2.y - ((p3.y - p1.y) / 6) * 0.92;
+        ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
+      }
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    });
+
+    ctx.font = "11px 'Ubuntu Mono', monospace";
+    ctx.textBaseline = "top";
+    ctx.fillStyle = "rgba(78,71,56,0.85)";
+    ctx.strokeStyle = "rgba(78,71,56,0.14)";
+    for (let seconds = 0; seconds <= maxDurationCap; seconds += Math.max(binSize, tickStep)) {
+      const x = xForDuration(seconds);
+      ctx.beginPath();
+      ctx.moveTo(x, pad.t + usableH);
+      ctx.lineTo(x, pad.t + usableH + 4);
+      ctx.stroke();
+      ctx.textAlign = x <= pad.l + 20 ? "left" : (x >= width - pad.r - 20 ? "right" : "center");
+      ctx.fillText(formatDurationAxisLabel(seconds, { allowHours: true }), x, pad.t + usableH + 8);
+    }
+  }
+
   function formatDurationAxisLabel(seconds, options = {}) {
     const { allowHours = false } = options;
     const totalSeconds = Math.max(0, Math.round(Number(seconds) || 0));
@@ -3181,21 +3292,13 @@ function isMobileLayout() {
     drawGenreUmbrellaPie(modal.querySelector("#libraryFileTypePie"), fileTypeCounts);
     drawGenreUmbrellaPie(modal.querySelector("#libraryRecordingTypePie"), recordingTypeCounts);
     drawGenreUmbrellaPie(modal.querySelector("#libraryFormatPie"), formatCounts);
-    drawDurationDistributionLine(modal.querySelector("#libraryLpDurationDistribution"), lpRuntimeValues, {
+    drawRuntimeDistributionLines(modal.querySelector("#libraryRuntimeDistribution"), [
+      { label: "LP", color: "hsl(34 38% 38%)", durations: lpRuntimeValues },
+      { label: "EP", color: "hsl(76 28% 38%)", durations: epRuntimeValues },
+    ], {
       binSize: 5 * 60,
       maxDurationCap: 200 * 60,
-      emptyText: "No LP runtime data available",
-      peakCountLabel: "albums",
-      allowHours: true,
       tickStep: 30 * 60,
-    });
-    drawDurationDistributionLine(modal.querySelector("#libraryEpDurationDistribution"), epRuntimeValues, {
-      binSize: 2 * 60,
-      maxDurationCap: 60 * 60,
-      emptyText: "No EP runtime data available",
-      peakCountLabel: "albums",
-      allowHours: true,
-      tickStep: 10 * 60,
     });
     drawDurationDistributionLine(modal.querySelector("#libraryDurationScatter"), durationValues);
     drawAverageSongLengthByGenreChart(modal.querySelector("#libraryGenreAverageDurationChart"), averageSongLengthByUmbrella);
