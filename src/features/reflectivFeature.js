@@ -249,6 +249,8 @@ function parseDurationToSeconds(value) {
   }
   if (parts.length === 3) {
     const [h, m, s] = parts;
+    // Some long tracks were exported as MM:SS:00 rather than H:MM:SS.
+    if (h >= 24 && m < 60 && s === 0) return h * 60 + m;
     return h * 3600 + m * 60 + s;
   }
   return null;
@@ -1545,6 +1547,16 @@ function isMobileLayout() {
     const totalSeconds = Math.max(0, Math.round(Number(seconds) || 0));
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
+    if (hours > 0) return `${hours}h ${minutes}m`;
+    return `${minutes}m`;
+  }
+
+  function formatDurationDaysHoursMinutesLabel(seconds) {
+    const totalSeconds = Math.max(0, Math.round(Number(seconds) || 0));
+    const days = Math.floor(totalSeconds / 86400);
+    const hours = Math.floor((totalSeconds % 86400) / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    if (days > 0) return `${days}d ${hours}h ${minutes}m`;
     if (hours > 0) return `${hours}h ${minutes}m`;
     return `${minutes}m`;
   }
@@ -2959,7 +2971,7 @@ function isMobileLayout() {
     setText("#musiclib-total-songs", rows.length.toLocaleString());
     setText("#musiclib-total-artists", artists.size.toLocaleString());
     setText("#musiclib-total-genres", genres.size.toLocaleString());
-    setText("#musiclib-total-duration", formatDurationHoursMinutesLabel(totalDurationSeconds));
+    setText("#musiclib-total-duration", formatDurationDaysHoursMinutesLabel(totalDurationSeconds));
 
     const libraryYears = [...albumYearByKey.values()]
       .map((year) => Number(year))
